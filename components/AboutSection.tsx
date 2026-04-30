@@ -28,7 +28,7 @@ export default function AboutSection() {
           viewport={{ once: true }}
         >
           <h2 className="text-5xl font-poppins font-bold mb-6">Über <span className="text-roma-red">Uns</span></h2>
-          <p className="text-lg text-gray-600 leading-relaxed mb-8">{text[lang]}</p>
+          <p className="text-lg text-gray-600 leading-relaxed mb-8">{text}</p>
           
           <div className="grid grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-roma-red">
