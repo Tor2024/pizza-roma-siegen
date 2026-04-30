@@ -55,7 +55,7 @@ export default function Header() {
               onClick={() => setLang('de')}
               className={`px-3 py-1 rounded-full transition-all ${lang === 'de' ? 'bg-roma-red text-white' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'}`}
               suppressHydrationWarning
-            >DE</button>
+            >GERMAN</button>
             <button 
               onClick={() => setLang('ru')}
               className={`px-3 py-1 rounded-full transition-all ${lang === 'ru' ? 'bg-roma-red text-white' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'}`}
