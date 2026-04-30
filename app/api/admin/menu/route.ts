@@ -31,7 +31,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'GitHub config missing' }, { status: 500 });
     }
 
-    // 1. Получаем текущий SHA файла
+    // 1. Пробуем получить текущий SHA файла (если файл существует)
+    let sha: string | undefined;
     const getResponse = await fetch(
       `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`,
       {
@@ -42,18 +43,25 @@ export async function POST(req: Request) {
       }
     );
 
-    if (!getResponse.ok) {
-      const error = await getResponse.text();
-      return NextResponse.json({ error: `GitHub API error: ${error}` }, { status: 500 });
+    if (getResponse.ok) {
+      const currentFile = await getResponse.json();
+      sha = currentFile.sha;
     }
-
-    const currentFile = await getResponse.json();
-    const sha = currentFile.sha;
+    // Если файл не найден (404) - создаем новый без SHA
 
     // 2. Кодируем новые данные в Base64
     const content = Buffer.from(JSON.stringify(newMenuData, null, 2)).toString('base64');
 
-    // 3. Делаем коммит
+    // 3. Делаем коммит (создаем или обновляем)
+    const requestBody: any = {
+      message: 'Update menu from Admin Panel',
+      content: content,
+      branch: 'main'
+    };
+    if (sha) {
+      requestBody.sha = sha;
+    }
+
     const updateResponse = await fetch(
       `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`,
       {
@@ -63,12 +71,7 @@ export async function POST(req: Request) {
           'Accept': 'application/vnd.github.v3+json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          message: 'Update menu from Admin Panel',
-          content: content,
-          sha: sha,
-          branch: 'main'
-        })
+        body: JSON.stringify(requestBody)
       }
     );
 
