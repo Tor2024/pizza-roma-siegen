@@ -212,33 +212,105 @@ export default function AdminDashboard() {
     });
   };
 
+  // Update menu item
+  const updateItem = (categoryKey: string, itemIndex: number, field: string, value: any) => {
+    const newMenuData = { ...menuData };
+    const item = newMenuData.categories[categoryKey].items[itemIndex];
+    
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.');
+      item[parent] = { ...item[parent], [child]: value };
+    } else {
+      item[field] = value;
+    }
+    
+    setMenuData(newMenuData);
+  };
+
+  // Update topping
+  const updateTopping = (categoryKey: string, itemIndex: number, toppingIndex: number, field: 'de' | 'ru' | 'price', value: any) => {
+    const newMenuData = { ...menuData };
+    const item = newMenuData.categories[categoryKey].items[itemIndex];
+    if (!item.toppings) item.toppings = [];
+    
+    if (field === 'price') {
+      item.toppings[toppingIndex].price = parseFloat(value);
+    } else {
+      item.toppings[toppingIndex].name[field] = value;
+    }
+    
+    setMenuData(newMenuData);
+  };
+
+  // Add new item
+  const addItem = (categoryKey: string) => {
+    const newMenuData = { ...menuData };
+    newMenuData.categories[categoryKey].items.push({
+      id: `new_${Date.now()}`,
+      name: { de: 'Neues Item', ru: 'Новое блюдо' },
+      description: { de: '', ru: '' },
+      price: 0,
+      image: '/images/placeholder.webp',
+      toppings: []
+    });
+    setMenuData(newMenuData);
+  };
+
+  // Delete item
+  const deleteItem = (categoryKey: string, itemIndex: number) => {
+    if (confirm('Удалить этот пункт?')) {
+      const newMenuData = { ...menuData };
+      newMenuData.categories[categoryKey].items.splice(itemIndex, 1);
+      setMenuData(newMenuData);
+    }
+  };
+
+  // Add topping
+  const addTopping = (categoryKey: string, itemIndex: number) => {
+    const newMenuData = { ...menuData };
+    const item = newMenuData.categories[categoryKey].items[itemIndex];
+    if (!item.toppings) item.toppings = [];
+    item.toppings.push({ name: { de: 'Extra', ru: 'Добавка' }, price: 1 });
+    setMenuData(newMenuData);
+  };
+
+  // Remove topping
+  const removeTopping = (categoryKey: string, itemIndex: number, toppingIndex: number) => {
+    const newMenuData = { ...menuData };
+    newMenuData.categories[categoryKey].items[itemIndex].toppings.splice(toppingIndex, 1);
+    setMenuData(newMenuData);
+  };
+
   return (
-    <div className="min-h-screen bg-roma-dark text-white">
-      {/* Header */}
-      <header className="bg-black/30 border-b border-white/10 px-6 py-4">
+    <div className="min-h-screen bg-roma-dark text-white pt-0">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 px-6 py-3">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <span className="text-roma-red text-3xl">♛</span>
-            <h1 className="text-2xl font-poppins font-bold">Pizza Roma Admin</h1>
+            <span className="text-roma-red text-2xl">♛</span>
+            <h1 className="text-xl font-poppins font-bold">Pizza Roma Admin</h1>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
               onClick={fetchOrders}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
               title="Обновить"
             >
-              <FiRefreshCw className={loading ? 'animate-spin' : ''} />
+              <FiRefreshCw className={loading ? 'animate-spin' : ''} size={18} />
             </button>
             <button 
               onClick={logout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-roma-red hover:bg-red-700 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-roma-red hover:bg-red-700 transition-colors text-sm"
             >
-              <FiLogOut /> Выход
+              <FiLogOut size={16} /> Выход
             </button>
           </div>
         </div>
       </header>
+
+      {/* Spacer for fixed header */}
+      <div className="h-14"></div>
 
       {/* Tabs */}
       <div className="max-w-7xl mx-auto px-6 mt-6">
@@ -396,74 +468,121 @@ export default function AdminDashboard() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                           <label className="text-sm text-white/60">Мин. заказ (€)</label>
-                          <input
-                            type="number"
-                            value={menuData.settings.delivery.minOrder}
-                            onChange={(e) => setMenuData({
-                              ...menuData,
-                              settings: { ...menuData.settings, delivery: { ...menuData.settings.delivery, minOrder: parseFloat(e.target.value) } }
-                            })}
-                            className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1"
-                          />
+                          <input type="number" step="0.1" value={menuData.settings?.delivery?.minOrder || 15} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, minOrder: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                         <div>
                           <label className="text-sm text-white/60">Бесплатно от (€)</label>
-                          <input
-                            type="number"
-                            value={menuData.settings.delivery.freeDeliveryThreshold}
-                            onChange={(e) => setMenuData({
-                              ...menuData,
-                              settings: { ...menuData.settings, delivery: { ...menuData.settings.delivery, freeDeliveryThreshold: parseFloat(e.target.value) } }
-                            })}
-                            className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1"
-                          />
+                          <input type="number" step="0.1" value={menuData.settings?.delivery?.freeDeliveryThreshold || 25} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, freeDeliveryThreshold: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                         <div>
                           <label className="text-sm text-white/60">Стоимость доставки (€)</label>
-                          <input
-                            type="number"
-                            value={menuData.settings.delivery.deliveryFee}
-                            onChange={(e) => setMenuData({
-                              ...menuData,
-                              settings: { ...menuData.settings, delivery: { ...menuData.settings.delivery, deliveryFee: parseFloat(e.target.value) } }
-                            })}
-                            className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1"
-                          />
+                          <input type="number" step="0.1" value={menuData.settings?.delivery?.deliveryFee || 3.5} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, deliveryFee: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                         <div>
                           <label className="text-sm text-white/60">Время доставки</label>
-                          <input
-                            type="text"
-                            value={menuData.settings.delivery.estimatedTime}
-                            onChange={(e) => setMenuData({
-                              ...menuData,
-                              settings: { ...menuData.settings, delivery: { ...menuData.settings.delivery, estimatedTime: e.target.value } }
-                            })}
-                            className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1"
-                          />
+                          <input type="text" value={menuData.settings?.delivery?.estimatedTime || '25-35 Min'} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, estimatedTime: e.target.value}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                       </div>
                     </div>
 
-                    {/* Статистика */}
-                    <div className="bg-black/20 rounded-xl p-4">
-                      <h3 className="font-semibold mb-3">Статистика меню</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        {Object.entries(menuData.categories).map(([key, cat]: [string, any]) => (
-                          <div key={key} className="bg-white/5 rounded-lg p-3 text-center">
-                            <p className="text-2xl font-bold text-roma-gold">{cat.items.length}</p>
-                            <p className="text-sm text-white/60">{cat.name.ru}</p>
+                    {/* Редактор категорий */}
+                    <div className="space-y-4">
+                      {Object.entries(menuData.categories || {}).map(([catKey, category]: [string, any]) => (
+                        <div key={catKey} className="bg-black/20 rounded-xl p-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <div>
+                              <h3 className="font-bold text-lg">{category.name?.ru || catKey}</h3>
+                              <p className="text-sm text-white/60">{category.name?.de || catKey}</p>
+                            </div>
+                            <button onClick={() => addItem(catKey)} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold transition-colors">
+                              + Добавить блюдо
+                            </button>
                           </div>
-                        ))}
-                      </div>
+
+                          {/* Список блюд */}
+                          <div className="space-y-3">
+                            {category.items?.map((item: any, idx: number) => (
+                              <div key={item.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
+                                  {/* Название DE */}
+                                  <div>
+                                    <label className="text-xs text-white/50">Название (DE)</label>
+                                    <input type="text" value={item.name?.de || ''} onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                  </div>
+                                  {/* Название RU */}
+                                  <div>
+                                    <label className="text-xs text-white/50">Название (RU)</label>
+                                    <input type="text" value={item.name?.ru || ''} onChange={(e) => updateItem(catKey, idx, 'name.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                  </div>
+                                  {/* Цена */}
+                                  <div>
+                                    <label className="text-xs text-white/50">Цена (€)</label>
+                                    <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                  </div>
+                                  {/* Изображение */}
+                                  <div>
+                                    <label className="text-xs text-white/50">Изображение</label>
+                                    <input type="text" value={item.image || ''} onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="/images/pizza.webp" />
+                                  </div>
+                                </div>
+
+                                {/* Описание */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                  <div>
+                                    <label className="text-xs text-white/50">Описание (DE)</label>
+                                    <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-white/50">Описание (RU)</label>
+                                    <textarea value={item.description?.ru || ''} onChange={(e) => updateItem(catKey, idx, 'description.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
+                                  </div>
+                                </div>
+
+                                {/* Добавки / Топпинги */}
+                                <div className="mb-3">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <label className="text-xs text-white/50">Добавки</label>
+                                    <button onClick={() => addTopping(catKey, idx)} className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">+ Добавка</button>
+                                  </div>
+                                  {item.toppings?.map((topping: any, tIdx: number) => (
+                                    <div key={tIdx} className="flex gap-2 mb-1">
+                                      <input type="text" value={topping.name?.de || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'de', e.target.value)} className="flex-1 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="DE" />
+                                      <input type="text" value={topping.name?.ru || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'ru', e.target.value)} className="flex-1 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="RU" />
+                                      <input type="number" step="0.1" value={topping.price || 0} onChange={(e) => updateTopping(catKey, idx, tIdx, 'price', e.target.value)} className="w-20 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="€" />
+                                      <button onClick={() => removeTopping(catKey, idx, tIdx)} className="px-2 py-1 text-red-400 hover:text-red-300 text-xs">×</button>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* Размеры (для пиццы) */}
+                                {item.sizes && (
+                                  <div className="mb-3">
+                                    <label className="text-xs text-white/50">Размеры</label>
+                                    <div className="flex gap-2 mt-1">
+                                      {Object.entries(item.sizes).map(([size, price]: [string, any]) => (
+                                        <div key={size} className="bg-white/5 rounded px-3 py-1 text-xs">
+                                          {size}cm: {price}€
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Кнопки */}
+                                <div className="flex justify-end">
+                                  <button onClick={() => deleteItem(catKey, idx)} className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors">
+                                    Удалить блюдо
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
-                    <button
-                      onClick={saveMenu}
-                      disabled={menuLoading}
-                      className="w-full bg-roma-red hover:bg-red-700 disabled:bg-gray-600 py-4 rounded-xl font-bold transition-colors"
-                    >
-                      {menuLoading ? 'Сохранение...' : '💾 Сохранить изменения в GitHub'}
+                    <button onClick={saveMenu} disabled={menuLoading} className="w-full bg-roma-red hover:bg-red-700 disabled:bg-gray-600 py-4 rounded-xl font-bold transition-colors sticky bottom-4 shadow-lg">
+                      {menuLoading ? 'Сохранение...' : '💾 Сохранить все изменения в GitHub'}
                     </button>
                   </div>
                 ) : (
