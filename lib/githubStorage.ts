@@ -1,7 +1,7 @@
 // GitHub storage for orders - FREE persistent storage!
 // Orders are saved to public/data/orders.json in the GitHub repo
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN2;
 const REPO_OWNER = process.env.VERCEL_GIT_REPO_OWNER || 'tor2024'; 
 const REPO_NAME = process.env.VERCEL_GIT_REPO_SLUG || 'pizza-roma-siegen';
 const FILE_PATH = 'public/data/orders.json';
