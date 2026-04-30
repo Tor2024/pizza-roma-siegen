@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 
-export default function AdminLogin() {
+function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -128,5 +128,17 @@ export default function AdminLogin() {
         </p>
       </motion.div>
     </div>
+  );
+}
+
+export default function AdminLogin() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-roma-dark flex items-center justify-center">
+        <div className="text-white/60">Загрузка...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
