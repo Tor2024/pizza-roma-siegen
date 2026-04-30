@@ -50,14 +50,16 @@ export default function Header() {
         {/* Right side */}
         <div className="flex items-center gap-6">
           {/* Language switcher */}
-          <div className="hidden md:flex items-center bg-black/30 backdrop-blur-sm rounded-full p-1 text-xs font-bold border border-white/20">
+          <div className="hidden md:flex items-center bg-black/30 backdrop-blur-sm rounded-full p-1 text-xs font-bold border border-white/20" suppressHydrationWarning>
             <button 
               onClick={() => setLang('de')}
               className={`px-3 py-1 rounded-full transition-all ${lang === 'de' ? 'bg-roma-red text-white' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'}`}
+              suppressHydrationWarning
             >DE</button>
             <button 
               onClick={() => setLang('ru')}
               className={`px-3 py-1 rounded-full transition-all ${lang === 'ru' ? 'bg-roma-red text-white' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'}`}
+              suppressHydrationWarning
             >RU</button>
           </div>
 
