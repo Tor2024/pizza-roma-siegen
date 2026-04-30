@@ -265,7 +265,7 @@ export default function AdminDashboard() {
     const newMenuData = { ...menuData };
     const item = newMenuData.categories[categoryKey].items[itemIndex];
     if (!item.toppings) item.toppings = [];
-    item.toppings.push({ name: { de: 'Extra', ru: 'Extra' }, price: 1 });
+    item.toppings.push({ name: { de: 'Extra', ru: '' }, price: 1 });
     setMenuData(newMenuData);
   };
 
@@ -278,16 +278,15 @@ export default function AdminDashboard() {
 
   // Add new category
   const addCategory = () => {
-    const catId = prompt('Kategorie ID eingeben (z.B. seeds, snacks):');
+    const catId = prompt('Kategorie ID eingeben (z.B. snacks, drinks):');
     if (!catId) return;
     
-    const nameDe = prompt('Kategoriename (DE):') || 'Neue Kategorie';
-    const nameRu = prompt('Kategoriename (RU):') || 'Neue Kategorie';
+    const name = prompt('Kategoriename:') || 'Neue Kategorie';
     
     const newMenuData = { ...menuData };
     newMenuData.categories[catId] = {
       id: catId,
-      name: { de: nameDe, ru: nameRu },
+      name: { de: name, ru: name },
       items: []
     };
     setMenuData(newMenuData);
@@ -527,25 +526,14 @@ export default function AdminDashboard() {
                         <div key={catKey} className="bg-black/20 rounded-xl p-4">
                           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                             {/* Editable category names */}
-                            <div className="flex-1 grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="text-xs text-white/50">Kategoriename (DE)</label>
-                                <input 
-                                  type="text" 
-                                  value={category.name?.de || catKey} 
-                                  onChange={(e) => updateCategoryName(catKey, 'de', e.target.value)}
-                                  className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-white font-semibold"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs text-white/50">Kategoriename (RU)</label>
-                                <input 
-                                  type="text" 
-                                  value={category.name?.ru || catKey} 
-                                  onChange={(e) => updateCategoryName(catKey, 'ru', e.target.value)}
-                                  className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-white font-semibold"
-                                />
-                              </div>
+                            <div className="flex-1">
+                              <label className="text-xs text-white/50">Kategoriename</label>
+                              <input 
+                                type="text" 
+                                value={category.name?.de || catKey} 
+                                onChange={(e) => updateCategoryName(catKey, 'de', e.target.value)}
+                                className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-white font-semibold"
+                              />
                             </div>
                             <div className="flex gap-2">
                               <button onClick={() => addItem(catKey)} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold transition-colors">
@@ -561,16 +549,11 @@ export default function AdminDashboard() {
                           <div className="space-y-3">
                             {category.items?.map((item: any, idx: number) => (
                               <div key={item.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
-                                  {/* Name DE */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-3">
+                                  {/* Name */}
                                   <div>
-                                    <label className="text-xs text-white/50">Name (DE)</label>
+                                    <label className="text-xs text-white/50">Name</label>
                                     <input type="text" value={item.name?.de || ''} onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
-                                  </div>
-                                  {/* Name RU */}
-                                  <div>
-                                    <label className="text-xs text-white/50">Name (RU)</label>
-                                    <input type="text" value={item.name?.ru || ''} onChange={(e) => updateItem(catKey, idx, 'name.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
                                   </div>
                                   {/* Price */}
                                   <div>
@@ -585,15 +568,9 @@ export default function AdminDashboard() {
                                 </div>
 
                                 {/* Description */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                                  <div>
-                                    <label className="text-xs text-white/50">Beschreibung (DE)</label>
-                                    <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
-                                  </div>
-                                  <div>
-                                    <label className="text-xs text-white/50">Beschreibung (RU)</label>
-                                    <textarea value={item.description?.ru || ''} onChange={(e) => updateItem(catKey, idx, 'description.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
-                                  </div>
+                                <div className="mb-3">
+                                  <label className="text-xs text-white/50">Beschreibung</label>
+                                  <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
                                 </div>
 
                                 {/* Extras / Toppings */}
@@ -604,8 +581,7 @@ export default function AdminDashboard() {
                                   </div>
                                   {item.toppings?.map((topping: any, tIdx: number) => (
                                     <div key={tIdx} className="flex gap-2 mb-1">
-                                      <input type="text" value={topping.name?.de || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'de', e.target.value)} className="flex-1 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="DE" />
-                                      <input type="text" value={topping.name?.ru || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'ru', e.target.value)} className="flex-1 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="RU" />
+                                      <input type="text" value={topping.name?.de || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'de', e.target.value)} className="flex-1 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="Extra Name" />
                                       <input type="number" step="0.1" value={topping.price || 0} onChange={(e) => updateTopping(catKey, idx, tIdx, 'price', e.target.value)} className="w-20 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="€" />
                                       <button onClick={() => removeTopping(catKey, idx, tIdx)} className="px-2 py-1 text-red-400 hover:text-red-300 text-xs">×</button>
                                     </div>

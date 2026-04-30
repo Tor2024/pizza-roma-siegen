@@ -44,14 +44,14 @@ function LoginForm() {
       });
 
       if (res.ok) {
-        // Устанавливаем cookie на 30 дней
+        // Setzen des Cookies für 30 Tage
         document.cookie = `admin_token=${password}; Max-Age=${30 * 24 * 60 * 60}; Path=/; SameSite=Strict`;
         window.location.href = from;
       } else {
-        setError('Неверный пароль');
+        setError('Falsches Passwort');
       }
     } catch (err) {
-      setError('Ошибка сети');
+      setError('Netzwerkfehler');
     }
 
     setLoading(false);
@@ -69,7 +69,7 @@ function LoginForm() {
           <div className="text-center mb-8">
             <div className="text-roma-red text-4xl mb-4">♛</div>
             <h1 className="text-2xl font-poppins font-bold text-white">Pizza Roma</h1>
-            <p className="text-white/60 mt-1">Панель администратора</p>
+            <p className="text-white/60 mt-1">Admin-Bereich</p>
           </div>
 
           {error && (
@@ -85,7 +85,7 @@ function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-white/80 mb-2">
-                Пароль администратора
+                Administrator-Passwort
               </label>
               <div className="relative">
                 <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
@@ -94,7 +94,7 @@ function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/10 border border-white/20 rounded-xl py-3 pl-12 pr-12 text-white placeholder:text-white/40 focus:outline-none focus:border-roma-gold"
-                  placeholder="Введите пароль"
+                  placeholder="Passwort eingeben"
                   autoFocus
                 />
                 <button
@@ -112,19 +112,19 @@ function LoginForm() {
               disabled={loading || !password}
               className="w-full bg-roma-red hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold transition-colors"
             >
-              {loading ? 'Вход...' : 'Войти'}
+              {loading ? 'Anmelden...' : 'Anmelden'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <a href="/" className="text-white/40 hover:text-white text-sm transition-colors">
-              ← Вернуться на сайт
+              ← Zurück zur Website
             </a>
           </div>
         </div>
 
         <p className="text-center text-white/30 text-sm mt-6">
-          Доступ только для администраторов
+          Nur für Administratoren
         </p>
       </motion.div>
     </div>
@@ -135,7 +135,7 @@ export default function AdminLogin() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-roma-dark flex items-center justify-center">
-        <div className="text-white/60">Загрузка...</div>
+        <div className="text-white/60">Wird geladen...</div>
       </div>
     }>
       <LoginForm />

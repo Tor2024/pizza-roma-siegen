@@ -154,10 +154,12 @@ const memoryCache = {
 // Get orders (with cache)
 export async function getOrders(): Promise<Order[]> {
   const now = Date.now();
-  // Refresh cache every 30 seconds
-  if (now - memoryCache.lastFetch > 30000) {
+  // Refresh cache every 30 seconds only if we have GitHub token
+  if (now - memoryCache.lastFetch > 30000 && GITHUB_TOKEN) {
     const githubOrders = await getOrdersFromGitHub();
-    memoryCache.orders = githubOrders;
+    if (githubOrders.length > 0) {
+      memoryCache.orders = githubOrders;
+    }
     memoryCache.lastFetch = now;
   }
   return memoryCache.orders;
