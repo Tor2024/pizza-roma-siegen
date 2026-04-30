@@ -1,7 +1,59 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 
-const redis = Redis.fromEnv();
+// In-memory fallback storage (for development or when Redis is not configured)
+const memoryStorage = {
+  orders: new Map<string, any>(),
+  orderList: new Set<string>()
+};
+
+// Try to initialize Redis, fallback to memory if not available
+let redis: Redis | null = null;
+try {
+  redis = Redis.fromEnv();
+} catch (e) {
+  console.warn('Redis not configured, using in-memory storage');
+  redis = null;
+}
+
+// Helper functions for storage
+const getOrder = async (id: string) => {
+  if (redis) return redis.get(`order:${id}`);
+  return memoryStorage.orders.get(id) || null;
+};
+
+const setOrder = async (id: string, data: any) => {
+  if (redis) return redis.set(`order:${id}`, data);
+  memoryStorage.orders.set(id, data);
+};
+
+const addOrderToList = async (id: string) => {
+  if (redis) return redis.sadd('orders_list', id);
+  memoryStorage.orderList.add(id);
+};
+
+const getOrderList = async () => {
+  if (redis) return redis.smembers('orders_list');
+  return Array.from(memoryStorage.orderList);
+};
+
+const updateOrderStatus = async (id: string, status: string) => {
+  if (redis) {
+    const order = await redis.get(`order:${id}`) as any;
+    if (order) {
+      order.status = status;
+      order.updatedAt = Date.now();
+      return redis.set(`order:${id}`, order);
+    }
+  } else {
+    const order = memoryStorage.orders.get(id);
+    if (order) {
+      order.status = status;
+      order.updatedAt = Date.now();
+      memoryStorage.orders.set(id, order);
+    }
+  }
+};
 
 // GET - получить все заказы
 export async function GET(request: Request) {
@@ -13,12 +65,12 @@ export async function GET(request: Request) {
     }
 
     // Получаем все ID заказов
-    const orderIds = await redis.smembers('orders_list');
+    const orderIds = await getOrderList();
     
     // Получаем данные каждого заказа
     const orders = [];
     for (const id of orderIds) {
-      const order = await redis.get(`order:${id}`);
+      const order = await getOrder(id);
       if (order) orders.push(order);
     }
     
@@ -56,9 +108,9 @@ export async function POST(req: Request) {
     };
 
     // Сохраняем заказ
-    await redis.set(`order:${orderId}`, newOrder);
+    await setOrder(orderId, newOrder);
     // Добавляем ID в список
-    await redis.sadd('orders_list', orderId);
+    await addOrderToList(orderId);
 
     return NextResponse.json({ 
       success: true, 
@@ -89,8 +141,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'Missing id or newStatus' }, { status: 400 });
     }
 
-    const orderKey = `order:${id}`;
-    const order: any = await redis.get(orderKey);
+    const order: any = await getOrder(id);
     
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
@@ -102,10 +153,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
-    order.status = newStatus;
-    order.updatedAt = Date.now();
-    
-    await redis.set(orderKey, order);
+    await updateOrderStatus(id, newStatus);
 
     return NextResponse.json({ 
       success: true, 
@@ -135,15 +183,20 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Missing order id' }, { status: 400 });
     }
 
-    const orderKey = `order:${id}`;
-    const exists = await redis.exists(orderKey);
+    const order = await getOrder(id);
     
-    if (!exists) {
+    if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    await redis.del(orderKey);
-    await redis.srem('orders_list', id);
+    // Delete from storage
+    if (redis) {
+      await redis.del(`order:${id}`);
+      await redis.srem('orders_list', id);
+    } else {
+      memoryStorage.orders.delete(id);
+      memoryStorage.orderList.delete(id);
+    }
 
     return NextResponse.json({ 
       success: true, 

@@ -1,7 +1,36 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 
-const redis = Redis.fromEnv();
+// In-memory fallback storage (for development or when Redis is not configured)
+const memoryStorage = {
+  orders: new Map<string, any>(),
+  orderList: new Set<string>()
+};
+
+// Try to initialize Redis, fallback to memory if not available
+let redis: Redis | null = null;
+try {
+  redis = Redis.fromEnv();
+} catch (e) {
+  console.warn('Redis not configured, using in-memory storage');
+  redis = null;
+}
+
+// Helper functions for storage
+const getOrder = async (id: string) => {
+  if (redis) return redis.get(`order:${id}`);
+  return memoryStorage.orders.get(id) || null;
+};
+
+const setOrder = async (id: string, data: any) => {
+  if (redis) return redis.set(`order:${id}`, data);
+  memoryStorage.orders.set(id, data);
+};
+
+const addOrderToList = async (id: string) => {
+  if (redis) return redis.sadd('orders_list', id);
+  memoryStorage.orderList.add(id);
+};
 
 // POST - создать заказ (для клиентов)
 export async function POST(req: Request) {
@@ -41,9 +70,9 @@ export async function POST(req: Request) {
       estimatedDelivery: orderData.estimatedDelivery || '25-35 min'
     };
 
-    // Сохраняем в Vercel KV
-    await redis.set(`order:${orderId}`, newOrder);
-    await redis.sadd('orders_list', orderId);
+    // Сохраняем заказ
+    await setOrder(orderId, newOrder);
+    await addOrderToList(orderId);
 
     // Отправляем уведомление админу (заглушка для future webhook)
     console.log(`🍕 New order received: ${orderId} - ${orderData.customer.name} - ${orderData.total}€`);
@@ -73,7 +102,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
     }
 
-    const order = await redis.get(`order:${orderId}`);
+    const order = await getOrder(orderId);
     
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
