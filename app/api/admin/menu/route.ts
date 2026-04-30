@@ -66,8 +66,13 @@ export async function POST(req: Request) {
       content: content,
       branch: 'main'
     };
-    if (sha) {
+    
+    // Если файл существует, добавляем SHA для обновления
+    if (sha && sha.length > 0) {
       requestBody.sha = sha;
+      console.log('Adding SHA to request:', sha);
+    } else {
+      console.log('No SHA - creating new file');
     }
 
     const updateResponse = await fetch(
