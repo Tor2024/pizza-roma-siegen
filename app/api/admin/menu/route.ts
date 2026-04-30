@@ -33,21 +33,29 @@ export async function POST(req: Request) {
 
     // 1. Пробуем получить текущий SHA файла (если файл существует)
     let sha: string | undefined;
-    const getResponse = await fetch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`,
-      {
-        headers: { 
-          'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
+    try {
+      const getResponse = await fetch(
+        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}?ref=main`,
+        {
+          headers: { 
+            'Authorization': `token ${GITHUB_TOKEN}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
         }
-      }
-    );
+      );
 
-    if (getResponse.ok) {
-      const currentFile = await getResponse.json();
-      sha = currentFile.sha;
+      if (getResponse.ok) {
+        const currentFile = await getResponse.json();
+        sha = currentFile.sha;
+        console.log('Got SHA for existing file:', sha);
+      } else if (getResponse.status === 404) {
+        console.log('File does not exist, will create new');
+      } else {
+        console.log('GitHub GET error:', getResponse.status);
+      }
+    } catch (e) {
+      console.log('Error fetching file SHA:', e);
     }
-    // Если файл не найден (404) - создаем новый без SHA
 
     // 2. Кодируем новые данные в Base64
     const content = Buffer.from(JSON.stringify(newMenuData, null, 2)).toString('base64');
