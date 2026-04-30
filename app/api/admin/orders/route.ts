@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 // GET - получить все заказы
 export async function GET(request: Request) {
@@ -11,12 +13,12 @@ export async function GET(request: Request) {
     }
 
     // Получаем все ID заказов
-    const orderIds = await kv.smembers('orders_list');
+    const orderIds = await redis.smembers('orders_list');
     
     // Получаем данные каждого заказа
     const orders = [];
     for (const id of orderIds) {
-      const order = await kv.get(`order:${id}`);
+      const order = await redis.get(`order:${id}`);
       if (order) orders.push(order);
     }
     
@@ -54,9 +56,9 @@ export async function POST(req: Request) {
     };
 
     // Сохраняем заказ
-    await kv.set(`order:${orderId}`, newOrder);
+    await redis.set(`order:${orderId}`, newOrder);
     // Добавляем ID в список
-    await kv.sadd('orders_list', orderId);
+    await redis.sadd('orders_list', orderId);
 
     return NextResponse.json({ 
       success: true, 
@@ -88,7 +90,7 @@ export async function PATCH(req: Request) {
     }
 
     const orderKey = `order:${id}`;
-    const order: any = await kv.get(orderKey);
+    const order: any = await redis.get(orderKey);
     
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
@@ -103,7 +105,7 @@ export async function PATCH(req: Request) {
     order.status = newStatus;
     order.updatedAt = Date.now();
     
-    await kv.set(orderKey, order);
+    await redis.set(orderKey, order);
 
     return NextResponse.json({ 
       success: true, 
@@ -134,14 +136,14 @@ export async function DELETE(req: Request) {
     }
 
     const orderKey = `order:${id}`;
-    const exists = await kv.exists(orderKey);
+    const exists = await redis.exists(orderKey);
     
     if (!exists) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    await kv.del(orderKey);
-    await kv.srem('orders_list', id);
+    await redis.del(orderKey);
+    await redis.srem('orders_list', id);
 
     return NextResponse.json({ 
       success: true, 

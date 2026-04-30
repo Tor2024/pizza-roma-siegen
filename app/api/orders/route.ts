@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 // POST - создать заказ (для клиентов)
 export async function POST(req: Request) {
@@ -40,8 +42,8 @@ export async function POST(req: Request) {
     };
 
     // Сохраняем в Vercel KV
-    await kv.set(`order:${orderId}`, newOrder);
-    await kv.sadd('orders_list', orderId);
+    await redis.set(`order:${orderId}`, newOrder);
+    await redis.sadd('orders_list', orderId);
 
     // Отправляем уведомление админу (заглушка для future webhook)
     console.log(`🍕 New order received: ${orderId} - ${orderData.customer.name} - ${orderData.total}€`);
@@ -71,7 +73,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
     }
 
-    const order = await kv.get(`order:${orderId}`);
+    const order = await redis.get(`order:${orderId}`);
     
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
