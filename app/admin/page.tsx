@@ -197,11 +197,6 @@ export default function AdminDashboard() {
     window.location.href = '/admin/login';
   };
 
-  // Force logout on page load - always require password
-  useEffect(() => {
-    logout();
-  }, []);
-
   // Format time
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleString('de-DE', {
