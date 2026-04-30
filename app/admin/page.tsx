@@ -555,17 +555,37 @@ export default function AdminDashboard() {
                                     <label className="text-xs text-white/50">Name</label>
                                     <input type="text" value={item.name?.de || ''} onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
                                   </div>
-                                  {/* Price */}
-                                  <div>
-                                    <label className="text-xs text-white/50">Preis (€)</label>
-                                    <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
-                                  </div>
                                   {/* Image */}
                                   <div>
                                     <label className="text-xs text-white/50">Bild</label>
                                     <input type="text" value={item.image || ''} onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="/images/pizza.webp" />
                                   </div>
+                                  {/* Single Price (for non-pizza items) */}
+                                  {item.price && !item.prices && (
+                                    <div>
+                                      <label className="text-xs text-white/50">Preis (€)</label>
+                                      <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                    </div>
+                                  )}
                                 </div>
+
+                                {/* Pizza Sizes with Prices */}
+                                {item.prices && (
+                                  <div className="grid grid-cols-3 gap-4 mb-3">
+                                    <div>
+                                      <label className="text-xs text-white/50">26 cm (€)</label>
+                                      <input type="number" step="0.01" value={item.prices?.['26'] || 0} onChange={(e) => updateItem(catKey, idx, 'prices.26', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                    </div>
+                                    <div>
+                                      <label className="text-xs text-white/50">32 cm (€)</label>
+                                      <input type="number" step="0.01" value={item.prices?.['32'] || 0} onChange={(e) => updateItem(catKey, idx, 'prices.32', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                    </div>
+                                    <div>
+                                      <label className="text-xs text-white/50">40 cm (€)</label>
+                                      <input type="number" step="0.01" value={item.prices?.['40'] || 0} onChange={(e) => updateItem(catKey, idx, 'prices.40', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                    </div>
+                                  </div>
+                                )}
 
                                 {/* Description */}
                                 <div className="mb-3">
