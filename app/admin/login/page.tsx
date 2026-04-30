@@ -44,8 +44,8 @@ function LoginForm() {
       });
 
       if (res.ok) {
-        // Setzen des Cookies für 30 Tage
-        document.cookie = `admin_token=${password}; Max-Age=${30 * 24 * 60 * 60}; Path=/; SameSite=Strict`;
+        // Session-Cookie (wird beim Schließen des Browsers gelöscht)
+        document.cookie = `admin_token=${password}; Path=/; SameSite=Strict`;
         window.location.href = from;
       } else {
         setError('Falsches Passwort');
