@@ -1,5 +1,6 @@
 import Hero from '@/components/Hero';
 import Offers from '@/components/Offers';
+// Language fix v2 - DE/RU only
 import MenuSection from '@/components/MenuSection';
 import DeliverySection from '@/components/DeliverySection';
 import AboutSection from '@/components/AboutSection';
