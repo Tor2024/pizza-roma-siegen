@@ -1,57 +1,22 @@
 import { NextResponse } from 'next/server';
-import { Redis } from '@upstash/redis';
 
-// In-memory fallback storage (for development or when Redis is not configured)
+// FREE in-memory storage - no Redis needed!
 const memoryStorage = {
   orders: new Map<string, any>(),
   orderList: new Set<string>()
 };
 
-// Try to initialize Redis, fallback to memory if not available
-let redis: Redis | null = null;
-try {
-  redis = Redis.fromEnv();
-} catch (e) {
-  console.warn('Redis not configured, using in-memory storage');
-  redis = null;
-}
-
-// Helper functions for storage
-const getOrder = async (id: string) => {
-  if (redis) return redis.get(`order:${id}`);
-  return memoryStorage.orders.get(id) || null;
-};
-
-const setOrder = async (id: string, data: any) => {
-  if (redis) return redis.set(`order:${id}`, data);
-  memoryStorage.orders.set(id, data);
-};
-
-const addOrderToList = async (id: string) => {
-  if (redis) return redis.sadd('orders_list', id);
-  memoryStorage.orderList.add(id);
-};
-
-const getOrderList = async () => {
-  if (redis) return redis.smembers('orders_list');
-  return Array.from(memoryStorage.orderList);
-};
-
+// Helper functions
+const getOrder = async (id: string) => memoryStorage.orders.get(id) || null;
+const setOrder = async (id: string, data: any) => memoryStorage.orders.set(id, data);
+const addOrderToList = async (id: string) => memoryStorage.orderList.add(id);
+const getOrderList = async () => Array.from(memoryStorage.orderList);
 const updateOrderStatus = async (id: string, status: string) => {
-  if (redis) {
-    const order = await redis.get(`order:${id}`) as any;
-    if (order) {
-      order.status = status;
-      order.updatedAt = Date.now();
-      return redis.set(`order:${id}`, order);
-    }
-  } else {
-    const order = memoryStorage.orders.get(id);
-    if (order) {
-      order.status = status;
-      order.updatedAt = Date.now();
-      memoryStorage.orders.set(id, order);
-    }
+  const order = memoryStorage.orders.get(id);
+  if (order) {
+    order.status = status;
+    order.updatedAt = Date.now();
+    memoryStorage.orders.set(id, order);
   }
 };
 
@@ -190,13 +155,8 @@ export async function DELETE(req: Request) {
     }
 
     // Delete from storage
-    if (redis) {
-      await redis.del(`order:${id}`);
-      await redis.srem('orders_list', id);
-    } else {
-      memoryStorage.orders.delete(id);
-      memoryStorage.orderList.delete(id);
-    }
+    memoryStorage.orders.delete(id);
+    memoryStorage.orderList.delete(id);
 
     return NextResponse.json({ 
       success: true, 
