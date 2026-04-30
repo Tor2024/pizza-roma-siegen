@@ -49,7 +49,7 @@ export default function Header() {
 
         {/* Right side */}
         <div className="flex items-center gap-6">
-          {/* Language switcher */}
+          {/* Language switcher - v3 DE/RU */}
           <div className="hidden md:flex items-center bg-black/30 backdrop-blur-sm rounded-full p-1 text-xs font-bold border border-white/20" suppressHydrationWarning>
             <button 
               onClick={() => setLang('de')}

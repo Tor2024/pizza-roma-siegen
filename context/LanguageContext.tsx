@@ -2,6 +2,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { dictionaries, Lang } from '@/lib/i18n';
 
+// Force clear old invalid language on module load
+if (typeof window !== 'undefined') {
+  const saved = localStorage.getItem('lang');
+  if (saved && saved !== 'de' && saved !== 'ru') {
+    localStorage.removeItem('lang');
+    localStorage.setItem('lang', 'de');
+  }
+}
+
 interface LanguageContextType {
   lang: Lang;
   setLang: (lang: Lang) => void;
