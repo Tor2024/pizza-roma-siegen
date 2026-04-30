@@ -1,23 +1,13 @@
 import { NextResponse } from 'next/server';
+import { getOrders, saveOrder, updateOrderStatus as updateGitHubStatus, deleteOrder } from '@/lib/githubStorage';
 
-// FREE in-memory storage - no Redis needed!
-const memoryStorage = {
-  orders: new Map<string, any>(),
-  orderList: new Set<string>()
-};
-
-// Helper functions
-const getOrder = async (id: string) => memoryStorage.orders.get(id) || null;
-const setOrder = async (id: string, data: any) => memoryStorage.orders.set(id, data);
-const addOrderToList = async (id: string) => memoryStorage.orderList.add(id);
-const getOrderList = async () => Array.from(memoryStorage.orderList);
-const updateOrderStatus = async (id: string, status: string) => {
-  const order = memoryStorage.orders.get(id);
-  if (order) {
-    order.status = status;
-    order.updatedAt = Date.now();
-    memoryStorage.orders.set(id, order);
-  }
+// In-memory cache for fast access
+const orderCache = new Map<string, any>();
+const refreshCache = async () => {
+  const orders = await getOrders();
+  orderCache.clear();
+  orders.forEach(o => orderCache.set(o.id, o));
+  return orders;
 };
 
 // GET - получить все заказы
@@ -29,15 +19,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Получаем все ID заказов
-    const orderIds = await getOrderList();
-    
-    // Получаем данные каждого заказа
-    const orders = [];
-    for (const id of orderIds) {
-      const order = await getOrder(id);
-      if (order) orders.push(order);
-    }
+    // Получаем заказы из GitHub (с кэшированием)
+    const orders = await refreshCache();
     
     // Сортируем по времени (новые сверху)
     orders.sort((a: any, b: any) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -72,10 +55,9 @@ export async function POST(req: Request) {
       updatedAt: Date.now()
     };
 
-    // Сохраняем заказ
-    await setOrder(orderId, newOrder);
-    // Добавляем ID в список
-    await addOrderToList(orderId);
+    // Сохраняем заказ в GitHub и кэш
+    await saveOrder(newOrder);
+    orderCache.set(orderId, newOrder);
 
     return NextResponse.json({ 
       success: true, 
@@ -106,19 +88,19 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'Missing id or newStatus' }, { status: 400 });
     }
 
-    const order: any = await getOrder(id);
-    
-    if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-    }
-
     // Валидные статусы
     const validStatuses = ['received', 'preparing', 'delivering', 'done', 'cancelled'];
     if (!validStatuses.includes(newStatus)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
-    await updateOrderStatus(id, newStatus);
+    // Обновляем в GitHub и кэше
+    await updateGitHubStatus(id, newStatus);
+    const order = orderCache.get(id);
+    if (order) {
+      order.status = newStatus;
+      order.updatedAt = Date.now();
+    }
 
     return NextResponse.json({ 
       success: true, 
@@ -148,15 +130,9 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Missing order id' }, { status: 400 });
     }
 
-    const order = await getOrder(id);
-    
-    if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-    }
-
-    // Delete from storage
-    memoryStorage.orders.delete(id);
-    memoryStorage.orderList.delete(id);
+    // Delete from GitHub and cache
+    await deleteOrder(id);
+    orderCache.delete(id);
 
     return NextResponse.json({ 
       success: true, 

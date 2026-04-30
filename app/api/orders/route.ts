@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server';
+import { saveOrder, getOrder } from '@/lib/githubStorage';
 
-// FREE in-memory storage - no Redis needed!
-const memoryStorage = {
-  orders: new Map<string, any>(),
-  orderList: new Set<string>()
-};
-
-// Helper functions
-const getOrder = async (id: string) => memoryStorage.orders.get(id) || null;
-const setOrder = async (id: string, data: any) => memoryStorage.orders.set(id, data);
-const addOrderToList = async (id: string) => memoryStorage.orderList.add(id);
+// In-memory cache for fast access
+const orderCache = new Map<string, any>();
 
 // POST - создать заказ (для клиентов)
 export async function POST(req: Request) {
@@ -49,9 +42,9 @@ export async function POST(req: Request) {
       estimatedDelivery: orderData.estimatedDelivery || '25-35 min'
     };
 
-    // Сохраняем заказ
-    await setOrder(orderId, newOrder);
-    await addOrderToList(orderId);
+    // Сохраняем заказ в GitHub (persistent) и cache
+    await saveOrder(newOrder);
+    orderCache.set(orderId, newOrder);
 
     // Отправляем уведомление админу (заглушка для future webhook)
     console.log(`🍕 New order received: ${orderId} - ${orderData.customer.name} - ${orderData.total}€`);
@@ -81,7 +74,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
     }
 
-    const order = await getOrder(orderId);
+    // Try cache first, then GitHub
+    let order = orderCache.get(orderId);
+    if (!order) {
+      order = await getOrder(orderId);
+      if (order) orderCache.set(orderId, order);
+    }
     
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
