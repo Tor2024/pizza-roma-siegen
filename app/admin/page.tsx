@@ -4,42 +4,37 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiRefreshCw, FiLogOut, FiCheckCircle, FiAlertCircle, FiPackage, FiTruck, FiClock } from 'react-icons/fi';
 
-// Конфигурация статусов
+// Status configuration - German only
 const statusMap = {
   received: { 
-    label: 'Получен', 
-    labelDe: 'Empfangen', 
+    label: 'Empfangen', 
     color: 'bg-blue-500', 
     icon: FiPackage,
-    hint: '🔔 Новый заказ! Проверьте наличие ингредиентов.' 
+    hint: '🔔 Neue Bestellung! Zutaten prüfen.' 
   },
   preparing: { 
-    label: 'Готовится', 
-    labelDe: 'In Zubereitung', 
+    label: 'In Zubereitung', 
     color: 'bg-orange-500', 
     icon: FiClock,
-    hint: '🔥 Пицца в печи. Клиент получил SMS.' 
+    hint: '🔥 Pizza im Ofen. Kunde wurde benachrichtigt.' 
   },
   delivering: { 
-    label: 'В пути', 
-    labelDe: 'Unterwegs', 
+    label: 'Unterwegs', 
     color: 'bg-indigo-500', 
     icon: FiTruck,
-    hint: '🏍 Курьер выехал. Время доставки ~15 мин.' 
+    hint: '🏍 Fahrer unterwegs. Lieferzeit ~15 Min.' 
   },
   done: { 
-    label: 'Доставлен', 
-    labelDe: 'Geliefert', 
+    label: 'Geliefert', 
     color: 'bg-green-500', 
     icon: FiCheckCircle,
-    hint: '✅ Заказ завершен.' 
+    hint: '✅ Bestellung abgeschlossen.' 
   },
   cancelled: { 
-    label: 'Отменен', 
-    labelDe: 'Storniert', 
+    label: 'Storniert', 
     color: 'bg-red-500', 
     icon: FiAlertCircle,
-    hint: '❌ Заказ отменен.' 
+    hint: '❌ Bestellung storniert.' 
   },
 };
 
@@ -76,7 +71,7 @@ export default function AdminDashboard() {
   const [menuLoading, setMenuLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
-  // Получаем admin token из cookie
+  // Get admin token from cookie
   const getAdminToken = () => {
     return document.cookie
       .split('; ')
@@ -84,7 +79,7 @@ export default function AdminDashboard() {
       ?.split('=')[1];
   };
 
-  // Загрузка заказов
+  // Load orders
   const fetchOrders = async () => {
     const token = getAdminToken();
     if (!token) {
@@ -111,7 +106,7 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  // Загрузка меню
+  // Load menu
   const fetchMenu = async () => {
     setMenuLoading(true);
     try {
@@ -126,21 +121,21 @@ export default function AdminDashboard() {
     setMenuLoading(false);
   };
 
-  // Polling каждые 10 секунд
+  // Poll every 10 seconds
   useEffect(() => {
     fetchOrders();
     const interval = setInterval(fetchOrders, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  // Загрузка меню при переключении таба
+  // Load menu when switching tabs
   useEffect(() => {
     if (tab === 'menu') {
       fetchMenu();
     }
   }, [tab]);
 
-  // Изменение статуса заказа
+  // Change order status
   const changeStatus = async (orderId: string, newStatus: OrderStatus) => {
     const token = getAdminToken();
     if (!token) return;
@@ -165,7 +160,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // Сохранение меню в GitHub
+  // Save menu to GitHub
   const saveMenu = async () => {
     const token = getAdminToken();
     if (!token || !menuData) return;
@@ -185,24 +180,24 @@ export default function AdminDashboard() {
 
       const result = await res.json();
       if (res.ok) {
-        setSaveMessage('✅ Меню сохранено! Vercel обновит сайт через 1 минуту.');
+        setSaveMessage('✅ Menü gespeichert! Vercel aktualisiert die Site in 1 Minute.');
       } else {
-        setSaveMessage(`❌ Ошибка: ${result.error || 'Unknown error'}`);
+        setSaveMessage(`❌ Fehler: ${result.error || 'Unknown error'}`);
       }
     } catch (err) {
-      setSaveMessage('❌ Network error');
+      setSaveMessage('❌ Netzwerkfehler');
     }
 
     setMenuLoading(false);
   };
 
-  // Выход
+  // Logout
   const logout = () => {
     document.cookie = 'admin_token=; Max-Age=0; path=/';
     window.location.href = '/admin/login';
   };
 
-  // Форматирование времени
+  // Format time
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleString('de-DE', {
       day: '2-digit',
@@ -247,7 +242,7 @@ export default function AdminDashboard() {
     const newMenuData = { ...menuData };
     newMenuData.categories[categoryKey].items.push({
       id: `new_${Date.now()}`,
-      name: { de: 'Neues Item', ru: 'Новое блюдо' },
+      name: { de: 'Neues Item', ru: 'Neues Item' },
       description: { de: '', ru: '' },
       price: 0,
       image: '/images/placeholder.webp',
@@ -258,7 +253,7 @@ export default function AdminDashboard() {
 
   // Delete item
   const deleteItem = (categoryKey: string, itemIndex: number) => {
-    if (confirm('Удалить этот пункт?')) {
+    if (confirm('Diesen Artikel löschen?')) {
       const newMenuData = { ...menuData };
       newMenuData.categories[categoryKey].items.splice(itemIndex, 1);
       setMenuData(newMenuData);
@@ -270,7 +265,7 @@ export default function AdminDashboard() {
     const newMenuData = { ...menuData };
     const item = newMenuData.categories[categoryKey].items[itemIndex];
     if (!item.toppings) item.toppings = [];
-    item.toppings.push({ name: { de: 'Extra', ru: 'Добавка' }, price: 1 });
+    item.toppings.push({ name: { de: 'Extra', ru: 'Extra' }, price: 1 });
     setMenuData(newMenuData);
   };
 
@@ -283,11 +278,11 @@ export default function AdminDashboard() {
 
   // Add new category
   const addCategory = () => {
-    const catId = prompt('Введите ID категории (например: seeds, snacks):');
+    const catId = prompt('Kategorie ID eingeben (z.B. seeds, snacks):');
     if (!catId) return;
     
-    const nameDe = prompt('Название категории (DE):') || 'Neue Kategorie';
-    const nameRu = prompt('Название категории (RU):') || 'Новая категория';
+    const nameDe = prompt('Kategoriename (DE):') || 'Neue Kategorie';
+    const nameRu = prompt('Kategoriename (RU):') || 'Neue Kategorie';
     
     const newMenuData = { ...menuData };
     newMenuData.categories[catId] = {
@@ -300,7 +295,7 @@ export default function AdminDashboard() {
 
   // Delete category
   const deleteCategory = (catKey: string) => {
-    if (confirm(`Удалить категорию "${menuData.categories[catKey].name.ru}" и все её товары?`)) {
+    if (confirm(`Kategorie "${menuData.categories[catKey].name.de}" und alle Artikel löschen?`)) {
       const newMenuData = { ...menuData };
       delete newMenuData.categories[catKey];
       setMenuData(newMenuData);
@@ -328,7 +323,7 @@ export default function AdminDashboard() {
             <button 
               onClick={fetchOrders}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-              title="Обновить"
+              title="Aktualisieren"
             >
               <FiRefreshCw className={loading ? 'animate-spin' : ''} size={18} />
             </button>
@@ -336,7 +331,7 @@ export default function AdminDashboard() {
               onClick={logout}
               className="flex items-center gap-2 px-3 py-2 rounded-lg bg-roma-red hover:bg-red-700 transition-colors text-sm"
             >
-              <FiLogOut size={16} /> Выход
+              <FiLogOut size={16} /> Abmelden
             </button>
           </div>
         </div>
@@ -354,7 +349,7 @@ export default function AdminDashboard() {
               tab === 'orders' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
             }`}
           >
-            Заказы ({orders.length})
+            Bestellungen ({orders.length})
           </button>
           <button 
             onClick={() => setTab('menu')} 
@@ -362,7 +357,7 @@ export default function AdminDashboard() {
               tab === 'menu' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
             }`}
           >
-            Меню и Настройки
+            Menü & Einstellungen
           </button>
         </div>
       </div>
@@ -387,8 +382,8 @@ export default function AdminDashboard() {
               {orders.length === 0 && !loading && (
                 <div className="text-center py-20 text-white/40">
                   <FiPackage size={48} className="mx-auto mb-4" />
-                  <p className="text-xl">Заказов пока нет...</p>
-                  <p className="text-sm mt-2">Новые заказы появятся здесь автоматически</p>
+                  <p className="text-xl">Noch keine Bestellungen...</p>
+                  <p className="text-sm mt-2">Neue Bestellungen erscheinen hier automatisch</p>
                 </div>
               )}
 
@@ -403,7 +398,7 @@ export default function AdminDashboard() {
                     className="bg-white/5 rounded-2xl p-6 border border-white/10"
                   >
                     <div className="flex flex-col lg:flex-row gap-6">
-                      {/* Информация о заказе */}
+                      {/* Order information */}
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-4">
                           <div>
@@ -412,7 +407,7 @@ export default function AdminDashboard() {
                           </div>
                           <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${cfg.color} text-white text-sm font-semibold`}>
                             <StatusIcon size={14} />
-                            {cfg.label} / {cfg.labelDe}
+                            {cfg.label}
                           </div>
                         </div>
 
@@ -422,21 +417,21 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="bg-black/20 rounded-xl p-4">
-                          <p className="text-sm text-white/60 mb-2">Состав заказа:</p>
+                          <p className="text-sm text-white/60 mb-2">Bestellinhalt:</p>
                           {order.items.map((item, idx) => (
                             <div key={idx} className="flex justify-between text-sm py-1">
-                              <span>{item.quantity}x {item.name.ru} {item.size && `(${item.size}cm)`}</span>
+                              <span>{item.quantity}x {item.name.de} {item.size && `(${item.size}cm)`}</span>
                               <span className="text-white/60">{(item.price * item.quantity).toFixed(2)} €</span>
                             </div>
                           ))}
                           {order.promoCode && (
                             <div className="flex justify-between text-sm py-1 text-green-400">
-                              <span>Промокод {order.promoCode}</span>
+                              <span>Gutschein {order.promoCode}</span>
                               <span>-{order.promoDiscount?.toFixed(2)} €</span>
                             </div>
                           )}
                           <div className="border-t border-white/10 mt-2 pt-2 flex justify-between font-bold">
-                            <span>Итого:</span>
+                            <span>Gesamt:</span>
                             <span className="text-roma-gold">{order.total.toFixed(2)} €</span>
                           </div>
                         </div>
@@ -444,9 +439,9 @@ export default function AdminDashboard() {
                         <p className="text-sm text-roma-gold mt-3">{cfg.hint}</p>
                       </div>
 
-                      {/* Управление статусом */}
+                      {/* Status management */}
                       <div className="lg:w-64 space-y-2">
-                        <p className="text-sm text-white/60 mb-2">Изменить статус:</p>
+                        <p className="text-sm text-white/60 mb-2">Status ändern:</p>
                         {Object.entries(statusMap).map(([status, config]) => (
                           <button
                             key={status}
@@ -459,7 +454,7 @@ export default function AdminDashboard() {
                             }`}
                           >
                             <config.icon size={14} />
-                            {config.label} / {config.labelDe}
+                            {config.label}
                           </button>
                         ))}
                       </div>
@@ -477,9 +472,9 @@ export default function AdminDashboard() {
               className="space-y-6"
             >
               <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                <h2 className="text-2xl font-bold mb-4">Управление Меню</h2>
+                <h2 className="text-2xl font-bold mb-4">Menüverwaltung</h2>
                 <p className="text-white/60 mb-6">
-                  Изменения будут отправлены в GitHub. Vercel автоматически обновит сайт в течение 1 минуты.
+                  Änderungen werden an GitHub gesendet. Vercel aktualisiert die Site automatisch innerhalb von 1 Minute.
                 </p>
 
                 {saveMessage && (
@@ -491,50 +486,50 @@ export default function AdminDashboard() {
                 {menuLoading ? (
                   <div className="text-center py-10">
                     <FiRefreshCw className="animate-spin mx-auto mb-2" size={24} />
-                    <p className="text-white/60">Загрузка...</p>
+                    <p className="text-white/60">Wird geladen...</p>
                   </div>
                 ) : menuData ? (
                   <div className="space-y-4">
-                    {/* Настройки доставки */}
+                    {/* Delivery settings */}
                     <div className="bg-black/20 rounded-xl p-4">
-                      <h3 className="font-semibold mb-3">Настройки доставки</h3>
+                      <h3 className="font-semibold mb-3">Lieferungseinstellungen</h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                          <label className="text-sm text-white/60">Мин. заказ (€)</label>
+                          <label className="text-sm text-white/60">Min. Bestellung (€)</label>
                           <input type="number" step="0.1" value={menuData.settings?.delivery?.minOrder || 15} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, minOrder: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                         <div>
-                          <label className="text-sm text-white/60">Бесплатно от (€)</label>
+                          <label className="text-sm text-white/60">Gratis ab (€)</label>
                           <input type="number" step="0.1" value={menuData.settings?.delivery?.freeDeliveryThreshold || 25} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, freeDeliveryThreshold: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                         <div>
-                          <label className="text-sm text-white/60">Стоимость доставки (€)</label>
+                          <label className="text-sm text-white/60">Lieferkosten (€)</label>
                           <input type="number" step="0.1" value={menuData.settings?.delivery?.deliveryFee || 3.5} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, deliveryFee: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                         <div>
-                          <label className="text-sm text-white/60">Время доставки</label>
+                          <label className="text-sm text-white/60">Lieferzeit</label>
                           <input type="text" value={menuData.settings?.delivery?.estimatedTime || '25-35 Min'} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, estimatedTime: e.target.value}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
                         </div>
                       </div>
                     </div>
 
-                    {/* Кнопка добавления категории */}
+                    {/* Add category button */}
                     <div className="flex justify-between items-center">
-                      <h3 className="font-semibold text-lg">Категории меню</h3>
+                      <h3 className="font-semibold text-lg">Menükategorien</h3>
                       <button onClick={addCategory} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-semibold transition-colors">
-                        + Добавить категорию
+                        + Kategorie hinzufügen
                       </button>
                     </div>
 
-                    {/* Редактор категорий */}
+                    {/* Category editor */}
                     <div className="space-y-4">
                       {Object.entries(menuData.categories || {}).map(([catKey, category]: [string, any]) => (
                         <div key={catKey} className="bg-black/20 rounded-xl p-4">
                           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                            {/* Редактируемые названия категории */}
+                            {/* Editable category names */}
                             <div className="flex-1 grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-xs text-white/50">Название категории (DE)</label>
+                                <label className="text-xs text-white/50">Kategoriename (DE)</label>
                                 <input 
                                   type="text" 
                                   value={category.name?.de || catKey} 
@@ -543,7 +538,7 @@ export default function AdminDashboard() {
                                 />
                               </div>
                               <div>
-                                <label className="text-xs text-white/50">Название категории (RU)</label>
+                                <label className="text-xs text-white/50">Kategoriename (RU)</label>
                                 <input 
                                   type="text" 
                                   value={category.name?.ru || catKey} 
@@ -554,58 +549,58 @@ export default function AdminDashboard() {
                             </div>
                             <div className="flex gap-2">
                               <button onClick={() => addItem(catKey)} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold transition-colors">
-                                + Добавить блюдо
+                                + Gericht hinzufügen
                               </button>
-                              <button onClick={() => deleteCategory(catKey)} className="px-4 py-2 bg-red-600/50 hover:bg-red-600 rounded-lg text-sm font-semibold transition-colors" title="Удалить категорию">
+                              <button onClick={() => deleteCategory(catKey)} className="px-4 py-2 bg-red-600/50 hover:bg-red-600 rounded-lg text-sm font-semibold transition-colors" title="Kategorie löschen">
                                 🗑️
                               </button>
                             </div>
                           </div>
 
-                          {/* Список блюд */}
+                          {/* Item list */}
                           <div className="space-y-3">
                             {category.items?.map((item: any, idx: number) => (
                               <div key={item.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
-                                  {/* Название DE */}
+                                  {/* Name DE */}
                                   <div>
-                                    <label className="text-xs text-white/50">Название (DE)</label>
+                                    <label className="text-xs text-white/50">Name (DE)</label>
                                     <input type="text" value={item.name?.de || ''} onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
                                   </div>
-                                  {/* Название RU */}
+                                  {/* Name RU */}
                                   <div>
-                                    <label className="text-xs text-white/50">Название (RU)</label>
+                                    <label className="text-xs text-white/50">Name (RU)</label>
                                     <input type="text" value={item.name?.ru || ''} onChange={(e) => updateItem(catKey, idx, 'name.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
                                   </div>
-                                  {/* Цена */}
+                                  {/* Price */}
                                   <div>
-                                    <label className="text-xs text-white/50">Цена (€)</label>
+                                    <label className="text-xs text-white/50">Preis (€)</label>
                                     <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
                                   </div>
-                                  {/* Изображение */}
+                                  {/* Image */}
                                   <div>
-                                    <label className="text-xs text-white/50">Изображение</label>
+                                    <label className="text-xs text-white/50">Bild</label>
                                     <input type="text" value={item.image || ''} onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="/images/pizza.webp" />
                                   </div>
                                 </div>
 
-                                {/* Описание */}
+                                {/* Description */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                                   <div>
-                                    <label className="text-xs text-white/50">Описание (DE)</label>
+                                    <label className="text-xs text-white/50">Beschreibung (DE)</label>
                                     <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
                                   </div>
                                   <div>
-                                    <label className="text-xs text-white/50">Описание (RU)</label>
+                                    <label className="text-xs text-white/50">Beschreibung (RU)</label>
                                     <textarea value={item.description?.ru || ''} onChange={(e) => updateItem(catKey, idx, 'description.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
                                   </div>
                                 </div>
 
-                                {/* Добавки / Топпинги */}
+                                {/* Extras / Toppings */}
                                 <div className="mb-3">
                                   <div className="flex justify-between items-center mb-2">
-                                    <label className="text-xs text-white/50">Добавки</label>
-                                    <button onClick={() => addTopping(catKey, idx)} className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">+ Добавка</button>
+                                    <label className="text-xs text-white/50">Extras</label>
+                                    <button onClick={() => addTopping(catKey, idx)} className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">+ Extra</button>
                                   </div>
                                   {item.toppings?.map((topping: any, tIdx: number) => (
                                     <div key={tIdx} className="flex gap-2 mb-1">
@@ -617,10 +612,10 @@ export default function AdminDashboard() {
                                   ))}
                                 </div>
 
-                                {/* Размеры (для пиццы) */}
+                                {/* Sizes (for pizza) */}
                                 {item.sizes && (
                                   <div className="mb-3">
-                                    <label className="text-xs text-white/50">Размеры</label>
+                                    <label className="text-xs text-white/50">Größen</label>
                                     <div className="flex gap-2 mt-1">
                                       {Object.entries(item.sizes).map(([size, price]: [string, any]) => (
                                         <div key={size} className="bg-white/5 rounded px-3 py-1 text-xs">
@@ -631,10 +626,10 @@ export default function AdminDashboard() {
                                   </div>
                                 )}
 
-                                {/* Кнопки */}
+                                {/* Buttons */}
                                 <div className="flex justify-end">
                                   <button onClick={() => deleteItem(catKey, idx)} className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors">
-                                    Удалить блюдо
+                                    Gericht löschen
                                   </button>
                                 </div>
                               </div>
@@ -645,11 +640,11 @@ export default function AdminDashboard() {
                     </div>
 
                     <button onClick={saveMenu} disabled={menuLoading} className="w-full bg-roma-red hover:bg-red-700 disabled:bg-gray-600 py-4 rounded-xl font-bold transition-colors sticky bottom-4 shadow-lg">
-                      {menuLoading ? 'Сохранение...' : '💾 Сохранить все изменения в GitHub'}
+                      {menuLoading ? 'Wird gespeichert...' : '💾 Alle Änderungen in GitHub speichern'}
                     </button>
                   </div>
                 ) : (
-                  <p className="text-white/40">Не удалось загрузить меню</p>
+                  <p className="text-white/40">Menü konnte nicht geladen werden</p>
                 )}
               </div>
             </motion.div>
