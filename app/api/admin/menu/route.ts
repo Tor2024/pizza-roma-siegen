@@ -21,11 +21,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Переменные окружения Vercel
-    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    const REPO_OWNER = process.env.GITHUB_OWNER;
-    const REPO_NAME = process.env.GITHUB_REPO;
-    const FILE_PATH = 'data/menu.json';
+    // Переменные окружения
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN2;
+    const REPO_OWNER = process.env.VERCEL_GIT_REPO_OWNER || 'tor2024';
+    const REPO_NAME = process.env.VERCEL_GIT_REPO_SLUG || 'pizza-roma-siegen';
+    const FILE_PATH = 'public/data/menu.json';
 
     if (!GITHUB_TOKEN || !REPO_OWNER || !REPO_NAME) {
       return NextResponse.json({ error: 'GitHub config missing' }, { status: 500 });
