@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function MenuCard({ id, image, name, desc, prices, toppings }: Props) {
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
   const addItem = useCartStore(state => state.addItem);
   const [selectedSize, setSelectedSize] = useState(Object.keys(prices)[0]);
   const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
@@ -50,13 +50,13 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
       className="glass-light rounded-3xl overflow-hidden flex flex-col h-full text-roma-text"
     >
       <div className="relative h-52 overflow-hidden group">
-        <img src={image} alt={name[lang]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <img src={image} alt={name.de} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
 
       <div className="p-5 flex flex-col flex-grow">
-        <h3 className="font-poppins font-bold text-xl mb-1">{name[lang]}</h3>
-        <p className="text-sm text-gray-500 mb-4 flex-grow">{desc[lang]}</p>
+        <h3 className="font-poppins font-bold text-xl mb-1">{name.de}</h3>
+        <p className="text-sm text-gray-500 mb-4 flex-grow">{desc.de}</p>
 
         {/* Size selection */}
         <div className="mb-4">
@@ -85,7 +85,7 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
                   onClick={() => handleAddTopping(top)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${selectedToppings.find(t => t.id === top.id) ? 'bg-roma-gold/10 border-roma-gold text-roma-dark' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
                 >
-                  +{top.name[lang]} ({top.price.toFixed(2)}€)
+                  +{top.name.de} ({top.price.toFixed(2)}€)
                 </button>
               ))}
             </div>

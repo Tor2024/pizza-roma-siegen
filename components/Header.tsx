@@ -8,7 +8,7 @@ import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
-  const { lang, setLang, t } = useLanguage();
+  const { t } = useLanguage();
   const { toggleCart, items } = useCartStore();
 
   useEffect(() => {
@@ -49,20 +49,6 @@ export default function Header() {
 
         {/* Right side */}
         <div className="flex items-center gap-6">
-          {/* Language switcher - v3 DE/RU */}
-          <div className="hidden md:flex items-center bg-black/30 backdrop-blur-sm rounded-full p-1 text-xs font-bold border border-white/20" suppressHydrationWarning>
-            <button 
-              onClick={() => setLang('de')}
-              className={`px-3 py-1 rounded-full transition-all ${lang === 'de' ? 'bg-roma-red text-white' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'}`}
-              suppressHydrationWarning
-            >GERMAN</button>
-            <button 
-              onClick={() => setLang('ru')}
-              className={`px-3 py-1 rounded-full transition-all ${lang === 'ru' ? 'bg-roma-red text-white' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'}`}
-              suppressHydrationWarning
-            >RU</button>
-          </div>
-
           {/* Cart */}
           <button onClick={toggleCart} className="relative text-white hover:text-roma-gold transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             <FiShoppingCart size={24} />
@@ -100,10 +86,6 @@ export default function Header() {
                   {t(link.key)}
                 </a>
               ))}
-              <div className="flex gap-2 mt-4">
-                <button onClick={() => setLang('de')} className={`flex-1 py-2 rounded-lg ${lang === 'de' ? 'bg-roma-red' : 'bg-white/10'}`}>DE</button>
-                <button onClick={() => setLang('ru')} className={`flex-1 py-2 rounded-lg ${lang === 'ru' ? 'bg-roma-red' : 'bg-white/10'}`}>RU</button>
-              </div>
             </nav>
           </motion.div>
         )}

@@ -27,7 +27,7 @@ const offers = [
 ];
 
 export default function Offers() {
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <section id="offers" className="py-20 bg-roma-dark">
@@ -53,12 +53,12 @@ export default function Offers() {
               <div className="h-56 overflow-hidden">
                 <img 
                   src={offer.img} 
-                  alt={offer.title[lang]} 
+                  alt={offer.title.de} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
               <div className="p-6 flex justify-between items-center">
-                <h3 className="text-xl font-poppins font-semibold text-white">{offer.title[lang]}</h3>
+                <h3 className="text-xl font-poppins font-semibold text-white">{offer.title.de}</h3>
                 <span className="text-2xl font-poppins font-bold text-roma-gold">{offer.price}</span>
               </div>
             </motion.div>

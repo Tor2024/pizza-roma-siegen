@@ -11,7 +11,7 @@ interface CheckoutModalProps {
 }
 
 export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
   const { items, subtotal, deliveryFee, total, removeItem } = useCartStore();
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -221,7 +221,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       <h3 className="text-white font-semibold mb-3">{t('order_summary')}</h3>
                       {items.map((item, idx) => (
                         <div key={idx} className="flex justify-between text-white/80 text-sm mb-2">
-                          <span>{item.quantity}x {item.name[lang]} ({item.size}cm)</span>
+                          <span>{item.quantity}x {item.name.de} ({item.size}cm)</span>
                           <span>{((item.price + item.toppings.reduce((a,t) => a+t.price, 0)) * item.quantity).toFixed(2)} €</span>
                         </div>
                       ))}

@@ -3,12 +3,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function AboutSection() {
-  const { lang } = useLanguage();
-  
-  const text = {
-    de: 'Pizza Roma Siegen — eine Familienpizzeria, die seit 2016 arbeitet. Wir kochen nach traditionellen italienischen Rezepten, verwenden frische Zutaten und liefern heiße Pizza in ganz Siegen.',
-    ru: 'Pizza Roma Siegen — семейная пиццерия, работающая с 2016 года. Мы готовим по традиционным итальянским рецептам, используем свежие ингредиенты и доставляем горячую пиццу по всему Зигену.'
-  };
+  const text = 'Pizza Roma Siegen — eine Familienpizzeria, die seit 2016 arbeitet. Wir kochen nach traditionellen italienischen Rezepten, verwenden frische Zutaten und liefern heiße Pizza in ganz Siegen.';
 
   return (
     <section id="about" className="py-24 bg-roma-gray text-roma-text">

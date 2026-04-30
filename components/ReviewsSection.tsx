@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import { FaStar, FaQuoteLeft } from 'react-icons/fa';
 
 const reviews = [
-  { id: 1, name: 'Markus W.', text: 'Beste Pizza in Siegen. Schnelle Lieferung, der Teig ist perfekt!', rating: 5, lang: 'de' },
-  { id: 2, name: 'Анна С.', text: 'Очень вкусно и быстро доставили. Пицца Маргарита просто огонь!', rating: 5, lang: 'ru' },
-  { id: 3, name: 'Lena K.', text: 'Familienservice erstklassig. Das Quattro Formaggi ist auf einer anderen Ebene.', rating: 5, lang: 'de' },
+  { id: 1, name: 'Markus W.', text: 'Beste Pizza in Siegen. Schnelle Lieferung, der Teig ist perfekt!', rating: 5 },
+  { id: 2, name: 'Anna S.', text: 'Hervorragender Service und leckere Pasta. Immer wieder gerne!', rating: 5 },
+  { id: 3, name: 'Lena K.', text: 'Familienservice erstklassig. Das Quattro Formaggi ist auf einer anderen Ebene.', rating: 5 },
 ];
 
 export default function ReviewsSection() {

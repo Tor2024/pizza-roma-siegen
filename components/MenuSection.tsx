@@ -227,7 +227,7 @@ const categoryColors: { [key: string]: string } = {
 };
 
 export default function MenuSection() {
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
   const [menuData, setMenuData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -272,7 +272,7 @@ export default function MenuSection() {
               href={`#cat-${key}`}
               className="px-6 py-2 rounded-full bg-roma-dark/5 hover:bg-roma-red hover:text-white text-roma-dark font-poppins font-semibold transition-all"
             >
-              {cat.name?.[lang] || key}
+              {cat.name?.de || key}
             </a>
           ))}
         </div>
@@ -281,7 +281,7 @@ export default function MenuSection() {
         {Object.entries(categories).map(([key, category]: [string, any], index) => (
           <div key={key} id={`cat-${key}`}>
             <h3 className={`text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 ${categoryColors[key] || 'border-gray-500'} pl-4`}>
-              {category.name?.[lang] || key}
+              {category.name?.de || key}
             </h3>
             <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-8 ${index < Object.keys(categories).length - 1 ? 'mb-20' : ''}`}>
               {category.items?.map((item: any) => (

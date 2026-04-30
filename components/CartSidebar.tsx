@@ -8,7 +8,7 @@ import CheckoutModal from './CheckoutModal';
 
 export default function CartSidebar() {
   const { isOpen, toggleCart, items, updateQuantity, removeItem, subtotal, deliveryFee, total } = useCartStore();
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
   const [showCheckout, setShowCheckout] = useState(false);
 
   return (
@@ -54,9 +54,9 @@ export default function CartSidebar() {
                     <motion.div key={`${item.id}-${item.size}-${topStr}`} layout className="flex gap-4 bg-white/5 p-3 rounded-2xl">
                       <img src={item.image} alt="" className="w-20 h-20 rounded-xl object-cover"/>
                       <div className="flex-grow">
-                        <h4 className="font-poppins font-semibold text-white">{item.name[lang]} ({item.size}cm)</h4>
+                        <h4 className="font-poppins font-semibold text-white">{item.name.de} ({item.size}cm)</h4>
                         {item.toppings.length > 0 && (
-                          <p className="text-xs text-roma-gold mt-1">+ {item.toppings.map(t => t.name[lang]).join(', ')}</p>
+                          <p className="text-xs text-roma-gold mt-1">+ {item.toppings.map(t => t.name.de).join(', ')}</p>
                         )}
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-2 bg-white/10 rounded-lg">
