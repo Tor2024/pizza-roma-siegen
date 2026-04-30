@@ -281,6 +281,39 @@ export default function AdminDashboard() {
     setMenuData(newMenuData);
   };
 
+  // Add new category
+  const addCategory = () => {
+    const catId = prompt('Введите ID категории (например: seeds, snacks):');
+    if (!catId) return;
+    
+    const nameDe = prompt('Название категории (DE):') || 'Neue Kategorie';
+    const nameRu = prompt('Название категории (RU):') || 'Новая категория';
+    
+    const newMenuData = { ...menuData };
+    newMenuData.categories[catId] = {
+      id: catId,
+      name: { de: nameDe, ru: nameRu },
+      items: []
+    };
+    setMenuData(newMenuData);
+  };
+
+  // Delete category
+  const deleteCategory = (catKey: string) => {
+    if (confirm(`Удалить категорию "${menuData.categories[catKey].name.ru}" и все её товары?`)) {
+      const newMenuData = { ...menuData };
+      delete newMenuData.categories[catKey];
+      setMenuData(newMenuData);
+    }
+  };
+
+  // Update category name
+  const updateCategoryName = (catKey: string, lang: 'de' | 'ru', value: string) => {
+    const newMenuData = { ...menuData };
+    newMenuData.categories[catKey].name[lang] = value;
+    setMenuData(newMenuData);
+  };
+
   return (
     <div className="min-h-screen bg-roma-dark text-white pt-0">
       {/* Fixed Header */}
@@ -485,18 +518,48 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
+                    {/* Кнопка добавления категории */}
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-semibold text-lg">Категории меню</h3>
+                      <button onClick={addCategory} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-semibold transition-colors">
+                        + Добавить категорию
+                      </button>
+                    </div>
+
                     {/* Редактор категорий */}
                     <div className="space-y-4">
                       {Object.entries(menuData.categories || {}).map(([catKey, category]: [string, any]) => (
                         <div key={catKey} className="bg-black/20 rounded-xl p-4">
-                          <div className="flex justify-between items-center mb-4">
-                            <div>
-                              <h3 className="font-bold text-lg">{category.name?.ru || catKey}</h3>
-                              <p className="text-sm text-white/60">{category.name?.de || catKey}</p>
+                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                            {/* Редактируемые названия категории */}
+                            <div className="flex-1 grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-xs text-white/50">Название категории (DE)</label>
+                                <input 
+                                  type="text" 
+                                  value={category.name?.de || catKey} 
+                                  onChange={(e) => updateCategoryName(catKey, 'de', e.target.value)}
+                                  className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-white font-semibold"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs text-white/50">Название категории (RU)</label>
+                                <input 
+                                  type="text" 
+                                  value={category.name?.ru || catKey} 
+                                  onChange={(e) => updateCategoryName(catKey, 'ru', e.target.value)}
+                                  className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-white font-semibold"
+                                />
+                              </div>
                             </div>
-                            <button onClick={() => addItem(catKey)} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold transition-colors">
-                              + Добавить блюдо
-                            </button>
+                            <div className="flex gap-2">
+                              <button onClick={() => addItem(catKey)} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold transition-colors">
+                                + Добавить блюдо
+                              </button>
+                              <button onClick={() => deleteCategory(catKey)} className="px-4 py-2 bg-red-600/50 hover:bg-red-600 rounded-lg text-sm font-semibold transition-colors" title="Удалить категорию">
+                                🗑️
+                              </button>
+                            </div>
                           </div>
 
                           {/* Список блюд */}

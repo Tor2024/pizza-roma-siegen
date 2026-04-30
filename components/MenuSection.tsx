@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import MenuCard from './MenuCard';
 
@@ -216,8 +217,44 @@ const menuData: { pizzas: MenuItem[]; pasta: MenuItem[]; salads: MenuItem[]; dri
   ]
 };
 
+// Category color mapping
+const categoryColors: { [key: string]: string } = {
+  pizzas: 'border-roma-red',
+  pasta: 'border-roma-gold',
+  salads: 'border-green-500',
+  drinks: 'border-blue-500',
+  desserts: 'border-pink-500'
+};
+
 export default function MenuSection() {
   const { lang, t } = useLanguage();
+  const [menuData, setMenuData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/data/menu.json')
+      .then(res => res.json())
+      .then(data => {
+        setMenuData(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  // Use fetched data or fallback to static
+  const categories = menuData?.categories || {};
+
+  if (loading) {
+    return (
+      <section id="menu" className="py-24 bg-roma-gray">
+        <div className="container mx-auto px-4 text-center">
+          <div className="w-12 h-12 border-4 border-roma-red border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="menu" className="py-24 bg-roma-gray">
@@ -227,44 +264,47 @@ export default function MenuSection() {
           <div className="w-20 h-1 bg-roma-red mx-auto mt-4"></div>
         </div>
 
-        {/* Category filter (Desktop) */}
+        {/* Category filter buttons - dynamic */}
         <div className="flex justify-center gap-4 mb-12 flex-wrap">
-          {['Pizza', 'Pasta', 'Salate', 'Getränke', 'Desserts'].map(cat => (
-            <button key={cat} className="px-6 py-2 rounded-full bg-roma-dark/5 hover:bg-roma-red hover:text-white text-roma-dark font-poppins font-semibold transition-all">
-              {cat}
-            </button>
+          {Object.entries(categories).map(([key, cat]: [string, any]) => (
+            <a 
+              key={key} 
+              href={`#cat-${key}`}
+              className="px-6 py-2 rounded-full bg-roma-dark/5 hover:bg-roma-red hover:text-white text-roma-dark font-poppins font-semibold transition-all"
+            >
+              {cat.name?.[lang] || key}
+            </a>
           ))}
         </div>
 
-        {/* Pizza grid */}
-        <h3 className="text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 border-roma-red pl-4">Pizza</h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {menuData.pizzas.map(pizza => <MenuCard key={pizza.id} {...pizza} />)}
-        </div>
+        {/* Dynamic category sections */}
+        {Object.entries(categories).map(([key, category]: [string, any], index) => (
+          <div key={key} id={`cat-${key}`}>
+            <h3 className={`text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 ${categoryColors[key] || 'border-gray-500'} pl-4`}>
+              {category.name?.[lang] || key}
+            </h3>
+            <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-8 ${index < Object.keys(categories).length - 1 ? 'mb-20' : ''}`}>
+              {category.items?.map((item: any) => (
+                <MenuCard 
+                  key={item.id} 
+                  id={item.id}
+                  image={item.image}
+                  name={item.name}
+                  desc={item.desc || item.description}
+                  prices={item.prices || { '1': item.price }}
+                  toppings={item.toppings || []}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
 
-        {/* Pasta grid */}
-        <h3 className="text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 border-roma-gold pl-4">Pasta</h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {menuData.pasta.map(p => <MenuCard key={p.id} {...p} />)}
-        </div>
-
-        {/* Salads grid */}
-        <h3 className="text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 border-green-500 pl-4">Salate / Салаты</h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {menuData.salads.map(s => <MenuCard key={s.id} {...s} />)}
-        </div>
-
-        {/* Drinks grid */}
-        <h3 className="text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 border-blue-500 pl-4">Getränke / Напитки</h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {menuData.drinks.map(d => <MenuCard key={d.id} {...d} />)}
-        </div>
-
-        {/* Desserts grid */}
-        <h3 className="text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 border-pink-500 pl-4">Desserts / Десерты</h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menuData.desserts.map(d => <MenuCard key={d.id} {...d} />)}
-        </div>
+        {/* Fallback if no data */}
+        {Object.keys(categories).length === 0 && (
+          <div className="text-center text-roma-dark/60">
+            <p>Menü wird geladen... / Меню загружается...</p>
+          </div>
+        )}
       </div>
     </section>
   );
