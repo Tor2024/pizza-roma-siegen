@@ -17,8 +17,12 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   // Load from localStorage on mount
   useEffect(() => {
     const savedLang = localStorage.getItem('lang') as Lang;
-    if (savedLang && (savedLang === 'de' || savedLang === 'ru')) {
+    // Only accept valid languages: 'de' or 'ru' (reset old 'en' or invalid to 'de')
+    if (savedLang === 'de' || savedLang === 'ru') {
       setLangState(savedLang);
+    } else {
+      // Reset invalid language to default 'de'
+      localStorage.setItem('lang', 'de');
     }
     setMounted(true);
   }, []);
