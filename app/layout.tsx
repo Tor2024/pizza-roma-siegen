@@ -14,6 +14,12 @@ export const metadata: Metadata = {
     title: 'Pizza Roma Siegen | Beste Pizza in der Stadt',
     description: 'Heiße pizza, schnell geliefert. Jetzt online bestellen!',
     images: ['/images/hero-bg.webp']
+  },
+  // Cache control to prevent old versions
+  other: {
+    'cache-control': 'no-cache, no-store, must-revalidate',
+    'pragma': 'no-cache',
+    'expires': '0'
   }
 }
 
@@ -24,6 +30,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          // Force clear any cached language and reload if needed
+          if (localStorage.getItem('lang')) {
+            localStorage.removeItem('lang');
+          }
+        `}} />
+      </head>
       <body className="font-inter antialiased">
         <LanguageProvider>
           <Header />
