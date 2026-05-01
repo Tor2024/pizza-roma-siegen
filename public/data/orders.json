@@ -69,8 +69,8 @@
     "total": 38.8,
     "paymentMethod": "cash",
     "deliveryTime": "asap",
-    "status": "done",
+    "status": "received",
     "createdAt": 1777622913853,
-    "updatedAt": 1777624113860
+    "updatedAt": 1777624189823
   }
 ]
