@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useMenuRefresh } from '@/hooks/useMenuRefresh';
 import MenuCard from './MenuCard';
 
 type CategoryKey = 'all' | 'pizzas' | 'pasta' | 'salads' | 'drinks' | 'desserts';
@@ -233,18 +234,32 @@ export default function MenuSection() {
   const [menuData, setMenuData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
+  const { lastUpdate, isRefreshing, error, refreshMenu } = useMenuRefresh(30000); // 30 seconds
 
+  // Initial load and refresh handling
   useEffect(() => {
-    fetch('/data/menu.json', { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => {
-        setMenuData(data);
+    const loadMenu = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/menu', { cache: 'no-store' });
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error('Menu API error:', data.error);
+          setMenuData({ categories: {} });
+        } else {
+          setMenuData(data);
+        }
+      } catch (error) {
+        console.error('Failed to load menu:', error);
+        setMenuData({ categories: {} });
+      } finally {
         setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    loadMenu();
+  }, [lastUpdate]); // Reload when lastUpdate changes
 
   // Use fetched data or fallback to static
   const categories = menuData?.categories || {};
@@ -270,6 +285,29 @@ export default function MenuSection() {
         <div className="text-center mb-16">
           <h2 className="text-5xl font-poppins font-bold text-roma-dark">{t('nav_menu')}</h2>
           <div className="w-20 h-1 bg-roma-red mx-auto mt-4"></div>
+          
+          {/* Refresh indicator */}
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <button
+              onClick={refreshMenu}
+              disabled={isRefreshing}
+              className="text-sm text-roma-dark/60 hover:text-roma-red transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              {isRefreshing ? (
+                <>
+                  <div className="w-4 h-4 border border-roma-red/30 border-t-roma-red rounded-full animate-spin"></div>
+                  Aktualisieren...
+                </>
+              ) : (
+                <>
+                  🔄 Menü aktualisieren
+                </>
+              )}
+            </button>
+            {error && (
+              <span className="text-xs text-red-500">Fehler beim Laden</span>
+            )}
+          </div>
         </div>
 
         {/* Category filter buttons - dynamic */}

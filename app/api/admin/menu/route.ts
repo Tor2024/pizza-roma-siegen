@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getMenu, updateMenu } from '@/lib/menuStorage';
+import { saveMenuToGitHub } from '@/lib/githubMenuStorage';
 
 // GET - получить текущее меню
 export async function GET() {
@@ -22,12 +23,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Сохраняем в память
+    // Сохраняем в память и в GitHub
     updateMenu(newMenuData);
+    
+    // Сохраняем в GitHub для персистентности
+    const githubSaved = await saveMenuToGitHub(newMenuData);
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Menü gespeichert! Änderungen sind sofort aktiv.'
+      message: githubSaved 
+        ? 'Menü gespeichert! Änderungen sind sofort aktiv und in GitHub gespeichert.' 
+        : 'Menü gespeichert! Änderungen sind sofort aktiv (GitHub Speicherung fehlgeschlagen).'
     });
   } catch (error) {
     console.error('Menu update error:', error);
