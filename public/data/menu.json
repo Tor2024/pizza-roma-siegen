@@ -618,7 +618,7 @@
   ],
   "settings": {
     "delivery": {
-      "minOrder": 15,
+      "minOrder": 20,
       "freeDeliveryThreshold": 25,
       "deliveryFee": 3.5,
       "estimatedTime": "25-35 Min"
