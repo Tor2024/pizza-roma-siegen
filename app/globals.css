@@ -29,12 +29,6 @@ body {
   will-change: transform;
 }
 
-/* Optimize sections for rendering */
-section {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 500px;
-}
-
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
