@@ -248,6 +248,7 @@ export default function MenuSection() {
           console.error('Menu API error:', data.error);
           setMenuData({ categories: {} });
         } else {
+          console.log('Menu loaded from:', data._source || 'unknown', 'timestamp:', data._timestamp);
           setMenuData(data);
         }
       } catch (error) {
@@ -306,6 +307,11 @@ export default function MenuSection() {
             </button>
             {error && (
               <span className="text-xs text-red-500">Fehler beim Laden</span>
+            )}
+            {menuData?._source && (
+              <span className={`text-xs px-2 py-1 rounded ${menuData._source === 'github' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                {menuData._source === 'github' ? '✓ GitHub' : '⚠ Local'}
+              </span>
             )}
           </div>
         </div>
