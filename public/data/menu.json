@@ -2,227 +2,87 @@
   "categories": {
     "pizzas": {
       "id": "pizzas",
-      "name": {
-        "de": "Pizza",
-        "ru": "Пицца"
-      },
+      "name": { "de": "Pizza", "ru": "Пицца" },
       "items": [
         {
           "id": "p1",
-          "image": "/images/p1_pizza_margherita.webp",
-          "name": {
-            "de": "Margherita Classic",
-            "ru": "Маргарита Классик"
-          },
-          "desc": {
-            "de": "Tomatensauce, Mozzarella, Basilikum",
-            "ru": "Томатный соус, Моцарелла, Базилик"
-          },
-          "prices": {
-            "26": 8.9,
-            "32": 1600,
-            "40": 15.9
-          },
+          "image": "/images/pizza-margherita.webp",
+          "name": { "de": "Margherita Classic", "ru": "Маргарита Классик" },
+          "desc": { "de": "Tomatensauce, Mozzarella, Basilikum", "ru": "Томатный соус, Моцарелла, Базилик" },
+          "prices": { "26": 8.90, "32": 11.90, "40": 15.90 },
           "toppings": [
-            {
-              "id": "t1",
-              "name": {
-                "de": "Extra Käse",
-                "ru": "Доп. сыр"
-              },
-              "price": 1.5
-            },
-            {
-              "id": "t2",
-              "name": {
-                "de": "Oliven",
-                "ru": "Оливки"
-              },
-              "price": 1
-            }
+            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
+            { "id": "t2", "name": { "de": "Oliven", "ru": "Оливки" }, "price": 1.00 }
           ],
-          "available": true,
-          "description": {
-            "de": "Margherita Classic - Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,"
-          }
+          "allergens": ["A", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Milch/Laktose", "ru": "Глютен (пшеница), молоко/лактоза" },
+          "available": true
         },
         {
           "id": "p2",
-          "image": "/images/p2_pizza_salami.webp",
-          "name": {
-            "de": "Salami",
-            "ru": "Салями"
-          },
-          "desc": {
-            "de": "Tomatensauce, Mozzarella, Salami",
-            "ru": "Томатный соус, Моцарелла, Салями"
-          },
-          "prices": {
-            "26": 1600,
-            "32": 1600,
-            "40": 16.9
-          },
+          "image": "/images/pizza-salami.webp",
+          "name": { "de": "Salami", "ru": "Салями" },
+          "desc": { "de": "Tomatensauce, Mozzarella, Salami", "ru": "Томатный соус, Моцарелла, Салями" },
+          "prices": { "26": 9.90, "32": 12.90, "40": 16.90 },
           "toppings": [
-            {
-              "id": "t1",
-              "name": {
-                "de": "Extra Käse",
-                "ru": "Доп. сыр"
-              },
-              "price": 1.5
-            },
-            {
-              "id": "t3",
-              "name": {
-                "de": "Pepperoni",
-                "ru": "Пепперони"
-              },
-              "price": 1.5
-            }
+            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
+            { "id": "t3", "name": { "de": "Pepperoni", "ru": "Пепперони" }, "price": 1.50 }
           ],
+          "allergens": ["A", "D", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Fisch, Milch/Laktose", "ru": "Глютен (пшеница), рыба, молоко/лактоза" },
           "available": true
         },
         {
           "id": "p3",
-          "image": "/images/p3_pizza_tonno.webp",
-          "name": {
-            "de": "Tonno",
-            "ru": "Тонно"
-          },
-          "desc": {
-            "de": "Tomatensauce, Mozzarella, Thunfisch, Zwiebeln",
-            "ru": "Томатный соус, Моцарелла, Тунец, Лук"
-          },
-          "prices": {
-            "26": 10.5,
-            "32": 13.5,
-            "40": 17.5
-          },
+          "image": "/images/pizza-tonno.webp",
+          "name": { "de": "Tonno", "ru": "Тонно" },
+          "desc": { "de": "Tomatensauce, Mozzarella, Thunfisch, Zwiebeln", "ru": "Томатный соус, Моцарелла, Тунец, Лук" },
+          "prices": { "26": 10.50, "32": 13.50, "40": 17.50 },
           "toppings": [
-            {
-              "id": "t1",
-              "name": {
-                "de": "Extra Käse",
-                "ru": "Доп. сыр"
-              },
-              "price": 1.5
-            },
-            {
-              "id": "t2",
-              "name": {
-                "de": "Oliven",
-                "ru": "Оливки"
-              },
-              "price": 1
-            }
+            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
+            { "id": "t2", "name": { "de": "Oliven", "ru": "Оливки" }, "price": 1.00 }
           ],
+          "allergens": ["A", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Milch/Laktose", "ru": "Глютен (пшеница), молоко/лактоза" },
           "available": true
         },
         {
           "id": "p4",
-          "image": "/images/p4_pizza_diavola.webp",
-          "name": {
-            "de": "Diavola",
-            "ru": "Дьявола"
-          },
-          "desc": {
-            "de": "Tomatensauce, Mozzarella, Scharfe Salami, Chili",
-            "ru": "Томатный соус, Моцарелла, Острая салями, Чили"
-          },
-          "prices": {
-            "26": 10.9,
-            "32": 13.9,
-            "40": 17.9
-          },
+          "image": "/images/pizza-diavola.webp",
+          "name": { "de": "Diavola", "ru": "Дьявола" },
+          "desc": { "de": "Tomatensauce, Mozzarella, Scharfe Salami, Chili", "ru": "Томатный соус, Моцарелла, Острая салями, Чили" },
+          "prices": { "26": 10.90, "32": 13.90, "40": 17.90 },
           "toppings": [
-            {
-              "id": "t1",
-              "name": {
-                "de": "Extra Käse",
-                "ru": "Доп. сыр"
-              },
-              "price": 1.5
-            },
-            {
-              "id": "t4",
-              "name": {
-                "de": "Extra Chili",
-                "ru": "Доп. чили"
-              },
-              "price": 0.5
-            }
+            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
+            { "id": "t4", "name": { "de": "Extra Chili", "ru": "Доп. чили" }, "price": 0.50 }
           ],
+          "allergens": ["A", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Milch/Laktose (vier Käsesorten)", "ru": "Глютен (пшеница), молоко/лактоза (четыре сыра)" },
           "available": true
         },
         {
           "id": "p5",
-          "image": "/images/p5_pizza_quattro.webp",
-          "name": {
-            "de": "Quattro Formaggi",
-            "ru": "Четыре сыра"
-          },
-          "desc": {
-            "de": "Mozzarella, Gorgonzola, Parmesan, Emmentaler",
-            "ru": "Моцарелла, Горгонзола, Пармезан, Эмменталер"
-          },
-          "prices": {
-            "26": 11.5,
-            "32": 14.5,
-            "40": 18.5
-          },
+          "image": "/images/pizza-quattro.webp",
+          "name": { "de": "Quattro Formaggi", "ru": "Четыре сыра" },
+          "desc": { "de": "Mozzarella, Gorgonzola, Parmesan, Emmentaler", "ru": "Моцарелла, Горгонзола, Пармезан, Эмменталер" },
+          "prices": { "26": 11.50, "32": 14.50, "40": 18.50 },
           "toppings": [
-            {
-              "id": "t5",
-              "name": {
-                "de": "Honig",
-                "ru": "Мед"
-              },
-              "price": 1
-            },
-            {
-              "id": "t6",
-              "name": {
-                "de": "Walnüsse",
-                "ru": "Грецкие орехи"
-              },
-              "price": 1.5
-            }
+            { "id": "t5", "name": { "de": "Honig", "ru": "Мед" }, "price": 1.00 },
+            { "id": "t6", "name": { "de": "Walnüsse", "ru": "Грецкие орехи" }, "price": 1.50 }
           ],
+          "allergens": ["A", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Milch/Laktose", "ru": "Глютен (пшеница), молоко/лактоза" },
           "available": true
         },
         {
           "id": "p6",
-          "image": "/images/p6_pizza_prosciutto.webp",
-          "name": {
-            "de": "Prosciutto Funghi",
-            "ru": "Прошутто Фунги"
-          },
-          "desc": {
-            "de": "Tomatensauce, Mozzarella, Schinken, Champignons",
-            "ru": "Томатный соус, Моцарелла, Ветчина, Грибы"
-          },
-          "prices": {
-            "26": 10.9,
-            "32": 13.9,
-            "40": 17.9
-          },
+          "image": "/images/pizza-prosciutto.webp",
+          "name": { "de": "Prosciutto Funghi", "ru": "Прошутто Фунги" },
+          "desc": { "de": "Tomatensauce, Mozzarella, Schinken, Champignons", "ru": "Томатный соус, Моцарелла, Ветчина, Грибы" },
+          "prices": { "26": 10.90, "32": 13.90, "40": 17.90 },
           "toppings": [
-            {
-              "id": "t1",
-              "name": {
-                "de": "Extra Käse",
-                "ru": "Доп. сыр"
-              },
-              "price": 1.5
-            },
-            {
-              "id": "t7",
-              "name": {
-                "de": "Trüffelöl",
-                "ru": "Трюфельное масло"
-              },
-              "price": 2
-            }
+            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
+            { "id": "t7", "name": { "de": "Trüffelöl", "ru": "Трюфельное масло" }, "price": 2.00 }
           ],
           "available": true
         }
@@ -230,343 +90,183 @@
     },
     "pasta": {
       "id": "pasta",
-      "name": {
-        "de": "Pasta",
-        "ru": "Паста"
-      },
+      "name": { "de": "Pasta", "ru": "Паста" },
       "items": [
         {
           "id": "pas1",
-          "image": "/images/pas1_pasta_carb.webp",
-          "name": {
-            "de": "Pasta Carbonara",
-            "ru": "Паста Карбонара"
-          },
-          "desc": {
-            "de": "Speck, Sahmesauce, Parmesan",
-            "ru": "Бекон, сливочный соус, Пармезан"
-          },
-          "prices": {
-            "1": 11.9
-          },
+          "image": "/images/pasta-carb.webp",
+          "name": { "de": "Pasta Carbonara", "ru": "Паста Карбонара" },
+          "desc": { "de": "Speck, Sahmesauce, Parmesan", "ru": "Бекон, сливочный соус, Пармезан" },
+          "prices": { "1": 11.90 },
           "toppings": [],
+          "allergens": ["A", "C", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Eier, Milch/Laktose", "ru": "Глютен (пшеница), яйца, молоко/лактоза" },
           "available": true
         },
         {
           "id": "pas2",
-          "image": "/images/pas2_pasta_bolo.webp",
-          "name": {
-            "de": "Pasta Bolognese",
-            "ru": "Паста Болоньезе"
-          },
-          "desc": {
-            "de": "Rindfleischsauce, Parmesan",
-            "ru": "Мясной соус, Пармезан"
-          },
-          "prices": {
-            "1": 10.9
-          },
+          "image": "/images/pasta-bolo.webp",
+          "name": { "de": "Pasta Bolognese", "ru": "Паста Болоньезе" },
+          "desc": { "de": "Rindfleischsauce, Parmesan", "ru": "Мясной соус, Пармезан" },
+          "prices": { "1": 10.90 },
           "toppings": [],
+          "allergens": ["A", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Milch/Laktose", "ru": "Глютен (пшеница), молоко/лактоза" },
           "available": true
         }
       ]
     },
     "salads": {
       "id": "salads",
-      "name": {
-        "de": "Salate",
-        "ru": "Салаты"
-      },
+      "name": { "de": "Salate", "ru": "Салаты" },
       "items": [
         {
           "id": "s1",
-          "image": "/images/s1_salad_caesar.webp",
-          "name": {
-            "de": "Caesar Salad",
-            "ru": "Салат Цезарь"
-          },
-          "desc": {
-            "de": "Römersalat, Croutons, Parmesan, Caesar-Dressing",
-            "ru": "Салат романо, крутоны, пармезан, соус Цезарь"
-          },
-          "prices": {
-            "1": 8.9
-          },
+          "image": "/images/salad-caesar.webp",
+          "name": { "de": "Caesar Salad", "ru": "Салат Цезарь" },
+          "desc": { "de": "Römersalat, Croutons, Parmesan, Caesar-Dressing", "ru": "Салат романо, крутоны, пармезан, соус Цезарь" },
+          "prices": { "1": 8.90 },
           "toppings": [
-            {
-              "id": "s1",
-              "name": {
-                "de": "Hähnchenbrust",
-                "ru": "Куриная грудка"
-              },
-              "price": 3.5
-            },
-            {
-              "id": "s2",
-              "name": {
-                "de": "Extra Parmesan",
-                "ru": "Доп. пармезан"
-              },
-              "price": 1.5
-            }
+            { "id": "s1", "name": { "de": "Hähnchenbrust", "ru": "Куриная грудка" }, "price": 3.50 },
+            { "id": "s2", "name": { "de": "Extra Parmesan", "ru": "Доп. пармезан" }, "price": 1.50 }
           ],
+          "allergens": ["A", "G", "C", "D"],
+          "allergensDesc": { "de": "Gluten (Weizen), Milch/Laktose, Eier, Fisch (Anchovis im Dressing)", "ru": "Глютен (пшеница), молоко/лактоза, яйца, рыба (анчоусы в соусе)" },
           "available": true
         },
         {
           "id": "s2",
-          "image": "/images/s2_salad_mista.webp",
-          "name": {
-            "de": "Insalata Mista",
-            "ru": "Смешанный салат"
-          },
-          "desc": {
-            "de": "Gemischter Blattsalat, Tomaten, Gurken, Oliven",
-            "ru": "Смешанный листовой салат, томаты, огурцы, оливки"
-          },
-          "prices": {
-            "1": 7.5
-          },
+          "image": "/images/salad-mista.webp",
+          "name": { "de": "Insalata Mista", "ru": "Смешанный салат" },
+          "desc": { "de": "Gemischter Blattsalat, Tomaten, Gurken, Oliven", "ru": "Смешанный листовой салат, томаты, огурцы, оливки" },
+          "prices": { "1": 7.50 },
           "toppings": [
-            {
-              "id": "s3",
-              "name": {
-                "de": "Thunfisch",
-                "ru": "Тунец"
-              },
-              "price": 2.5
-            },
-            {
-              "id": "s4",
-              "name": {
-                "de": "Mozzarella",
-                "ru": "Моцарелла"
-              },
-              "price": 2
-            }
+            { "id": "s3", "name": { "de": "Thunfisch", "ru": "Тунец" }, "price": 2.50 },
+            { "id": "s4", "name": { "de": "Mozzarella", "ru": "Моцарелла" }, "price": 2.00 }
           ],
+          "allergens": [],
+          "allergensDesc": { "de": "Keine Allergene (Thunfisch/Mozzarella optional)", "ru": "Нет аллергенов (тунец/моцарелла опционально)" },
           "available": true
         },
         {
           "id": "s3",
-          "image": "/images/s3_salad_tomate.webp",
-          "name": {
-            "de": "Tomaten-Mozzarella",
-            "ru": "Томат с моцареллой"
-          },
-          "desc": {
-            "de": "Frische Tomaten, Büffelmozzarella, Basilikum, Olivenöl",
-            "ru": "Свежие томаты, буйволиная моцарелла, базилик, оливковое масло"
-          },
-          "prices": {
-            "1": 9.9
-          },
+          "image": "/images/salad-tomate.webp",
+          "name": { "de": "Tomaten-Mozzarella", "ru": "Томат с моцареллой" },
+          "desc": { "de": "Frische Tomaten, Büffelmozzarella, Basilikum, Olivenöl", "ru": "Свежие томаты, буйволиная моцарелла, базилик, оливковое масло" },
+          "prices": { "1": 9.90 },
           "toppings": [
-            {
-              "id": "s5",
-              "name": {
-                "de": "Rucola",
-                "ru": "Руккола"
-              },
-              "price": 1.5
-            },
-            {
-              "id": "s6",
-              "name": {
-                "de": "Balsamico",
-                "ru": "Бальзамико"
-              },
-              "price": 0.5
-            }
+            { "id": "s5", "name": { "de": "Rucola", "ru": "Руккола" }, "price": 1.50 },
+            { "id": "s6", "name": { "de": "Balsamico", "ru": "Бальзамико" }, "price": 0.50 }
           ],
+          "allergens": ["G"],
+          "allergensDesc": { "de": "Milch/Laktose (Mozzarella)", "ru": "Молоко/лактоза (моцарелла)" },
           "available": true
         }
       ]
     },
     "drinks": {
       "id": "drinks",
-      "name": {
-        "de": "Getränke",
-        "ru": "Напитки"
-      },
+      "name": { "de": "Getränke", "ru": "Напитки" },
       "items": [
         {
           "id": "d1",
           "image": "/images/drink-cola.webp",
-          "name": {
-            "de": "Coca Cola 0,5L",
-            "ru": "Кока-Кола 0,5л"
-          },
-          "desc": {
-            "de": "Eisgekühlt",
-            "ru": "Ледяная"
-          },
-          "prices": {
-            "1": 0.5
-          },
+          "name": { "de": "Coca Cola 0,5L", "ru": "Кока-Кола 0,5л" },
+          "desc": { "de": "Eisgekühlt", "ru": "Ледяная" },
+          "prices": { "1": 2.90 },
           "toppings": [],
+          "allergens": [],
+          "allergensDesc": { "de": "Keine Allergene", "ru": "Нет аллергенов" },
           "available": true
         },
         {
           "id": "d2",
           "image": "/images/drink-fanta.webp",
-          "name": {
-            "de": "Fanta 0,5L",
-            "ru": "Фанта 0,5л"
-          },
-          "desc": {
-            "de": "Orange, erfrischend",
-            "ru": "Апельсин, освежающая"
-          },
-          "prices": {
-            "1": 0.5
-          },
+          "name": { "de": "Fanta 0,5L", "ru": "Фанта 0,5л" },
+          "desc": { "de": "Orange, erfrischend", "ru": "Апельсин, освежающая" },
+          "prices": { "1": 2.90 },
           "toppings": [],
+          "allergens": [],
+          "allergensDesc": { "de": "Keine Allergene", "ru": "Нет аллергенов" },
           "available": true
         },
         {
           "id": "d3",
           "image": "/images/drink-sprite.webp",
-          "name": {
-            "de": "Sprite 0,5L",
-            "ru": "Спрайт 0,5л"
-          },
-          "desc": {
-            "de": "Lemon-Lime, erfrischend",
-            "ru": "Лимон-лайм, освежающий"
-          },
-          "prices": {
-            "1": 0.5
-          },
+          "name": { "de": "Sprite 0,5L", "ru": "Спрайт 0,5л" },
+          "desc": { "de": "Lemon-Lime, erfrischend", "ru": "Лимон-лайм, освежающий" },
+          "prices": { "1": 2.90 },
           "toppings": [],
+          "allergens": [],
+          "allergensDesc": { "de": "Keine Allergene", "ru": "Нет аллергенов" },
           "available": true
         },
         {
           "id": "d4",
           "image": "/images/drink-water.webp",
-          "name": {
-            "de": "Mineralwasser 0,5L",
-            "ru": "Минеральная вода 0,5л"
-          },
-          "desc": {
-            "de": "Mit oder ohne Kohlensäure",
-            "ru": "С газом или без"
-          },
-          "prices": {
-            "1": 2.5
-          },
+          "name": { "de": "Mineralwasser 0,5L", "ru": "Минеральная вода 0,5л" },
+          "desc": { "de": "Mit oder ohne Kohlensäure", "ru": "С газом или без" },
+          "prices": { "1": 2.50 },
           "toppings": [],
+          "allergens": [],
+          "allergensDesc": { "de": "Keine Allergene", "ru": "Нет аллергенов" },
           "available": true
         },
         {
           "id": "d5",
           "image": "/images/drink-beer.webp",
-          "name": {
-            "de": "Bier 0,5L",
-            "ru": "Пиво 0,5л"
-          },
-          "desc": {
-            "de": "Deutsches Pils",
-            "ru": "Немецкий пилснер"
-          },
-          "prices": {
-            "1": 3.9
-          },
+          "name": { "de": "Bier 0,5L", "ru": "Пиво 0,5л" },
+          "desc": { "de": "Deutsches Pils", "ru": "Немецкий пилснер" },
+          "prices": { "1": 3.90 },
           "toppings": [],
+          "allergens": ["A"],
+          "allergensDesc": { "de": "Gluten (Gerste, Weizen)", "ru": "Глютен (ячмень, пшеница)" },
           "available": true
         }
       ]
     },
     "desserts": {
       "id": "desserts",
-      "name": {
-        "de": "Desserts",
-        "ru": "Десерты"
-      },
+      "name": { "de": "Desserts", "ru": "Десерты" },
       "items": [
         {
           "id": "de1",
-          "image": "/images/de1_dessert_tiramisu.webp",
-          "name": {
-            "de": "Tiramisu",
-            "ru": "Тирамису"
-          },
-          "desc": {
-            "de": "Hausgemacht, klassisch italienisch",
-            "ru": "Домашнее, классическое итальянское"
-          },
-          "prices": {
-            "1": 5.9
-          },
+          "image": "/images/dessert-tiramisu.webp",
+          "name": { "de": "Tiramisu", "ru": "Тирамису" },
+          "desc": { "de": "Hausgemacht, klassisch italienisch", "ru": "Домашнее, классическое итальянское" },
+          "prices": { "1": 5.90 },
           "toppings": [
-            {
-              "id": "de1",
-              "name": {
-                "de": "Extra Kakao",
-                "ru": "Доп. какао"
-              },
-              "price": 0.5
-            }
+            { "id": "de1", "name": { "de": "Extra Kakao", "ru": "Доп. какао" }, "price": 0.50 }
           ],
+          "allergens": ["A", "C", "G"],
+          "allergensDesc": { "de": "Gluten (Weizen), Eier, Milch/Laktose (Mascarpone)", "ru": "Глютен (пшеница), яйца, молоко/лактоза (маскарпоне)" },
           "available": true
         },
         {
           "id": "de2",
-          "image": "/images/de2_dessert_panna.webp",
-          "name": {
-            "de": "Panna Cotta",
-            "ru": "Панна-котта"
-          },
-          "desc": {
-            "de": "Mit Erdbeersauce",
-            "ru": "С клубничным соусом"
-          },
-          "prices": {
-            "1": 5.5
-          },
+          "image": "/images/dessert-panna.webp",
+          "name": { "de": "Panna Cotta", "ru": "Панна-котта" },
+          "desc": { "de": "Mit Erdbeersauce", "ru": "С клубничным соусом" },
+          "prices": { "1": 5.50 },
           "toppings": [
-            {
-              "id": "de2",
-              "name": {
-                "de": "Beerenmix",
-                "ru": "Ягодный микс"
-              },
-              "price": 1.5
-            }
+            { "id": "de2", "name": { "de": "Beerenmix", "ru": "Ягодный микс" }, "price": 1.50 }
           ],
+          "allergens": ["G"],
+          "allergensDesc": { "de": "Milch/Laktose (Sahne)", "ru": "Молоко/лактоза (сливки)" },
           "available": true
         },
         {
           "id": "de3",
-          "image": "/images/de3_dessert_ice.webp",
-          "name": {
-            "de": "Eis 3 Kugeln",
-            "ru": "Мороженое 3 шарика"
-          },
-          "desc": {
-            "de": "Vanille, Schoko, Erdbeere",
-            "ru": "Ваниль, шоколад, клубника"
-          },
-          "prices": {
-            "1": 4.9
-          },
+          "image": "/images/dessert-ice.webp",
+          "name": { "de": "Eis 3 Kugeln", "ru": "Мороженое 3 шарика" },
+          "desc": { "de": "Vanille, Schoko, Erdbeere", "ru": "Ваниль, шоколад, клубника" },
+          "prices": { "1": 4.90 },
           "toppings": [
-            {
-              "id": "de3",
-              "name": {
-                "de": "Sahne",
-                "ru": "Сливки"
-              },
-              "price": 0.5
-            },
-            {
-              "id": "de4",
-              "name": {
-                "de": "Schokosoße",
-                "ru": "Шоколадный соус"
-              },
-              "price": 0.5
-            }
+            { "id": "de3", "name": { "de": "Sahne", "ru": "Сливки" }, "price": 0.50 },
+            { "id": "de4", "name": { "de": "Schokosoße", "ru": "Шоколадный соус" }, "price": 0.50 }
           ],
+          "allergens": ["G"],
+          "allergensDesc": { "de": "Milch/Laktose", "ru": "Молоко/лактоза" },
           "available": true
         }
       ]
@@ -576,51 +276,33 @@
     {
       "id": "o1",
       "img": "/images/offer-2pizza.webp",
-      "title": {
-        "de": "2 Pizzen + Cola",
-        "ru": "2 Пиццы + Кола"
-      },
-      "desc": {
-        "de": "2 Pizzen nach Wahl + 0,5L Cola",
-        "ru": "2 Пиццы на выбор + 0,5л Кола"
-      },
+      "title": { "de": "2 Pizzen + Cola", "ru": "2 Пиццы + Кола" },
+      "desc": { "de": "2 Pizzen nach Wahl + 0,5L Cola", "ru": "2 Пиццы на выбор + 0,5л Кола" },
       "price": "19.90 €",
-      "badge": "Spare 25%"
+      "badge": "Spare 30%"
     },
     {
       "id": "o2",
       "img": "/images/offer-family.webp",
-      "title": {
-        "de": "Familien Menü",
-        "ru": "Семейное Меню"
-      },
-      "desc": {
-        "de": "3 Pizzen + 2 Getränke + Dessert",
-        "ru": "3 Пиццы + 2 Напитка + Десерт"
-      },
+      "title": { "de": "Familien Menü", "ru": "Семейное Меню" },
+      "desc": { "de": "3 Pizzen + 2 Getränke + Dessert", "ru": "3 Пиццы + 2 Напитка + Десерт" },
       "price": "29.90 €",
       "badge": "Bestseller"
     },
     {
       "id": "o3",
       "img": "/images/offer-lunch.webp",
-      "title": {
-        "de": "Mittagsangebot",
-        "ru": "Обеденное предложение"
-      },
-      "desc": {
-        "de": "Pizza + Salat + Getränk 11-14 Uhr",
-        "ru": "Пицца + Салат + Напиток 11-14"
-      },
+      "title": { "de": "Mittagsangebot", "ru": "Обеденное предложение" },
+      "desc": { "de": "Pizza + Salat + Getränk 11-14 Uhr", "ru": "Пицца + Салат + Напиток 11-14" },
       "price": "8.90 €",
       "badge": "11-14 Uhr"
     }
   ],
   "settings": {
     "delivery": {
-      "minOrder": 20,
-      "freeDeliveryThreshold": 25,
-      "deliveryFee": 3.5,
+      "minOrder": 15.00,
+      "freeDeliveryThreshold": 25.00,
+      "deliveryFee": 3.50,
       "estimatedTime": "25-35 Min"
     },
     "hours": {
@@ -629,56 +311,8 @@
       "sun": "12:00 - 22:00"
     },
     "promoCodes": {
-      "ROMA10": {
-        "discount": 0.1,
-        "active": true
-      },
-      "ROMA20": {
-        "discount": 0.2,
-        "active": true
-      }
-    }
-  },
-  "legal": {
-    "impressum": {
-      "companyName": "Pizza Roma Siegen",
-      "owner": "[Inhaber Name]",
-      "address": "[Straße und Hausnummer], 57072 Siegen",
-      "phone": "+49 271 [Telefonnummer]",
-      "email": "info@pizza-roma-siegen.de",
-      "ustId": "DE [USt-IdNr.]",
-      "steuernummer": "[Steuernummer]",
-      "registerCourt": "",
-      "registerNumber": "",
-      "responsibleForContent": "[Inhaber Name]",
-      "responsibleAddress": "[Straße und Hausnummer], 57072 Siegen",
-      "additionalInfo": ""
-    },
-    "datenschutz": {
-      "intro": "Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.",
-      "controller": "Pizza Roma Siegen, [Inhaber Name], [Straße und Hausnummer], 57072 Siegen",
-      "dataCollected": "Bei einer Bestellung erheben wir folgende Daten: Name, Lieferadresse, Telefonnummer, E-Mail-Adresse, Bestelldaten. Bei der Nutzung unserer Website werden zudem IP-Adresse, Browsertyp und -version, Betriebssystem und Zugriffszeiten automatisch erhoben.",
-      "purpose": "Die Verarbeitung Ihrer Daten erfolgt zur Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO) sowie zur Bereitstellung unserer Website und Verbesserung unseres Angebots (Art. 6 Abs. 1 lit. f DSGVO).",
-      "hosting": "Unsere Website wird von Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA, gehostet. Weitere Informationen finden Sie unter vercel.com/privacy.",
-      "cookies": "Wir verwenden technisch notwendige Cookies, um den Betrieb der Website zu gewährleisten. Es werden keine Tracking-Cookies gesetzt, ohne dass Sie Ihre Einwilligung erteilt haben.",
-      "rights": "Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) und Widerspruch (Art. 21 DSGVO). Kontakt: info@pizza-roma-siegen.de",
-      "additionalInfo": ""
-    },
-    "agb": {
-      "companyName": "Pizza Roma Siegen",
-      "intro": "Die folgenden Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Bestellungen über unseren Online-Shop.",
-      "scope": "Diese AGB gelten für alle Verträge zwischen Pizza Roma Siegen und dem Kunden über die Lieferung von Speisen und Getränken.",
-      "contractFormation": "Die Darstellung der Produkte im Online-Shop stellt kein rechtsverbindliches Angebot dar. Durch Absenden der Bestellung gibt der Kunde ein verbindliches Angebot ab. Der Vertrag kommt zustande, wenn wir die Bestellung durch Zusendung einer Auftragsbestätigung oder durch Lieferung der Ware annehmen.",
-      "prices": "Alle angegebenen Preise sind Bruttopreise inklusive der gesetzlichen Umsatzsteuer (19%). Die Lieferkosten werden separat ausgewiesen und betragen 3,50 € (kostenlos ab 25 € Bestellwert).",
-      "delivery": "Die Lieferung erfolgt ausschließlich innerhalb des Liefergebietes von Siegen und Umgebung. Die angegebenen Lieferzeiten sind Schätzungen. Wir bemühen uns um pünktliche Lieferung, können jedoch Verzögerungen aufgrund von Verkehr oder Wetter nicht ausschließen.",
-      "payment": "Die Bezahlung erfolgt bei Lieferung in Bar oder per Kartenzahlung. Online-Zahlungen sind per PayPal oder Kreditkarte möglich.",
-      "retentionOfTitle": "Bis zur vollständigen Bezahlung bleibt die Ware unser Eigentum.",
-      "warranty": "Bei Mängeln an der gelieferten Ware hat der Kunde Anspruch auf Nacherfüllung (Ersatzlieferung oder Nachbesserung).",
-      "liability": "Wir haften unbeschränkt für Vorsatz und grobe Fahrlässigkeit. Für leichte Fahrlässigkeit haften wir nur bei Verletzung wesentlicher Vertragspflichten.",
-      "rightOfWithdrawal": "Da es sich bei Lebensmitteln um leicht verderbliche Waren handelt, besteht kein Widerrufsrecht gemäß § 312g Abs. 2 Nr. 1 BGB.",
-      "dataProtection": "Informationen zum Datenschutz finden Sie in unserer Datenschutzerklärung unter /datenschutz.",
-      "finalProvisions": "Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist Siegen, soweit der Kunde Kaufmann ist.",
-      "additionalInfo": ""
+      "ROMA10": { "discount": 0.1, "active": true },
+      "ROMA20": { "discount": 0.2, "active": true }
     }
   }
 }
