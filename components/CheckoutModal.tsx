@@ -67,6 +67,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
   const [hasPaid, setHasPaid] = useState(false);
   const [orderError, setOrderError] = useState('');
+  const [agbAccepted, setAgbAccepted] = useState(false);
 
   const handlePayment = async () => {
     if (hasPaid || isProcessing) return; // Prevent double submission
@@ -402,6 +403,29 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       </div>
                     </div>
 
+                    {/* Legal compliance: Widerrufsrecht for perishable goods */}
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
+                      <p className="text-yellow-400/90 text-sm">
+                        <strong>Widerrufsrecht:</strong> Da es sich bei Lebensmitteln um leicht verderbliche Waren handelt, besteht kein Widerrufsrecht gemäß § 312g Abs. 2 Nr. 1 BGB. 
+                        Die Ware wird nach Ihrer Bestellung frisch zubereitet.
+                      </p>
+                    </div>
+
+                    {/* AGB Checkbox */}
+                    <div className="flex items-start gap-3 mb-4">
+                      <input 
+                        type="checkbox" 
+                        id="agb" 
+                        checked={agbAccepted}
+                        onChange={(e) => setAgbAccepted(e.target.checked)}
+                        className="mt-1 w-4 h-4 accent-roma-red cursor-pointer"
+                      />
+                      <label htmlFor="agb" className="text-sm text-white/70 cursor-pointer">
+                        Ich habe die <a href="#" className="text-roma-gold hover:underline">AGB</a> gelesen und stimme ihnen zu. 
+                        Ich bestätige, dass ich über das fehlende Widerrufsrecht informiert wurde.
+                      </label>
+                    </div>
+
                     <div className="flex gap-3 pt-4">
                       {orderError && (
                         <div className="w-full mb-2 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm">
@@ -416,9 +440,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       </button>
                       <button 
                         onClick={handlePayment}
-                        disabled={isProcessing || hasPaid}
-                        className="flex-[2] bg-roma-red text-white py-4 rounded-xl font-bold hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                        aria-label={isProcessing ? 'Wird verarbeitet' : `Jetzt bezahlen ${finalTotal.toFixed(2)} Euro`}
+                        disabled={isProcessing || hasPaid || !agbAccepted}
+                        className="flex-[2] bg-roma-red text-white py-4 rounded-xl font-bold hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        aria-label={isProcessing ? 'Wird verarbeitet' : `Zahlungspflichtig bestellen ${finalTotal.toFixed(2)} Euro`}
                       >
                         {isProcessing ? (
                           <>
@@ -427,7 +451,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                           </>
                         ) : (
                           <>
-                            <FiCreditCard /> {t('pay_now')} {finalTotal.toFixed(2)} €
+                            <FiCreditCard /> Zahlungspflichtig bestellen {finalTotal.toFixed(2)} €
                           </>
                         )}
                       </button>
