@@ -41,7 +41,10 @@
               "price": 1
             }
           ],
-          "available": true
+          "available": true,
+          "description": {
+            "de": "Margherita Classic - Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,Frische Tomato, Zwiebel,"
+          }
         },
         {
           "id": "p2",
