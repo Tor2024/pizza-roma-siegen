@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getOrders, saveOrder, updateOrderStatus as updateGitHubStatus, deleteOrder } from '@/lib/githubStorage';
+import { getOrders, saveOrder, updateOrderStatus as updateGitHubStatus, deleteOrder, validateOrderPrices } from '@/lib/githubStorage';
 
 // In-memory cache for fast access
 const orderCache = new Map<string, any>();
@@ -45,11 +45,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Валидация цен на бэкенде (не доверяем фронтенду!)
+    const priceValidation = await validateOrderPrices(orderData.items);
+    if (!priceValidation.valid) {
+      return NextResponse.json({ 
+        error: 'Price validation failed', 
+        details: priceValidation.error 
+      }, { status: 400 });
+    }
+
+    // Пересчитываем total на бэкенде
+    const calculatedSubtotal = priceValidation.calculatedTotal || orderData.items.reduce((sum: number, item: any) => {
+      const toppingSum = item.toppings?.reduce((t: number, top: any) => t + (top.price || 0), 0) || 0;
+      return sum + ((item.price + toppingSum) * (item.quantity || 1));
+    }, 0);
+
     const orderId = `ord_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     const newOrder = {
       id: orderId,
       ...orderData,
+      subtotal: calculatedSubtotal,
+      total: calculatedSubtotal + (orderData.deliveryFee || 0) - (orderData.promoDiscount || 0),
       status: 'received',
       createdAt: Date.now(),
       updatedAt: Date.now()

@@ -365,6 +365,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                           <span>{t('total')}</span>
                           <span>{finalTotal.toFixed(2)} €</span>
                         </div>
+                        <p className="text-xs text-white/50 mt-1">Alle Preise inkl. 19% MwSt. zzgl. Lieferkosten.</p>
                       </div>
                     </div>
 

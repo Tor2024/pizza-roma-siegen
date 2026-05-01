@@ -76,7 +76,7 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
                 onClick={() => setSelectedSize(size)}
                 className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${selectedSize === size ? 'bg-roma-red text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
-                {size} cm - {prices[size].toFixed(2)} €
+                {size} cm - {prices[size].toFixed(2)} € <span className="text-xs font-normal text-gray-400">(inkl. 19% MwSt)</span>
               </button>
             ))}
           </div>
@@ -106,7 +106,7 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
           onClick={handleAddToCart}
           className={`w-full py-3 rounded-2xl font-poppins font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${addedToCart ? 'bg-green-500 text-white' : 'bg-roma-dark text-white hover:bg-roma-red'}`}
         >
-          {addedToCart ? <><FiCheck /> {t('added')}</> : <><FiPlus /> {t('add_to_cart')} – {(prices[selectedSize] + selectedToppings.reduce((a, b) => a + b.price, 0)).toFixed(2)} €</>}
+          {addedToCart ? <><FiCheck /> {t('added')}</> : <><FiPlus /> {t('add_to_cart')} – {(prices[selectedSize] + selectedToppings.reduce((a, b) => a + b.price, 0)).toFixed(2)} € <span className="text-xs font-normal opacity-70">(inkl. MwSt)</span></>}
         </motion.button>
       </div>
     </motion.div>

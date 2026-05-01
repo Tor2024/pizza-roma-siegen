@@ -92,6 +92,7 @@ export default function CartSidebar() {
                     <span>{t('total')}</span>
                     <span>{total().toFixed(2)} €</span>
                   </div>
+                  <p className="text-xs text-white/50 mt-1">Alle Preise inkl. 19% MwSt.</p>
                 </div>
                 <button 
                   onClick={() => setShowCheckout(true)}

@@ -193,4 +193,94 @@ export async function getOrder(orderId: string): Promise<Order | null> {
   return orders.find(o => o.id === orderId) || null;
 }
 
+// Get menu from GitHub for price validation
+export async function getMenuFromGitHub(): Promise<any> {
+  try {
+    if (!GITHUB_TOKEN) {
+      console.log('No GITHUB_TOKEN, cannot fetch menu');
+      return null;
+    }
+
+    const response = await fetch(
+      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/public/data/menu.json?ref=${BRANCH}`,
+      {
+        headers: {
+          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      }
+    );
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = Buffer.from(data.content, 'base64').toString('utf-8');
+    return JSON.parse(content);
+  } catch (error) {
+    console.error('Error fetching menu from GitHub:', error);
+    return null;
+  }
+}
+
+// Validate order prices against menu
+export async function validateOrderPrices(items: any[]): Promise<{ valid: boolean; error?: string; calculatedTotal?: number }> {
+  const menu = await getMenuFromGitHub();
+  if (!menu || !menu.categories) {
+    // If we can't fetch menu, accept the order (fallback)
+    return { valid: true };
+  }
+
+  let calculatedTotal = 0;
+
+  for (const item of items) {
+    // Find the item in menu categories
+    let foundItem = null;
+    for (const categoryKey of Object.keys(menu.categories)) {
+      const category = menu.categories[categoryKey];
+      const menuItem = category.items.find((i: any) => i.id === item.id);
+      if (menuItem) {
+        foundItem = menuItem;
+        break;
+      }
+    }
+
+    if (!foundItem) {
+      return { valid: false, error: `Item ${item.id} not found in menu` };
+    }
+
+    // Validate base price
+    const expectedPrice = foundItem.prices?.[item.size] || foundItem.price;
+    if (expectedPrice !== item.price) {
+      return { 
+        valid: false, 
+        error: `Price mismatch for ${item.name?.de || item.id}: expected ${expectedPrice}, got ${item.price}` 
+      };
+    }
+
+    // Calculate with toppings
+    let itemTotal = item.price;
+    if (item.toppings && item.toppings.length > 0) {
+      for (const topping of item.toppings) {
+        // Find topping in menu item
+        const menuTopping = foundItem.toppings?.find((t: any) => t.id === topping.id);
+        if (menuTopping) {
+          itemTotal += menuTopping.price;
+        } else {
+          return { valid: false, error: `Topping ${topping.id} not found for ${item.id}` };
+        }
+      }
+    }
+
+    calculatedTotal += itemTotal * (item.quantity || 1);
+  }
+
+  return { valid: true, calculatedTotal };
+}
+
 export type { Order };
