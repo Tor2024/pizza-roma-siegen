@@ -20,7 +20,8 @@ function LoginForm() {
       .find(row => row.startsWith('admin_token='))
       ?.split('=')[1];
     
-    if (token) {
+    // Проверяем только если токен не пустой и не пробелы
+    if (token && token.trim().length > 0) {
       // Проверяем валидность токена
       fetch('/api/admin/orders', {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -29,6 +30,8 @@ function LoginForm() {
         if (res.ok && from !== '/admin/login') {
           window.location.href = from;
         }
+      }).catch(() => {
+        // Ошибка сети - игнорируем, остаёмся на странице логина
       });
     }
   }, [from]);
