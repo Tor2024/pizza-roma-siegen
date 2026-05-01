@@ -50,7 +50,13 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
       className="glass-light rounded-3xl overflow-hidden flex flex-col h-full text-roma-text"
     >
       <div className="relative h-52 overflow-hidden group">
-        <img src={image} alt={name.de} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <img 
+          src={image} 
+          alt={name.de} 
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 will-change-transform"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
 
