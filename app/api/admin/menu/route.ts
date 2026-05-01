@@ -1,12 +1,33 @@
 import { NextResponse } from 'next/server';
 import { getMenu, updateMenu } from '@/lib/menuStorage';
-import { saveMenuToGitHub } from '@/lib/githubMenuStorage';
+import { saveMenuToGitHub, getMenuFromGitHub } from '@/lib/githubMenuStorage';
 
-// GET - получить текущее меню
+// GET - получить текущее меню (сначала GitHub, потом fallback)
 export async function GET() {
   try {
+    // Try GitHub first for latest data
+    const githubMenu = await getMenuFromGitHub();
+    if (githubMenu) {
+      // Update in-memory cache with latest GitHub data
+      updateMenu(githubMenu);
+      return NextResponse.json(githubMenu, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+    }
+    
+    // Fallback to in-memory/local data
     const menuData = getMenu();
-    return NextResponse.json(menuData);
+    return NextResponse.json(menuData, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to load menu' }, { status: 500 });
   }
