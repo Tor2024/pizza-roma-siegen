@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CartSidebar from '@/components/CartSidebar'
 import FloatingCTA from '@/components/FloatingCTA'
+import Preloader from '@/components/Preloader'
 
 export const metadata: Metadata = {
   title: 'Pizza Roma Siegen | Beste Italienische Pizza & Lieferservice',
@@ -39,13 +40,15 @@ export default function RootLayout({
         `}} />
       </head>
       <body className="font-inter antialiased">
-        <LanguageProvider>
-          <Header />
-          <CartSidebar />
-          <main>{children}</main>
-          <FloatingCTA />
-          <Footer />
-        </LanguageProvider>
+        <Preloader>
+          <LanguageProvider>
+            <Header />
+            <CartSidebar />
+            <main>{children}</main>
+            <FloatingCTA />
+            <Footer />
+          </LanguageProvider>
+        </Preloader>
       </body>
     </html>
   )
