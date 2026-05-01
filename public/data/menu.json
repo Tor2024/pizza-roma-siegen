@@ -9,7 +9,7 @@
       "items": [
         {
           "id": "p1",
-          "image": "/images/pizza-margherita.webp",
+          "image": "/images/p1_pizza_margherita.webp",
           "name": {
             "de": "Margherita Classic",
             "ru": "Маргарита Классик"
@@ -48,7 +48,7 @@
         },
         {
           "id": "p2",
-          "image": "/images/pizza-salami.webp",
+          "image": "/images/p2_pizza_salami.webp",
           "name": {
             "de": "Salami",
             "ru": "Салями"
@@ -84,7 +84,7 @@
         },
         {
           "id": "p3",
-          "image": "/images/pizza-tonno.webp",
+          "image": "/images/p3_pizza_tonno.webp",
           "name": {
             "de": "Tonno",
             "ru": "Тонно"
@@ -120,7 +120,7 @@
         },
         {
           "id": "p4",
-          "image": "/images/pizza-diavola.webp",
+          "image": "/images/p4_pizza_diavola.webp",
           "name": {
             "de": "Diavola",
             "ru": "Дьявола"
@@ -156,7 +156,7 @@
         },
         {
           "id": "p5",
-          "image": "/images/pizza-quattro.webp",
+          "image": "/images/p5_pizza_quattro.webp",
           "name": {
             "de": "Quattro Formaggi",
             "ru": "Четыре сыра"
@@ -192,7 +192,7 @@
         },
         {
           "id": "p6",
-          "image": "/images/pizza-prosciutto.webp",
+          "image": "/images/p6_pizza_prosciutto.webp",
           "name": {
             "de": "Prosciutto Funghi",
             "ru": "Прошутто Фунги"
@@ -237,7 +237,7 @@
       "items": [
         {
           "id": "pas1",
-          "image": "/images/pasta-carb.webp",
+          "image": "/images/pas1_pasta_carb.webp",
           "name": {
             "de": "Pasta Carbonara",
             "ru": "Паста Карбонара"
@@ -254,7 +254,7 @@
         },
         {
           "id": "pas2",
-          "image": "/images/pasta-bolo.webp",
+          "image": "/images/pas2_pasta_bolo.webp",
           "name": {
             "de": "Pasta Bolognese",
             "ru": "Паста Болоньезе"
@@ -280,7 +280,7 @@
       "items": [
         {
           "id": "s1",
-          "image": "/images/salad-caesar.webp",
+          "image": "/images/s1_salad_caesar.webp",
           "name": {
             "de": "Caesar Salad",
             "ru": "Салат Цезарь"
@@ -314,7 +314,7 @@
         },
         {
           "id": "s2",
-          "image": "/images/salad-mista.webp",
+          "image": "/images/s2_salad_mista.webp",
           "name": {
             "de": "Insalata Mista",
             "ru": "Смешанный салат"
@@ -348,7 +348,7 @@
         },
         {
           "id": "s3",
-          "image": "/images/salad-tomate.webp",
+          "image": "/images/s3_salad_tomate.webp",
           "name": {
             "de": "Tomaten-Mozzarella",
             "ru": "Томат с моцареллой"
@@ -485,7 +485,7 @@
       "items": [
         {
           "id": "de1",
-          "image": "/images/dessert-tiramisu.webp",
+          "image": "/images/de1_dessert_tiramisu.webp",
           "name": {
             "de": "Tiramisu",
             "ru": "Тирамису"
@@ -511,7 +511,7 @@
         },
         {
           "id": "de2",
-          "image": "/images/dessert-panna.webp",
+          "image": "/images/de2_dessert_panna.webp",
           "name": {
             "de": "Panna Cotta",
             "ru": "Панна-котта"
@@ -537,7 +537,7 @@
         },
         {
           "id": "de3",
-          "image": "/images/dessert-ice.webp",
+          "image": "/images/de3_dessert_ice.webp",
           "name": {
             "de": "Eis 3 Kugeln",
             "ru": "Мороженое 3 шарика"
