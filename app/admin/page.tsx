@@ -123,11 +123,14 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  // Load menu
+  // Load menu with cache busting
   const fetchMenu = async () => {
     setMenuLoading(true);
     try {
-      const res = await fetch('/api/admin/menu');
+      const res = await fetch(`/api/admin/menu?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       if (res.ok) {
         const data = await res.json();
         setMenuData(data);
@@ -197,12 +200,14 @@ export default function AdminDashboard() {
 
       const result = await res.json();
       if (res.ok) {
-        setSaveMessage('✅ Menü gespeichert! Vercel aktualisiert die Site in 1 Minute.');
+        const githubStatus = result.message?.includes('GitHub') ? ' (GitHub OK)' : ' (GitHub fehlgeschlagen - nur lokal)';
+        setSaveMessage(`✅ Menü gespeichert!${githubStatus} Vercel aktualisiert die Site in 1 Minute.`);
+        setTimeout(() => fetchMenu(), 1000);
       } else {
-        setSaveMessage(`❌ Fehler: ${result.error || 'Unknown error'}`);
+        setSaveMessage(`❌ Fehler: ${result.error || result.details || 'Unknown error'}`);
       }
     } catch (err) {
-      setSaveMessage('❌ Netzwerkfehler');
+      setSaveMessage(`❌ Netzwerkfehler: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
 
     setMenuLoading(false);
@@ -220,10 +225,16 @@ export default function AdminDashboard() {
         body: JSON.stringify(menuData)
       });
       const data = await res.json();
-      setSaveMessage(data.success ? '✅ Angebote gespeichert!' : `❌ Fehler: ${data.error || 'Unbekannt'}`);
-      setTimeout(() => setSaveMessage(''), 3000);
+      if (data.success) {
+        const githubStatus = data.message?.includes('GitHub') ? ' (GitHub OK)' : ' (GitHub fehlgeschlagen)';
+        setSaveMessage(`✅ Angebote gespeichert!${githubStatus}`);
+        setTimeout(() => fetchMenu(), 1000);
+      } else {
+        setSaveMessage(`❌ Fehler: ${data.error || data.details || 'Unbekannt'}`);
+      }
+      setTimeout(() => setSaveMessage(''), 5000);
     } catch (err) {
-      setSaveMessage('❌ Speichern fehlgeschlagen');
+      setSaveMessage(`❌ Speichern fehlgeschlagen: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
     setMenuLoading(false);
   };
@@ -249,10 +260,16 @@ export default function AdminDashboard() {
         body: JSON.stringify(menuData)
       });
       const data = await res.json();
-      setSaveMessage(data.success ? '✅ Rechtliche Texte gespeichert!' : `❌ Fehler: ${data.error || 'Unbekannt'}`);
-      setTimeout(() => setSaveMessage(''), 3000);
+      if (data.success) {
+        const githubStatus = data.message?.includes('GitHub') ? ' (GitHub OK)' : ' (GitHub fehlgeschlagen)';
+        setSaveMessage(`✅ Rechtliche Texte gespeichert!${githubStatus}`);
+        setTimeout(() => fetchMenu(), 1000);
+      } else {
+        setSaveMessage(`❌ Fehler: ${data.error || data.details || 'Unbekannt'}`);
+      }
+      setTimeout(() => setSaveMessage(''), 5000);
     } catch (err) {
-      setSaveMessage('❌ Speichern fehlgeschlagen');
+      setSaveMessage(`❌ Speichern fehlgeschlagen: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
     setMenuLoading(false);
   };
