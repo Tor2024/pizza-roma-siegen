@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCartStore } from '@/store/useCartStore';
@@ -50,11 +51,13 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
       className="glass-light rounded-3xl overflow-hidden flex flex-col h-full text-roma-text"
     >
       <div className="relative h-52 overflow-hidden group">
-        <img 
+        <Image 
           src={image} 
           alt={name.de} 
-          decoding="async"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>

@@ -1,21 +1,42 @@
 'use client';
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { dictionaries } from '@/lib/i18n';
 
 interface LanguageContextType {
   t: (key: string) => string;
+  lang: Lang;
+  setLanguage?: (lang: Lang) => void;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+type Lang = 'de' | 'ru';
+
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  // German only - no language switching
+  const [lang, setLang] = useState<Lang>('de');
+
+  // Load saved language on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem('pizza-roma-lang') as Lang;
+    if (savedLang && (savedLang === 'de' || savedLang === 'ru')) {
+      setLang(savedLang);
+    }
+  }, []);
+
+  // Save language when changed
+  const setLanguage = (newLang: Lang) => {
+    setLang(newLang);
+    localStorage.setItem('pizza-roma-lang', newLang);
+  };
+
   const t = (key: string) => {
-    return dictionaries.de[key as keyof typeof dictionaries.de] || key;
+    // Fallback to 'de' if language not found in dictionaries
+    const dict = (dictionaries as Record<string, Record<string, string>>)[lang] || dictionaries.de;
+    return dict[key] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ t }}>
+    <LanguageContext.Provider value={{ t, lang, setLanguage }}>
       {children}
     </LanguageContext.Provider>
   );

@@ -110,4 +110,4 @@ export const dictionaries = {
   },
 };
 
-export type Lang = 'de';
+export type Lang = 'de' | 'ru';

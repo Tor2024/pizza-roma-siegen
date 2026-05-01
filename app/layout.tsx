@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { LanguageProvider } from '@/context/LanguageContext'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import OfflineDetector from '@/components/OfflineDetector'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CartSidebar from '@/components/CartSidebar'
@@ -40,15 +42,18 @@ export default function RootLayout({
         `}} />
       </head>
       <body className="font-inter antialiased">
-        <Preloader>
-          <LanguageProvider>
-            <Header />
-            <CartSidebar />
-            <main>{children}</main>
-            <FloatingCTA />
-            <Footer />
-          </LanguageProvider>
-        </Preloader>
+        <ErrorBoundary>
+          <OfflineDetector />
+          <Preloader>
+            <LanguageProvider>
+              <Header />
+              <CartSidebar />
+              <main>{children}</main>
+              <FloatingCTA />
+              <Footer />
+            </LanguageProvider>
+          </Preloader>
+        </ErrorBoundary>
       </body>
     </html>
   )

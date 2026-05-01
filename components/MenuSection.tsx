@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import MenuCard from './MenuCard';
 
+type CategoryKey = 'all' | 'pizzas' | 'pasta' | 'salads' | 'drinks' | 'desserts';
+
 interface Topping {
   id: string;
   name: { de: string; ru: string };
@@ -230,6 +232,7 @@ export default function MenuSection() {
   const { t } = useLanguage();
   const [menuData, setMenuData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
 
   useEffect(() => {
     fetch('/data/menu.json')
@@ -245,6 +248,11 @@ export default function MenuSection() {
 
   // Use fetched data or fallback to static
   const categories = menuData?.categories || {};
+
+  // Filter categories based on active selection
+  const filteredCategories = activeCategory === 'all' 
+    ? categories 
+    : { [activeCategory]: categories[activeCategory] };
 
   if (loading) {
     return (
@@ -266,19 +274,33 @@ export default function MenuSection() {
 
         {/* Category filter buttons - dynamic */}
         <div className="flex justify-center gap-4 mb-12 flex-wrap">
+          <button
+            onClick={() => setActiveCategory('all')}
+            className={`px-6 py-2 rounded-full font-poppins font-semibold transition-all ${
+              activeCategory === 'all' 
+                ? 'bg-roma-red text-white' 
+                : 'bg-roma-dark/5 hover:bg-roma-red hover:text-white text-roma-dark'
+            }`}
+          >
+            Alle
+          </button>
           {Object.entries(categories).map(([key, cat]: [string, any]) => (
-            <a 
+            <button 
               key={key} 
-              href={`#cat-${key}`}
-              className="px-6 py-2 rounded-full bg-roma-dark/5 hover:bg-roma-red hover:text-white text-roma-dark font-poppins font-semibold transition-all"
+              onClick={() => setActiveCategory(key as CategoryKey)}
+              className={`px-6 py-2 rounded-full font-poppins font-semibold transition-all ${
+                activeCategory === key 
+                  ? 'bg-roma-red text-white' 
+                  : 'bg-roma-dark/5 hover:bg-roma-red hover:text-white text-roma-dark'
+              }`}
             >
               {cat.name?.de || key}
-            </a>
+            </button>
           ))}
         </div>
 
         {/* Dynamic category sections */}
-        {Object.entries(categories).map(([key, category]: [string, any], index) => (
+        {Object.entries(filteredCategories).map(([key, category]: [string, any], index) => (
           <div key={key} id={`cat-${key}`}>
             <h3 className={`text-3xl font-poppins font-bold text-roma-dark mb-8 border-l-4 ${categoryColors[key] || 'border-gray-500'} pl-4`}>
               {category.name?.de || key}

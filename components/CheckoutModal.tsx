@@ -1,9 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCartStore } from '@/store/useCartStore';
 import { FiX, FiCheck, FiCreditCard, FiTruck, FiClock } from 'react-icons/fi';
+
+// Validation utilities
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePhone = (phone: string): boolean => {
+  // German phone format: +49 or 0 followed by digits, spaces, dashes allowed
+  const phoneRegex = /^(\+49|0)[\d\s\-]{6,20}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ''));
+};
+
+const validateZip = (zip: string): boolean => {
+  // German ZIP: 5 digits
+  const zipRegex = /^\d{5}$/;
+  return zipRegex.test(zip);
+};
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -47,8 +65,12 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
   const finalTotal = total() - promoDiscount;
 
+  const [hasPaid, setHasPaid] = useState(false);
+
   const handlePayment = async () => {
+    if (hasPaid || isProcessing) return; // Prevent double submission
     setIsProcessing(true);
+    setHasPaid(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsProcessing(false);
     setIsSuccess(true);
@@ -59,8 +81,31 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     setStep(1);
     setPromoCode('');
     setPromoDiscount(0);
+    setAddress({
+      street: '',
+      number: '',
+      zip: '57072',
+      city: 'Siegen',
+      phone: '',
+      email: '',
+      note: ''
+    });
     onClose();
   };
+
+  // Validation state
+  const emailError = address.email && !validateEmail(address.email);
+  const phoneError = address.phone && !validatePhone(address.phone);
+  const zipError = address.zip && !validateZip(address.zip);
+  
+  const isAddressValid = useMemo(() => {
+    return address.street && 
+           address.number && 
+           address.phone && 
+           validatePhone(address.phone) &&
+           validateZip(address.zip) &&
+           (!address.email || validateEmail(address.email));
+  }, [address]);
 
   const deliveryOptions = [
     { id: 'asap', label: t('asap'), time: '25-35 min' },
@@ -76,15 +121,22 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             className="bg-roma-dark rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl border border-white/10"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="checkout-title"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <h2 className="text-2xl font-poppins font-bold text-white">
+              <h2 id="checkout-title" className="text-2xl font-poppins font-bold text-white">
                 {isSuccess ? t('order_success') : 
                  step === 1 ? t('delivery_details') : 
                  t('payment')}
               </h2>
-              <button onClick={onClose} className="text-white/70 hover:text-white"><FiX size={24} /></button>
+              <button 
+                onClick={onClose} 
+                className="text-white/70 hover:text-white"
+                aria-label="Schließen"
+              ><FiX size={24} /></button>
             </div>
 
             {/* Success State */}
@@ -140,6 +192,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         type="text" 
                         placeholder={t('street')}
                         value={address.street}
+                        maxLength={100}
                         onChange={(e) => setAddress({...address, street: e.target.value})}
                         className="bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
                       />
@@ -147,40 +200,54 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         type="text" 
                         placeholder={t('number')}
                         value={address.number}
+                        maxLength={10}
                         onChange={(e) => setAddress({...address, number: e.target.value})}
                         className="bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <input 
-                        type="text" 
-                        placeholder="PLZ" 
-                        value={address.zip}
-                        onChange={(e) => setAddress({...address, zip: e.target.value})}
-                        className="bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
-                      />
+                      <div>
+                        <input 
+                          type="text" 
+                          placeholder="PLZ (5 Stellen)" 
+                          value={address.zip}
+                          maxLength={5}
+                          onChange={(e) => setAddress({...address, zip: e.target.value.replace(/\D/g, '')})}
+                          className={`w-full bg-white/10 text-white p-3 rounded-xl border outline-none placeholder:text-white/40 ${zipError ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-roma-gold'}`}
+                        />
+                        {zipError && <p className="text-red-400 text-xs mt-1">5-stelliger ZIP erforderlich</p>}
+                      </div>
                       <input 
                         type="text" 
                         placeholder={t('city')}
                         value={address.city}
+                        maxLength={50}
                         onChange={(e) => setAddress({...address, city: e.target.value})}
                         className="bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
                       />
                     </div>
-                    <input 
-                      type="tel" 
-                      placeholder={t('phone')}
-                      value={address.phone}
-                      onChange={(e) => setAddress({...address, phone: e.target.value})}
-                      className="w-full bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
-                    />
-                    <input 
-                      type="email" 
-                      placeholder="E-Mail"
-                      value={address.email}
-                      onChange={(e) => setAddress({...address, email: e.target.value})}
-                      className="w-full bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
-                    />
+                    <div>
+                      <input 
+                        type="tel" 
+                        placeholder={t('phone') + ' (z.B. 0271 12345678)'}
+                        value={address.phone}
+                        maxLength={20}
+                        onChange={(e) => setAddress({...address, phone: e.target.value})}
+                        className={`w-full bg-white/10 text-white p-3 rounded-xl border outline-none placeholder:text-white/40 ${phoneError ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-roma-gold'}`}
+                      />
+                      {phoneError && <p className="text-red-400 text-xs mt-1">Ungültige Telefonnummer</p>}
+                    </div>
+                    <div>
+                      <input 
+                        type="email" 
+                        placeholder="E-Mail (optional)"
+                        value={address.email}
+                        maxLength={100}
+                        onChange={(e) => setAddress({...address, email: e.target.value})}
+                        className={`w-full bg-white/10 text-white p-3 rounded-xl border outline-none placeholder:text-white/40 ${emailError ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-roma-gold'}`}
+                      />
+                      {emailError && <p className="text-red-400 text-xs mt-1">Ungültige E-Mail-Adresse</p>}
+                    </div>
                     
                     {/* Delivery Time */}
                     <div className="pt-4">
@@ -199,17 +266,22 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       </div>
                     </div>
 
-                    <textarea 
-                      placeholder={t('comment')}
-                      value={address.note}
-                      onChange={(e) => setAddress({...address, note: e.target.value})}
-                      className="w-full bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none h-20 resize-none placeholder:text-white/40"
-                    />
+                    <div>
+                      <textarea 
+                        placeholder={t('comment')}
+                        value={address.note}
+                        maxLength={500}
+                        onChange={(e) => setAddress({...address, note: e.target.value})}
+                        className="w-full bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none h-20 resize-none placeholder:text-white/40"
+                      />
+                      <p className="text-white/40 text-xs mt-1 text-right">{address.note.length}/500</p>
+                    </div>
 
                     <button 
                       onClick={() => setStep(2)}
-                      disabled={!address.street || !address.number || !address.phone}
+                      disabled={!isAddressValid}
                       className="w-full bg-roma-gold text-roma-dark py-4 rounded-xl font-bold hover:bg-yellow-500 transition-all disabled:bg-gray-600 disabled:cursor-not-allowed"
+                      aria-label="Weiter zur Zahlung"
                     >
                       {t('continue_payment')}
                     </button>
@@ -291,8 +363,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       </button>
                       <button 
                         onClick={handlePayment}
-                        disabled={isProcessing}
+                        disabled={isProcessing || hasPaid}
                         className="flex-[2] bg-roma-red text-white py-4 rounded-xl font-bold hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        aria-label={isProcessing ? 'Wird verarbeitet' : `Jetzt bezahlen ${finalTotal.toFixed(2)} Euro`}
                       >
                         {isProcessing ? (
                           <>
