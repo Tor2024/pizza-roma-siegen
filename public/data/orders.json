@@ -131,8 +131,8 @@
     "total": 1611.5,
     "paymentMethod": "cash",
     "deliveryTime": "asap",
-    "status": "cancelled",
+    "status": "done",
     "createdAt": 1777624791414,
-    "updatedAt": 1777624820283
+    "updatedAt": 1777624821207
   }
 ]
