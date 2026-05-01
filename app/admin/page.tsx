@@ -46,18 +46,26 @@ interface Order {
     name: string;
     phone: string;
     address: string;
+    email?: string;
+    note?: string;
   };
   items: Array<{
+    id: string;
     name: { de: string; ru: string };
     quantity: number;
     price: number;
     size?: string;
+    toppings?: Array<{ id: string; name: { de: string; ru: string }; price: number }>;
+    image?: string;
   }>;
   total: number;
   subtotal: number;
   deliveryFee: number;
   status: OrderStatus;
   createdAt: number;
+  updatedAt?: number;
+  paymentMethod?: string;
+  deliveryTime?: string;
   promoCode?: string;
   promoDiscount?: number;
 }
@@ -70,6 +78,7 @@ export default function AdminDashboard() {
   const [menuData, setMenuData] = useState<any>(null);
   const [menuLoading, setMenuLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [orderFilter, setOrderFilter] = useState<OrderStatus | 'all'>('all');
 
   // Get admin token from cookie
   const getAdminToken = () => {
@@ -419,7 +428,7 @@ export default function AdminDashboard() {
               tab === 'orders' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
             }`}
           >
-            Bestellungen ({orders.length})
+            Bestellungen ({orders.filter(o => o.status === 'received').length}/{orders.length})
           </button>
           <button 
             onClick={() => setTab('menu')} 
@@ -465,23 +474,56 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {orders.map((order) => {
+              {/* Order filter */}
+              {orders.length > 0 && (
+                <div className="flex gap-2 flex-wrap mb-4">
+                  <button
+                    onClick={() => setOrderFilter('all')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${orderFilter === 'all' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
+                  >
+                    Alle ({orders.length})
+                  </button>
+                  {Object.entries(statusMap).map(([status, config]) => {
+                    const count = orders.filter(o => o.status === status).length;
+                    if (count === 0) return null;
+                    return (
+                      <button
+                        key={status}
+                        onClick={() => setOrderFilter(status as OrderStatus)}
+                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${orderFilter === status ? `${config.color} text-white` : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
+                      >
+                        <config.icon size={12} />
+                        {config.label} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {orders
+                .filter(o => orderFilter === 'all' || o.status === orderFilter)
+                .map((order) => {
                 const cfg = statusMap[order.status];
                 const StatusIcon = cfg.icon;
+                const elapsed = Math.floor((Date.now() - order.createdAt) / 60000);
+                const isUrgent = order.status === 'received' && elapsed > 10;
                 
                 return (
                   <motion.div
                     key={order.id}
                     layout
-                    className="bg-white/5 rounded-2xl p-6 border border-white/10"
+                    className={`bg-white/5 rounded-2xl p-6 border ${isUrgent ? 'border-red-500/50 animate-pulse' : 'border-white/10'}`}
                   >
                     <div className="flex flex-col lg:flex-row gap-6">
                       {/* Order information */}
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-4">
                           <div>
-                            <h3 className="text-xl font-bold">{order.customer.name}</h3>
-                            <p className="text-white/60 text-sm">#{order.id.slice(-8)} • {formatTime(order.createdAt)}</p>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-xl font-bold">📍 {order.customer.address}</h3>
+                              {isUrgent && <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">⚠ {elapsed} Min</span>}
+                            </div>
+                            <p className="text-white/60 text-sm">#{order.id.slice(-8)} • {formatTime(order.createdAt)} • Vor {elapsed} Min.</p>
                           </div>
                           <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${cfg.color} text-white text-sm font-semibold`}>
                             <StatusIcon size={14} />
@@ -489,17 +531,33 @@ export default function AdminDashboard() {
                           </div>
                         </div>
 
-                        <div className="space-y-2 mb-4">
+                        <div className="space-y-1 mb-4">
                           <p className="text-white/80">📞 {order.customer.phone}</p>
-                          <p className="text-white/60 text-sm">📍 {order.customer.address}</p>
+                          {order.customer.email && <p className="text-white/60 text-sm">✉️ {order.customer.email}</p>}
+                          {order.customer.note && <p className="text-yellow-400/80 text-sm">� {order.customer.note}</p>}
+                          {order.paymentMethod && (
+                            <p className="text-white/60 text-sm">
+                              💰 {order.paymentMethod === 'cash' ? 'Barzahlung' : order.paymentMethod === 'card' ? 'Karte' : order.paymentMethod === 'paypal' ? 'PayPal' : order.paymentMethod}
+                            </p>
+                          )}
+                          {order.deliveryTime && (
+                            <p className="text-white/60 text-sm">🕐 {order.deliveryTime === 'asap' ? 'Schnellstmöglich' : order.deliveryTime}</p>
+                          )}
                         </div>
 
                         <div className="bg-black/20 rounded-xl p-4">
                           <p className="text-sm text-white/60 mb-2">Bestellinhalt:</p>
                           {order.items.map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-sm py-1">
-                              <span>{item.quantity}x {item.name.de} {item.size && `(${item.size}cm)`}</span>
-                              <span className="text-white/60">{(item.price * item.quantity).toFixed(2)} €</span>
+                            <div key={idx} className="py-1">
+                              <div className="flex justify-between text-sm">
+                                <span>{item.quantity}x {item.name.de} {item.size && `(${item.size}cm)`}</span>
+                                <span className="text-white/60">{(item.price * item.quantity).toFixed(2)} €</span>
+                              </div>
+                              {item.toppings && item.toppings.length > 0 && (
+                                <div className="ml-4 text-xs text-white/40">
+                                  + {item.toppings.map(t => t.name.de).join(', ')}
+                                </div>
+                              )}
                             </div>
                           ))}
                           {order.promoCode && (
@@ -508,9 +566,19 @@ export default function AdminDashboard() {
                               <span>-{order.promoDiscount?.toFixed(2)} €</span>
                             </div>
                           )}
-                          <div className="border-t border-white/10 mt-2 pt-2 flex justify-between font-bold">
-                            <span>Gesamt:</span>
-                            <span className="text-roma-gold">{order.total.toFixed(2)} €</span>
+                          <div className="border-t border-white/10 mt-2 pt-2 space-y-1">
+                            <div className="flex justify-between text-sm text-white/60">
+                              <span>Zwischensumme</span>
+                              <span>{order.subtotal.toFixed(2)} €</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-white/60">
+                              <span>Lieferkosten</span>
+                              <span>{order.deliveryFee.toFixed(2)} €</span>
+                            </div>
+                            <div className="flex justify-between font-bold">
+                              <span>Gesamt</span>
+                              <span className="text-roma-gold">{order.total.toFixed(2)} €</span>
+                            </div>
                           </div>
                         </div>
 

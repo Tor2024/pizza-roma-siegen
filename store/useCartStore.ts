@@ -24,6 +24,7 @@ interface CartState {
   addItem: (item: CartItem) => void;
   removeItem: (id: string, size: string, toppingsStr: string) => void;
   updateQuantity: (id: string, size: string, toppingsStr: string, quantity: number) => void;
+  clearCart: () => void;
   subtotal: () => number;
   deliveryFee: () => number;
   total: () => number;
@@ -51,6 +52,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: (id, size, toppingsStr, quantity) => set((state) => ({
         items: state.items.map(i => (i.id === id && i.size === size && i.toppings.map(t=>t.id).join(',') === toppingsStr) ? { ...i, quantity } : i)
       })),
+      clearCart: () => set({ items: [] }),
       subtotal: () => get().items.reduce((acc, item) => acc + (item.price + item.toppings.reduce((a, t) => a + t.price, 0)) * item.quantity, 0),
       deliveryFee: () => {
         const sub = get().subtotal();

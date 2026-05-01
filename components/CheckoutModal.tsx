@@ -30,7 +30,7 @@ interface CheckoutModalProps {
 
 export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const { t } = useLanguage();
-  const { items, subtotal, deliveryFee, total, removeItem } = useCartStore();
+  const { items, subtotal, deliveryFee, total, removeItem, clearCart } = useCartStore();
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -66,14 +66,62 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const finalTotal = total() - promoDiscount;
 
   const [hasPaid, setHasPaid] = useState(false);
+  const [orderError, setOrderError] = useState('');
 
   const handlePayment = async () => {
     if (hasPaid || isProcessing) return; // Prevent double submission
     setIsProcessing(true);
     setHasPaid(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsProcessing(false);
-    setIsSuccess(true);
+    setOrderError('');
+    
+    try {
+      // Send order to server
+      const response = await fetch('/api/admin/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(item => ({
+            id: item.id,
+            name: item.name,
+            size: item.size,
+            price: item.price + item.toppings.reduce((a: number, t: any) => a + t.price, 0),
+            quantity: item.quantity,
+            toppings: item.toppings,
+            image: item.image
+          })),
+          customer: {
+            name: `${address.street} ${address.number}`,
+            phone: address.phone,
+            email: address.email || undefined,
+            address: `${address.street} ${address.number}, ${address.zip} ${address.city}`,
+            note: address.note || undefined
+          },
+          subtotal: subtotal(),
+          deliveryFee: deliveryFee(),
+          total: finalTotal,
+          paymentMethod: selectedPayment,
+          deliveryTime: deliveryTime,
+          promoCode: promoCode || undefined,
+          promoDiscount: promoDiscount > 0 ? promoDiscount : undefined
+        })
+      });
+
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        clearCart();
+        setIsProcessing(false);
+        setIsSuccess(true);
+      } else {
+        setOrderError(result.error || 'Bestellung fehlgeschlagen. Bitte versuchen Sie es erneut.');
+        setIsProcessing(false);
+        setHasPaid(false);
+      }
+    } catch (error) {
+      setOrderError('Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.');
+      setIsProcessing(false);
+      setHasPaid(false);
+    }
   };
 
   const handleNewOrder = () => {
@@ -355,6 +403,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                     </div>
 
                     <div className="flex gap-3 pt-4">
+                      {orderError && (
+                        <div className="w-full mb-2 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm">
+                          {orderError}
+                        </div>
+                      )}
                       <button 
                         onClick={() => setStep(1)}
                         className="flex-1 bg-white/10 text-white py-4 rounded-xl font-bold hover:bg-white/20 transition-all"
