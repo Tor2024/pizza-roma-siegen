@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCartStore } from '@/store/useCartStore';
 import { FiPlus, FiCheck } from 'react-icons/fi';
+import { showToast } from '@/components/Toast';
 
 interface Topping { id: string; name: { de: string; ru: string }; price: number; }
 interface Props {
@@ -42,6 +43,7 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
       image
     });
     setAddedToCart(true);
+    showToast(`${name.de} (${selectedSize}cm) zum Warenkorb hinzugefügt`, 'success');
     setTimeout(() => setAddedToCart(false), 1500);
   };
 

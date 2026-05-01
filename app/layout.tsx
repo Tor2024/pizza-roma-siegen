@@ -9,6 +9,7 @@ import CartSidebar from '@/components/CartSidebar'
 import FloatingCTA from '@/components/FloatingCTA'
 import Preloader from '@/components/Preloader'
 import CookieConsent from '@/components/CookieConsent'
+import ToastContainer from '@/components/Toast'
 
 export const metadata: Metadata = {
   title: 'Pizza Roma Siegen | Beste Italienische Pizza & Lieferservice',
@@ -53,6 +54,7 @@ export default function RootLayout({
               <FloatingCTA />
               <Footer />
               <CookieConsent />
+              <ToastContainer />
             </LanguageProvider>
           </Preloader>
         </ErrorBoundary>
