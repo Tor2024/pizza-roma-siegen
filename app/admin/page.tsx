@@ -550,15 +550,69 @@ export default function AdminDashboard() {
                             {category.items?.map((item: any, idx: number) => (
                               <div key={item.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-3">
-                                  {/* Name */}
-                                  <div>
-                                    <label className="text-xs text-white/50">Name</label>
-                                    <input type="text" value={item.name?.de || ''} onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                  {/* Name with Image Preview */}
+                                  <div className="flex items-center gap-3">
+                                    {item.image && (
+                                      <img 
+                                        src={item.image} 
+                                        alt={item.name?.de} 
+                                        className="w-12 h-12 rounded object-cover border border-white/20"
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                      />
+                                    )}
+                                    <div className="flex-1">
+                                      <label className="text-xs text-white/50">Name</label>
+                                      <input type="text" value={item.name?.de || ''} onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                    </div>
                                   </div>
-                                  {/* Image */}
+                                  {/* Image Upload */}
                                   <div>
                                     <label className="text-xs text-white/50">Bild</label>
-                                    <input type="text" value={item.image || ''} onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="/images/pizza.webp" />
+                                    <div className="flex gap-2">
+                                      <input 
+                                        type="text" 
+                                        value={item.image || ''} 
+                                        onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} 
+                                        className="flex-1 bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" 
+                                        placeholder="/images/pizza.webp" 
+                                      />
+                                      <label className="px-3 py-1 mt-1 bg-white/20 hover:bg-white/30 rounded cursor-pointer text-sm flex items-center">
+                                        📁
+                                        <input 
+                                          type="file" 
+                                          accept="image/*" 
+                                          className="hidden"
+                                          onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            
+                                            const token = getAdminToken();
+                                            const formData = new FormData();
+                                            const filename = `${item.id}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                                            formData.append('file', file);
+                                            formData.append('filename', filename);
+                                            
+                                            try {
+                                              const res = await fetch('/api/admin/upload', {
+                                                method: 'POST',
+                                                headers: { 'Authorization': `Bearer ${token}` },
+                                                body: formData
+                                              });
+                                              const data = await res.json();
+                                              if (data.success) {
+                                                updateItem(catKey, idx, 'image', data.path);
+                                                setSaveMessage('✅ Bild hochgeladen!');
+                                                setTimeout(() => setSaveMessage(''), 2000);
+                                              } else {
+                                                setSaveMessage(`❌ Fehler: ${data.error}`);
+                                              }
+                                            } catch (err) {
+                                              setSaveMessage('❌ Upload fehlgeschlagen');
+                                            }
+                                          }}
+                                        />
+                                      </label>
+                                    </div>
                                   </div>
                                   {/* Single Price (for non-pizza items) */}
                                   {item.price && !item.prices && (
