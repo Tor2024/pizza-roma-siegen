@@ -223,7 +223,7 @@ export default function AdminDashboard() {
   };
 
   // Update topping
-  const updateTopping = (categoryKey: string, itemIndex: number, toppingIndex: number, field: 'de' | 'ru' | 'price', value: any) => {
+  const updateTopping = (categoryKey: string, itemIndex: number, toppingIndex: number, field: 'de' | 'price', value: any) => {
     const newMenuData = { ...menuData };
     const item = newMenuData.categories[categoryKey].items[itemIndex];
     if (!item.toppings) item.toppings = [];
@@ -302,9 +302,9 @@ export default function AdminDashboard() {
   };
 
   // Update category name
-  const updateCategoryName = (catKey: string, lang: 'de' | 'ru', value: string) => {
+  const updateCategoryName = (catKey: string, value: string) => {
     const newMenuData = { ...menuData };
-    newMenuData.categories[catKey].name[lang] = value;
+    newMenuData.categories[catKey].name.de = value;
     setMenuData(newMenuData);
   };
 
@@ -610,7 +610,7 @@ export default function AdminDashboard() {
                               <input 
                                 type="text" 
                                 value={category.name?.de || catKey} 
-                                onChange={(e) => updateCategoryName(catKey, 'de', e.target.value)}
+                                onChange={(e) => updateCategoryName(catKey, e.target.value)}
                                 className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-white font-semibold"
                               />
                             </div>
@@ -867,24 +867,16 @@ export default function AdminDashboard() {
                               )}
                               <div className="flex-1 space-y-2">
                                 <div>
-                                  <label className="text-xs text-white/50">Titel (DE)</label>
+                                  <label className="text-xs text-white/50">Titel</label>
                                   <input type="text" value={offer.title?.de || ''} onChange={(e) => updateOffer(idx, 'title.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
-                                </div>
-                                <div>
-                                  <label className="text-xs text-white/50">Titel (RU)</label>
-                                  <input type="text" value={offer.title?.ru || ''} onChange={(e) => updateOffer(idx, 'title.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 text-sm text-white" />
                                 </div>
                               </div>
                             </div>
                             {/* Description + Image URL */}
                             <div className="space-y-2">
                               <div>
-                                <label className="text-xs text-white/50">Beschreibung (DE)</label>
+                                <label className="text-xs text-white/50">Beschreibung</label>
                                 <input type="text" value={offer.desc?.de || ''} onChange={(e) => updateOffer(idx, 'desc.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="Beschreibung..." />
-                              </div>
-                              <div>
-                                <label className="text-xs text-white/50">Beschreibung (RU)</label>
-                                <input type="text" value={offer.desc?.ru || ''} onChange={(e) => updateOffer(idx, 'desc.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 text-sm text-white" placeholder="Описание..." />
                               </div>
                               <div>
                                 <label className="text-xs text-white/50">Bild URL</label>
