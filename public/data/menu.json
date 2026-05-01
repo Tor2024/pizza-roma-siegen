@@ -391,7 +391,7 @@
       "items": [
         {
           "id": "d1",
-          "image": "/images/drink-cola.webp",
+          "image": "/images/d1_cola.webp",
           "name": {
             "de": "Coca Cola 0,5L",
             "ru": "Кока-Кола 0,5л"
@@ -408,7 +408,7 @@
         },
         {
           "id": "d2",
-          "image": "/images/drink-fanta.webp",
+          "image": "/images/d2_fanta.webp",
           "name": {
             "de": "Fanta 0,5L",
             "ru": "Фанта 0,5л"
