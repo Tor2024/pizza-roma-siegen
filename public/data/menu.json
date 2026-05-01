@@ -573,24 +573,42 @@
     {
       "id": "o1",
       "img": "/images/offer-2pizza.webp",
-      "title": { "de": "2 Pizzen + Cola", "ru": "2 Пиццы + Кола" },
-      "desc": { "de": "2 Pizzen nach Wahl + 0,5L Cola", "ru": "2 Пиццы на выбор + 0,5л Кола" },
+      "title": {
+        "de": "2 Pizzen + Cola",
+        "ru": "2 Пиццы + Кола"
+      },
+      "desc": {
+        "de": "2 Pizzen nach Wahl + 0,5L Cola",
+        "ru": "2 Пиццы на выбор + 0,5л Кола"
+      },
       "price": "19.90 €",
       "badge": "Spare 30%"
     },
     {
       "id": "o2",
       "img": "/images/offer-family.webp",
-      "title": { "de": "Familien Menü", "ru": "Семейное Меню" },
-      "desc": { "de": "3 Pizzen + 2 Getränke + Dessert", "ru": "3 Пиццы + 2 Напитка + Десерт" },
+      "title": {
+        "de": "Familien Menü",
+        "ru": "Семейное Меню"
+      },
+      "desc": {
+        "de": "3 Pizzen + 2 Getränke + Dessert",
+        "ru": "3 Пиццы + 2 Напитка + Десерт"
+      },
       "price": "29.90 €",
       "badge": "Bestseller"
     },
     {
       "id": "o3",
       "img": "/images/offer-lunch.webp",
-      "title": { "de": "Mittagsangebot", "ru": "Обеденное предложение" },
-      "desc": { "de": "Pizza + Salat + Getränk 11-14 Uhr", "ru": "Пицца + Салат + Напиток 11-14" },
+      "title": {
+        "de": "Mittagsangebot",
+        "ru": "Обеденное предложение"
+      },
+      "desc": {
+        "de": "Pizza + Salat + Getränk 11-14 Uhr",
+        "ru": "Пицца + Салат + Напиток 11-14"
+      },
       "price": "8.90 €",
       "badge": "11-14 Uhr"
     }
