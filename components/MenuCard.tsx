@@ -50,9 +50,9 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
   return (
     <motion.div 
       whileHover={{ y: -5 }}
-      className="glass-light rounded-3xl overflow-hidden flex flex-col h-full text-roma-text"
+      className="glass-light rounded-3xl overflow-hidden text-roma-text"
     >
-      <div className="relative aspect-[4/3] overflow-hidden group">
+      <div className="relative h-56 overflow-hidden group">
         <Image 
           src={image} 
           alt={name.de} 
@@ -64,9 +64,9 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
 
-      <div className="p-5 flex flex-col flex-grow">
+      <div className="p-5">
         <h3 className="font-poppins font-bold text-xl mb-1">{name.de}</h3>
-        <p className="text-sm text-gray-500 mb-4 flex-grow">{desc.de}</p>
+        <p className="text-sm text-gray-500 mb-4">{desc.de}</p>
 
         {/* Size selection */}
         <div className="mb-4">
