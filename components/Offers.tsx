@@ -54,9 +54,8 @@ export default function Offers() {
                 <img 
                   src={offer.img} 
                   alt={offer.title.de}
-                  loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 will-change-transform"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
               <div className="p-6 flex justify-between items-center">
