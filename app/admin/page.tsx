@@ -556,7 +556,7 @@ export default function AdminDashboard() {
                                       <img 
                                         src={item.image} 
                                         alt={item.name?.de} 
-                                        className="w-12 h-12 rounded object-cover border border-white/20"
+                                        className="w-24 h-24 rounded object-cover border border-white/20"
                                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                       />
                                     )}
@@ -623,20 +623,60 @@ export default function AdminDashboard() {
                                   )}
                                 </div>
 
-                                {/* Pizza Sizes with Prices */}
+                                {/* Pizza Sizes with Prices - Dynamic */}
                                 {item.prices && (
-                                  <div className="grid grid-cols-3 gap-4 mb-3">
-                                    <div>
-                                      <label className="text-xs text-white/50">26 cm (€)</label>
-                                      <input type="number" step="0.01" value={item.prices?.['26'] || 0} onChange={(e) => updateItem(catKey, idx, 'prices.26', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                  <div className="mb-3">
+                                    <div className="flex justify-between items-center mb-2">
+                                      <label className="text-xs text-white/50">Größen & Preise</label>
+                                      <button 
+                                        onClick={() => {
+                                          const newSize = prompt('Neue Größe eingeben (z.B. 30):');
+                                          if (newSize && !item.prices[newSize]) {
+                                            updateItem(catKey, idx, `prices.${newSize}`, 0);
+                                          }
+                                        }}
+                                        className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors"
+                                      >
+                                        + Größe
+                                      </button>
                                     </div>
-                                    <div>
-                                      <label className="text-xs text-white/50">32 cm (€)</label>
-                                      <input type="number" step="0.01" value={item.prices?.['32'] || 0} onChange={(e) => updateItem(catKey, idx, 'prices.32', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
-                                    </div>
-                                    <div>
-                                      <label className="text-xs text-white/50">40 cm (€)</label>
-                                      <input type="number" step="0.01" value={item.prices?.['40'] || 0} onChange={(e) => updateItem(catKey, idx, 'prices.40', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                      {Object.entries(item.prices).map(([size, price]: [string, any]) => (
+                                        <div key={size} className="bg-white/5 rounded-lg p-2 relative group">
+                                          <div className="flex items-center gap-1 mb-1">
+                                            <input 
+                                              type="text" 
+                                              value={size} 
+                                              className="flex-1 bg-transparent text-xs text-white/70 font-semibold outline-none border-b border-white/20 focus:border-roma-gold"
+                                              onChange={(e) => {
+                                                const newKey = e.target.value;
+                                                if (newKey !== size) {
+                                                  const newPrices = { ...item.prices };
+                                                  newPrices[newKey] = newPrices[size];
+                                                  delete newPrices[size];
+                                                  updateItem(catKey, idx, 'prices', newPrices);
+                                                }
+                                              }}
+                                            />
+                                            <span className="text-xs text-white/40">cm</span>
+                                            <button 
+                                              onClick={() => {
+                                                const newPrices = { ...item.prices };
+                                                delete newPrices[size];
+                                                updateItem(catKey, idx, 'prices', newPrices);
+                                              }}
+                                              className="text-red-400 hover:text-red-300 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >×</button>
+                                          </div>
+                                          <input 
+                                            type="number" 
+                                            step="0.01" 
+                                            value={price || 0} 
+                                            onChange={(e) => updateItem(catKey, idx, `prices.${size}`, parseFloat(e.target.value))} 
+                                            className="w-full bg-white/10 rounded px-2 py-1 text-sm text-white" 
+                                          />
+                                        </div>
+                                      ))}
                                     </div>
                                   </div>
                                 )}
