@@ -60,7 +60,7 @@ export default function Footer() {
         <div className="flex gap-6 mt-4 md:mt-0">
           <a href="/datenschutz" className="hover:text-white transition-colors">{t('footer_privacy')}</a>
           <a href="/impressum" className="hover:text-white transition-colors">{t('footer_imprint')}</a>
-          <a href="#" className="hover:text-white transition-colors">{t('footer_terms')}</a>
+          <a href="/agb" className="hover:text-white transition-colors">{t('footer_terms')}</a>
         </div>
       </div>
     </footer>

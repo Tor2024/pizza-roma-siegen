@@ -422,7 +422,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         className="mt-1 w-4 h-4 accent-roma-red cursor-pointer"
                       />
                       <label htmlFor="agb" className="text-sm text-white/70 cursor-pointer">
-                        Ich habe die <a href="#" className="text-roma-gold hover:underline">AGB</a> gelesen und stimme ihnen zu. 
+                        Ich habe die <a href="/agb" target="_blank" className="text-roma-gold hover:underline">AGB</a> gelesen und stimme ihnen zu. 
                         Ich bestätige, dass ich über das fehlende Widerrufsrecht informiert wurde.
                       </label>
                     </div>

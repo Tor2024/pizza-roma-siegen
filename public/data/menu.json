@@ -660,6 +660,22 @@
       "cookies": "Wir verwenden technisch notwendige Cookies, um den Betrieb der Website zu gewährleisten. Es werden keine Tracking-Cookies gesetzt, ohne dass Sie Ihre Einwilligung erteilt haben.",
       "rights": "Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) und Widerspruch (Art. 21 DSGVO). Kontakt: info@pizza-roma-siegen.de",
       "additionalInfo": ""
+    },
+    "agb": {
+      "companyName": "Pizza Roma Siegen",
+      "intro": "Die folgenden Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Bestellungen über unseren Online-Shop.",
+      "scope": "Diese AGB gelten für alle Verträge zwischen Pizza Roma Siegen und dem Kunden über die Lieferung von Speisen und Getränken.",
+      "contractFormation": "Die Darstellung der Produkte im Online-Shop stellt kein rechtsverbindliches Angebot dar. Durch Absenden der Bestellung gibt der Kunde ein verbindliches Angebot ab. Der Vertrag kommt zustande, wenn wir die Bestellung durch Zusendung einer Auftragsbestätigung oder durch Lieferung der Ware annehmen.",
+      "prices": "Alle angegebenen Preise sind Bruttopreise inklusive der gesetzlichen Umsatzsteuer (19%). Die Lieferkosten werden separat ausgewiesen und betragen 3,50 € (kostenlos ab 25 € Bestellwert).",
+      "delivery": "Die Lieferung erfolgt ausschließlich innerhalb des Liefergebietes von Siegen und Umgebung. Die angegebenen Lieferzeiten sind Schätzungen. Wir bemühen uns um pünktliche Lieferung, können jedoch Verzögerungen aufgrund von Verkehr oder Wetter nicht ausschließen.",
+      "payment": "Die Bezahlung erfolgt bei Lieferung in Bar oder per Kartenzahlung. Online-Zahlungen sind per PayPal oder Kreditkarte möglich.",
+      "retentionOfTitle": "Bis zur vollständigen Bezahlung bleibt die Ware unser Eigentum.",
+      "warranty": "Bei Mängeln an der gelieferten Ware hat der Kunde Anspruch auf Nacherfüllung (Ersatzlieferung oder Nachbesserung).",
+      "liability": "Wir haften unbeschränkt für Vorsatz und grobe Fahrlässigkeit. Für leichte Fahrlässigkeit haften wir nur bei Verletzung wesentlicher Vertragspflichten.",
+      "rightOfWithdrawal": "Da es sich bei Lebensmitteln um leicht verderbliche Waren handelt, besteht kein Widerrufsrecht gemäß § 312g Abs. 2 Nr. 1 BGB.",
+      "dataProtection": "Informationen zum Datenschutz finden Sie in unserer Datenschutzerklärung unter /datenschutz.",
+      "finalProvisions": "Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist Siegen, soweit der Kunde Kaufmann ist.",
+      "additionalInfo": ""
     }
   }
 }

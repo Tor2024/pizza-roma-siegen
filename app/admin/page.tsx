@@ -221,7 +221,7 @@ export default function AdminDashboard() {
   };
 
   // Update legal field
-  const updateLegal = (section: 'impressum' | 'datenschutz', field: string, value: string) => {
+  const updateLegal = (section: 'impressum' | 'datenschutz' | 'agb', field: string, value: string) => {
     const newMenuData = { ...menuData };
     if (!newMenuData.legal) newMenuData.legal = {};
     if (!newMenuData.legal[section]) newMenuData.legal[section] = {};
@@ -1067,7 +1067,7 @@ export default function AdminDashboard() {
               <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
                 <h2 className="text-2xl font-bold mb-4">Rechtliche Texte verwalten</h2>
                 <p className="text-white/60 mb-6">
-                  Impressum und Datenschutzerklärung. Änderungen werden an GitHub gesendet und auf der Website aktualisiert.
+                  Impressum, Datenschutzerklärung und AGB. Änderungen werden an GitHub gesendet und auf der Website aktualisiert.
                 </p>
 
                 {saveMessage && (
@@ -1173,6 +1173,69 @@ export default function AdminDashboard() {
                         <div>
                           <label className="text-xs text-white/50">Zusätzliche Informationen</label>
                           <textarea value={menuData.legal?.datenschutz?.additionalInfo || ''} onChange={(e) => updateLegal('datenschutz', 'additionalInfo', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* AGB */}
+                    <div className="bg-black/20 rounded-xl p-6">
+                      <h3 className="text-xl font-semibold mb-4 text-roma-gold">Allgemeine Geschäftsbedingungen (AGB)</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-xs text-white/50">Firmenname</label>
+                          <input type="text" value={menuData.legal?.agb?.companyName || ''} onChange={(e) => updateLegal('agb', 'companyName', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Einleitung</label>
+                          <textarea value={menuData.legal?.agb?.intro || ''} onChange={(e) => updateLegal('agb', 'intro', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 1 Geltungsbereich</label>
+                          <textarea value={menuData.legal?.agb?.scope || ''} onChange={(e) => updateLegal('agb', 'scope', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 2 Vertragsschluss</label>
+                          <textarea value={menuData.legal?.agb?.contractFormation || ''} onChange={(e) => updateLegal('agb', 'contractFormation', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 3 Preise</label>
+                          <textarea value={menuData.legal?.agb?.prices || ''} onChange={(e) => updateLegal('agb', 'prices', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 4 Lieferung</label>
+                          <textarea value={menuData.legal?.agb?.delivery || ''} onChange={(e) => updateLegal('agb', 'delivery', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 5 Zahlung</label>
+                          <textarea value={menuData.legal?.agb?.payment || ''} onChange={(e) => updateLegal('agb', 'payment', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 6 Eigentumsvorbehalt</label>
+                          <textarea value={menuData.legal?.agb?.retentionOfTitle || ''} onChange={(e) => updateLegal('agb', 'retentionOfTitle', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[40px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 7 Gewährleistung</label>
+                          <textarea value={menuData.legal?.agb?.warranty || ''} onChange={(e) => updateLegal('agb', 'warranty', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 8 Haftung</label>
+                          <textarea value={menuData.legal?.agb?.liability || ''} onChange={(e) => updateLegal('agb', 'liability', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 9 Widerrufsrecht</label>
+                          <textarea value={menuData.legal?.agb?.rightOfWithdrawal || ''} onChange={(e) => updateLegal('agb', 'rightOfWithdrawal', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 10 Datenschutz</label>
+                          <textarea value={menuData.legal?.agb?.dataProtection || ''} onChange={(e) => updateLegal('agb', 'dataProtection', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[40px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 11 Schlussbestimmungen</label>
+                          <textarea value={menuData.legal?.agb?.finalProvisions || ''} onChange={(e) => updateLegal('agb', 'finalProvisions', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">§ 12 Zusätzliche Bestimmungen</label>
+                          <textarea value={menuData.legal?.agb?.additionalInfo || ''} onChange={(e) => updateLegal('agb', 'additionalInfo', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
                         </div>
                       </div>
                     </div>
