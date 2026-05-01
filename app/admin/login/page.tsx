@@ -23,9 +23,10 @@ function LoginForm() {
     if (token) {
       // Проверяем валидность токена
       fetch('/api/admin/orders', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
       }).then(res => {
-        if (res.ok) {
+        if (res.ok && from !== '/admin/login') {
           window.location.href = from;
         }
       });
@@ -40,7 +41,8 @@ function LoginForm() {
     try {
       // Проверяем пароль через API
       const res = await fetch('/api/admin/orders', {
-        headers: { 'Authorization': `Bearer ${password}` }
+        headers: { 'Authorization': `Bearer ${password}` },
+        credentials: 'include'
       });
 
       if (res.ok) {
