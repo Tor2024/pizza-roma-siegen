@@ -72,5 +72,67 @@
     "status": "received",
     "createdAt": 1777622913853,
     "updatedAt": 1777624202953
+  },
+  {
+    "id": "ord_1777624791414_wg5e59v0o",
+    "items": [
+      {
+        "id": "p2",
+        "name": {
+          "de": "Salami",
+          "ru": "Салями"
+        },
+        "size": "32",
+        "price": 1601.5,
+        "quantity": 1,
+        "toppings": [
+          {
+            "id": "t3",
+            "name": {
+              "de": "Pepperoni",
+              "ru": "Пепперони"
+            },
+            "price": 1.5
+          }
+        ],
+        "image": "/images/pizza-salami.webp"
+      },
+      {
+        "id": "s2",
+        "name": {
+          "de": "Insalata Mista",
+          "ru": "Смешанный салат"
+        },
+        "size": "1",
+        "price": 10,
+        "quantity": 1,
+        "toppings": [
+          {
+            "id": "s3",
+            "name": {
+              "de": "Thunfisch",
+              "ru": "Тунец"
+            },
+            "price": 2.5
+          }
+        ],
+        "image": "/images/salad-mista.webp"
+      }
+    ],
+    "customer": {
+      "name": "пывпывпывпыв 1",
+      "phone": "015200000000",
+      "email": "barbarisv@gmail.com",
+      "address": "пывпывпывпыв 1, 57072 Siegen",
+      "note": "пвапвапвапвап"
+    },
+    "subtotal": 1611.5,
+    "deliveryFee": 0,
+    "total": 1611.5,
+    "paymentMethod": "cash",
+    "deliveryTime": "asap",
+    "status": "received",
+    "createdAt": 1777624791414,
+    "updatedAt": 1777624791414
   }
 ]
