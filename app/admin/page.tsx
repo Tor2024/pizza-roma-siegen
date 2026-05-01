@@ -746,9 +746,20 @@ export default function AdminDashboard() {
                           <div className="space-y-3">
                             {category.items?.map((item: any, idx: number) => (
                               <div key={item.id || idx} className={`rounded-lg p-4 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-3">
-                                  {/* Name and Bild in one row - SYMMETRIC */}
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex flex-col md:flex-row gap-4 mb-3">
+                                  {/* Image preview - LEFT SIDE */}
+                                  {item.image && (
+                                    <div className="flex-shrink-0">
+                                      <img 
+                                        src={item.image} 
+                                        alt={item.name?.de} 
+                                        className={`w-24 h-24 rounded object-cover border ${isDarkMode ? 'border-white/20' : 'border-gray-300'}`}
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                      />
+                                    </div>
+                                  )}
+                                  {/* Name and Bild fields - RIGHT SIDE */}
+                                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* Name field */}
                                     <div>
                                       <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Name</label>
@@ -809,25 +820,15 @@ export default function AdminDashboard() {
                                       </div>
                                     </div>
                                   </div>
-                                  {/* Image preview below */}
-                                  {item.image && (
-                                    <div className="mt-2">
-                                      <img 
-                                        src={item.image} 
-                                        alt={item.name?.de} 
-                                        className={`w-24 h-24 rounded object-cover border ${isDarkMode ? 'border-white/20' : 'border-gray-300'}`}
-                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                      />
-                                    </div>
-                                  )}
-                                  {/* Single Price (for non-pizza items) */}
-                                  {item.price && !item.prices && (
-                                    <div>
-                                      <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Preis (€)</label>
-                                      <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
-                                    </div>
-                                  )}
                                 </div>
+
+                                {/* Single Price (for non-pizza items) */}
+                                {item.price && !item.prices && (
+                                  <div className="mb-3">
+                                    <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Preis (€)</label>
+                                    <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                                  </div>
+                                )}
 
                                 {/* Pizza Sizes with Prices - Dynamic */}
                                 {item.prices && (
