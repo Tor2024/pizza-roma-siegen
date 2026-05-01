@@ -58,8 +58,8 @@ export default function Footer() {
       <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs px-4 container mx-auto">
         <p>© 2024 Pizza Roma Siegen. {t('footer_copyright')}</p>
         <div className="flex gap-6 mt-4 md:mt-0">
-          <a href="#" className="hover:text-white transition-colors">{t('footer_privacy')}</a>
-          <a href="#" className="hover:text-white transition-colors">{t('footer_imprint')}</a>
+          <a href="/datenschutz" className="hover:text-white transition-colors">{t('footer_privacy')}</a>
+          <a href="/impressum" className="hover:text-white transition-colors">{t('footer_imprint')}</a>
           <a href="#" className="hover:text-white transition-colors">{t('footer_terms')}</a>
         </div>
       </div>

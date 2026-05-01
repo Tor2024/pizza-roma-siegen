@@ -72,7 +72,7 @@ interface Order {
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [tab, setTab] = useState<'orders' | 'menu' | 'offers'>('orders');
+  const [tab, setTab] = useState<'orders' | 'menu' | 'offers' | 'legal'>('orders');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [menuData, setMenuData] = useState<any>(null);
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
 
   // Load menu when switching tabs
   useEffect(() => {
-    if (tab === 'menu' || tab === 'offers') {
+    if (tab === 'menu' || tab === 'offers' || tab === 'legal') {
       fetchMenu();
     }
   }, [tab]);
@@ -197,6 +197,55 @@ export default function AdminDashboard() {
       setSaveMessage('❌ Netzwerkfehler');
     }
 
+    setMenuLoading(false);
+  };
+
+  // Save offers
+  const saveOffers = async () => {
+    setMenuLoading(true);
+    const token = getAdminToken();
+    if (!token) return;
+    try {
+      const res = await fetch('/api/admin/menu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(menuData)
+      });
+      const data = await res.json();
+      setSaveMessage(data.success ? '✅ Angebote gespeichert!' : `❌ Fehler: ${data.error || 'Unbekannt'}`);
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (err) {
+      setSaveMessage('❌ Speichern fehlgeschlagen');
+    }
+    setMenuLoading(false);
+  };
+
+  // Update legal field
+  const updateLegal = (section: 'impressum' | 'datenschutz', field: string, value: string) => {
+    const newMenuData = { ...menuData };
+    if (!newMenuData.legal) newMenuData.legal = {};
+    if (!newMenuData.legal[section]) newMenuData.legal[section] = {};
+    newMenuData.legal[section][field] = value;
+    setMenuData(newMenuData);
+  };
+
+  // Save legal
+  const saveLegal = async () => {
+    setMenuLoading(true);
+    const token = getAdminToken();
+    if (!token) return;
+    try {
+      const res = await fetch('/api/admin/menu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(menuData)
+      });
+      const data = await res.json();
+      setSaveMessage(data.success ? '✅ Rechtliche Texte gespeichert!' : `❌ Fehler: ${data.error || 'Unbekannt'}`);
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (err) {
+      setSaveMessage('❌ Speichern fehlgeschlagen');
+    }
     setMenuLoading(false);
   };
 
@@ -357,37 +406,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Save offers
-  const saveOffers = async () => {
-    const token = getAdminToken();
-    if (!token || !menuData) return;
-
-    setMenuLoading(true);
-    setSaveMessage('');
-
-    try {
-      const res = await fetch('/api/admin/menu', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(menuData)
-      });
-
-      const result = await res.json();
-      if (res.ok) {
-        setSaveMessage('✅ Angebote gespeichert! Änderungen sind in ca. 30 Sekunden auf der Website sichtbar.');
-      } else {
-        setSaveMessage(`❌ Fehler: ${result.error || 'Unknown error'}`);
-      }
-    } catch (err) {
-      setSaveMessage('❌ Netzwerkfehler');
-    }
-
-    setMenuLoading(false);
-  };
-
   return (
     <div className="min-h-screen bg-roma-dark text-white pt-0">
       {/* Fixed Header */}
@@ -445,6 +463,14 @@ export default function AdminDashboard() {
             }`}
           >
             Angebote
+          </button>
+          <button 
+            onClick={() => setTab('legal')} 
+            className={`px-6 py-3 rounded-t-lg font-semibold transition-colors ${
+              tab === 'legal' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
+            }`}
+          >
+            Rechtliches
           </button>
         </div>
       </div>
@@ -1027,6 +1053,136 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <p className="text-white/40">Angebote konnten nicht geladen werden</p>
+                )}
+              </div>
+            </motion.div>
+          ) : tab === 'legal' ? (
+            <motion.div
+              key="legal"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                <h2 className="text-2xl font-bold mb-4">Rechtliche Texte verwalten</h2>
+                <p className="text-white/60 mb-6">
+                  Impressum und Datenschutzerklärung. Änderungen werden an GitHub gesendet und auf der Website aktualisiert.
+                </p>
+
+                {saveMessage && (
+                  <div className={`p-4 rounded-xl mb-4 ${saveMessage.includes('✅') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {saveMessage}
+                  </div>
+                )}
+
+                {menuLoading ? (
+                  <div className="text-center py-10">
+                    <FiRefreshCw className="animate-spin mx-auto mb-2" size={24} />
+                    <p className="text-white/60">Wird geladen...</p>
+                  </div>
+                ) : menuData ? (
+                  <div className="space-y-8">
+                    {/* IMPRESSUM */}
+                    <div className="bg-black/20 rounded-xl p-6">
+                      <h3 className="text-xl font-semibold mb-4 text-roma-gold">Impressum (§5 TMG)</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-white/50">Firmenname</label>
+                          <input type="text" value={menuData.legal?.impressum?.companyName || ''} onChange={(e) => updateLegal('impressum', 'companyName', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Inhaber</label>
+                          <input type="text" value={menuData.legal?.impressum?.owner || ''} onChange={(e) => updateLegal('impressum', 'owner', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Adresse</label>
+                          <input type="text" value={menuData.legal?.impressum?.address || ''} onChange={(e) => updateLegal('impressum', 'address', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" placeholder="Straße, PLZ Stadt" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Telefon</label>
+                          <input type="text" value={menuData.legal?.impressum?.phone || ''} onChange={(e) => updateLegal('impressum', 'phone', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">E-Mail</label>
+                          <input type="email" value={menuData.legal?.impressum?.email || ''} onChange={(e) => updateLegal('impressum', 'email', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">USt-IdNr.</label>
+                          <input type="text" value={menuData.legal?.impressum?.ustId || ''} onChange={(e) => updateLegal('impressum', 'ustId', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" placeholder="DEXXXXXXXXX" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Steuernummer</label>
+                          <input type="text" value={menuData.legal?.impressum?.steuernummer || ''} onChange={(e) => updateLegal('impressum', 'steuernummer', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Registergericht (optional)</label>
+                          <input type="text" value={menuData.legal?.impressum?.registerCourt || ''} onChange={(e) => updateLegal('impressum', 'registerCourt', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Registernummer (optional)</label>
+                          <input type="text" value={menuData.legal?.impressum?.registerNumber || ''} onChange={(e) => updateLegal('impressum', 'registerNumber', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Verantwortlich für Inhalt (§55 RStV)</label>
+                          <input type="text" value={menuData.legal?.impressum?.responsibleForContent || ''} onChange={(e) => updateLegal('impressum', 'responsibleForContent', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="text-xs text-white/50">Verantwortlich Adresse</label>
+                          <input type="text" value={menuData.legal?.impressum?.responsibleAddress || ''} onChange={(e) => updateLegal('impressum', 'responsibleAddress', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="text-xs text-white/50">Zusätzliche Informationen</label>
+                          <textarea value={menuData.legal?.impressum?.additionalInfo || ''} onChange={(e) => updateLegal('impressum', 'additionalInfo', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" placeholder="Weitere rechtliche Hinweise..." />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* DATENSCHUTZ */}
+                    <div className="bg-black/20 rounded-xl p-6">
+                      <h3 className="text-xl font-semibold mb-4 text-roma-gold">Datenschutzerklärung (DSGVO)</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-xs text-white/50">Einleitung</label>
+                          <textarea value={menuData.legal?.datenschutz?.intro || ''} onChange={(e) => updateLegal('datenschutz', 'intro', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Verantwortliche Stelle</label>
+                          <input type="text" value={menuData.legal?.datenschutz?.controller || ''} onChange={(e) => updateLegal('datenschutz', 'controller', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Erhobene Daten</label>
+                          <textarea value={menuData.legal?.datenschutz?.dataCollected || ''} onChange={(e) => updateLegal('datenschutz', 'dataCollected', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Zweck der Verarbeitung</label>
+                          <textarea value={menuData.legal?.datenschutz?.purpose || ''} onChange={(e) => updateLegal('datenschutz', 'purpose', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Hosting (Vercel)</label>
+                          <textarea value={menuData.legal?.datenschutz?.hosting || ''} onChange={(e) => updateLegal('datenschutz', 'hosting', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Cookies</label>
+                          <textarea value={menuData.legal?.datenschutz?.cookies || ''} onChange={(e) => updateLegal('datenschutz', 'cookies', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Ihre Rechte (DSGVO Artikel)</label>
+                          <textarea value={menuData.legal?.datenschutz?.rights || ''} onChange={(e) => updateLegal('datenschutz', 'rights', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50">Zusätzliche Informationen</label>
+                          <textarea value={menuData.legal?.datenschutz?.additionalInfo || ''} onChange={(e) => updateLegal('datenschutz', 'additionalInfo', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <button onClick={saveLegal} disabled={menuLoading} className="w-full bg-roma-red hover:bg-red-700 disabled:bg-gray-600 py-4 rounded-xl font-bold transition-colors sticky bottom-4 shadow-lg">
+                      {menuLoading ? 'Wird gespeichert...' : '💾 Rechtliche Texte in GitHub speichern'}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-white/40">Daten konnten nicht geladen werden</p>
                 )}
               </div>
             </motion.div>
