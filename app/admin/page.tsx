@@ -64,7 +64,7 @@ interface Order {
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [tab, setTab] = useState<'orders' | 'menu'>('orders');
+  const [tab, setTab] = useState<'orders' | 'menu' | 'offers'>('orders');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [menuData, setMenuData] = useState<any>(null);
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
 
   // Load menu when switching tabs
   useEffect(() => {
-    if (tab === 'menu') {
+    if (tab === 'menu' || tab === 'offers') {
       fetchMenu();
     }
   }, [tab]);
@@ -308,6 +308,77 @@ export default function AdminDashboard() {
     setMenuData(newMenuData);
   };
 
+  // Update offer
+  const updateOffer = (offerIndex: number, field: string, value: any) => {
+    const newMenuData = { ...menuData };
+    if (!newMenuData.offers) newMenuData.offers = [];
+    const offer = newMenuData.offers[offerIndex];
+    
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.');
+      offer[parent] = { ...offer[parent], [child]: value };
+    } else {
+      offer[field] = value;
+    }
+    
+    setMenuData(newMenuData);
+  };
+
+  // Add new offer
+  const addOffer = () => {
+    const newMenuData = { ...menuData };
+    if (!newMenuData.offers) newMenuData.offers = [];
+    newMenuData.offers.push({
+      id: `o_${Date.now()}`,
+      img: '/images/offer-placeholder.webp',
+      title: { de: 'Neues Angebot', ru: 'Новое предложение' },
+      desc: { de: '', ru: '' },
+      price: '0.00 €',
+      badge: ''
+    });
+    setMenuData(newMenuData);
+  };
+
+  // Delete offer
+  const deleteOffer = (offerIndex: number) => {
+    if (confirm('Dieses Angebot löschen?')) {
+      const newMenuData = { ...menuData };
+      newMenuData.offers.splice(offerIndex, 1);
+      setMenuData(newMenuData);
+    }
+  };
+
+  // Save offers
+  const saveOffers = async () => {
+    const token = getAdminToken();
+    if (!token || !menuData) return;
+
+    setMenuLoading(true);
+    setSaveMessage('');
+
+    try {
+      const res = await fetch('/api/admin/menu', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(menuData)
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        setSaveMessage('✅ Angebote gespeichert! Änderungen sind in ca. 30 Sekunden auf der Website sichtbar.');
+      } else {
+        setSaveMessage(`❌ Fehler: ${result.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      setSaveMessage('❌ Netzwerkfehler');
+    }
+
+    setMenuLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-roma-dark text-white pt-0">
       {/* Fixed Header */}
@@ -357,6 +428,14 @@ export default function AdminDashboard() {
             }`}
           >
             Menü & Einstellungen
+          </button>
+          <button 
+            onClick={() => setTab('offers')} 
+            className={`px-6 py-3 rounded-t-lg font-semibold transition-colors ${
+              tab === 'offers' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
+            }`}
+          >
+            Angebote
           </button>
         </div>
       </div>
@@ -462,7 +541,7 @@ export default function AdminDashboard() {
                 );
               })}
             </motion.div>
-          ) : (
+          ) : tab === 'menu' ? (
             <motion.div
               key="menu"
               initial={{ opacity: 0, y: 20 }}
@@ -738,7 +817,160 @@ export default function AdminDashboard() {
                 )}
               </div>
             </motion.div>
-          )}
+          ) : tab === 'offers' ? (
+            <motion.div
+              key="offers"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                <h2 className="text-2xl font-bold mb-4">Angebote verwalten</h2>
+                <p className="text-white/60 mb-6">
+                  Änderungen werden an GitHub gesendet und sind in ca. 30 Sekunden auf der Website sichtbar.
+                </p>
+
+                {saveMessage && (
+                  <div className={`p-4 rounded-xl mb-4 ${saveMessage.includes('✅') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {saveMessage}
+                  </div>
+                )}
+
+                {menuLoading ? (
+                  <div className="text-center py-10">
+                    <FiRefreshCw className="animate-spin mx-auto mb-2" size={24} />
+                    <p className="text-white/60">Wird geladen...</p>
+                  </div>
+                ) : menuData ? (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-semibold text-lg">Angebote ({menuData.offers?.length || 0})</h3>
+                      <button onClick={addOffer} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold transition-colors">
+                        + Angebot hinzufügen
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {(menuData.offers || []).map((offer: any, idx: number) => (
+                        <div key={offer.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-3">
+                            {/* Image Preview + Title DE */}
+                            <div className="flex items-start gap-3">
+                              {offer.img && (
+                                <img 
+                                  src={offer.img} 
+                                  alt={offer.title?.de || 'Angebot'} 
+                                  className="w-24 h-24 rounded object-cover border border-white/20 flex-shrink-0"
+                                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                />
+                              )}
+                              <div className="flex-1 space-y-2">
+                                <div>
+                                  <label className="text-xs text-white/50">Titel (DE)</label>
+                                  <input type="text" value={offer.title?.de || ''} onChange={(e) => updateOffer(idx, 'title.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-white/50">Titel (RU)</label>
+                                  <input type="text" value={offer.title?.ru || ''} onChange={(e) => updateOffer(idx, 'title.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 text-sm text-white" />
+                                </div>
+                              </div>
+                            </div>
+                            {/* Description + Image URL */}
+                            <div className="space-y-2">
+                              <div>
+                                <label className="text-xs text-white/50">Beschreibung (DE)</label>
+                                <input type="text" value={offer.desc?.de || ''} onChange={(e) => updateOffer(idx, 'desc.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="Beschreibung..." />
+                              </div>
+                              <div>
+                                <label className="text-xs text-white/50">Beschreibung (RU)</label>
+                                <input type="text" value={offer.desc?.ru || ''} onChange={(e) => updateOffer(idx, 'desc.ru', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 text-sm text-white" placeholder="Описание..." />
+                              </div>
+                              <div>
+                                <label className="text-xs text-white/50">Bild URL</label>
+                                <div className="flex gap-2">
+                                  <input 
+                                    type="text" 
+                                    value={offer.img || ''} 
+                                    onChange={(e) => updateOffer(idx, 'img', e.target.value)} 
+                                    className="flex-1 bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" 
+                                    placeholder="/images/offer.webp" 
+                                  />
+                                  <label className="px-3 py-1 mt-1 bg-white/20 hover:bg-white/30 rounded cursor-pointer text-sm flex items-center">
+                                    📁
+                                    <input 
+                                      type="file" 
+                                      accept="image/*" 
+                                      className="hidden"
+                                      onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        const token = getAdminToken();
+                                        const formData = new FormData();
+                                        const filename = `offer_${offer.id}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                                        formData.append('file', file);
+                                        formData.append('filename', filename);
+                                        try {
+                                          const res = await fetch('/api/admin/upload', {
+                                            method: 'POST',
+                                            headers: { 'Authorization': `Bearer ${token}` },
+                                            body: formData
+                                          });
+                                          const data = await res.json();
+                                          if (data.success) {
+                                            updateOffer(idx, 'img', data.path);
+                                            setSaveMessage('✅ Bild hochgeladen!');
+                                            setTimeout(() => setSaveMessage(''), 2000);
+                                          } else {
+                                            setSaveMessage(`❌ Fehler: ${data.error}`);
+                                          }
+                                        } catch (err) {
+                                          setSaveMessage('❌ Upload fehlgeschlagen');
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Price + Badge */}
+                            <div className="space-y-2">
+                              <div>
+                                <label className="text-xs text-white/50">Preis</label>
+                                <input type="text" value={offer.price || ''} onChange={(e) => updateOffer(idx, 'price', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="19.90 €" />
+                              </div>
+                              <div>
+                                <label className="text-xs text-white/50">Badge / Etikett</label>
+                                <input type="text" value={offer.badge || ''} onChange={(e) => updateOffer(idx, 'badge', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="Spare 30%" />
+                              </div>
+                              <div className="flex justify-end pt-2">
+                                <button onClick={() => deleteOffer(idx)} className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors">
+                                  Angebot löschen
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {(menuData.offers || []).length === 0 && (
+                      <div className="text-center py-10 text-white/40">
+                        <p className="text-lg">Keine Angebote</p>
+                        <p className="text-sm mt-2">Klicken Sie auf "+ Angebot hinzufügen" um ein neues Angebot zu erstellen</p>
+                      </div>
+                    )}
+
+                    <button onClick={saveOffers} disabled={menuLoading} className="w-full bg-roma-red hover:bg-red-700 disabled:bg-gray-600 py-4 rounded-xl font-bold transition-colors sticky bottom-4 shadow-lg">
+                      {menuLoading ? 'Wird gespeichert...' : '💾 Angebote in GitHub speichern'}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-white/40">Angebote konnten nicht geladen werden</p>
+                )}
+              </div>
+            </motion.div>
+          ) : null}
         </AnimatePresence>
       </div>
     </div>
