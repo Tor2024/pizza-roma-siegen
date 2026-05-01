@@ -442,7 +442,7 @@
         },
         {
           "id": "d4",
-          "image": "/images/drink-water.webp",
+          "image": "/images/d4_Mineralwasser_0_5L.webp",
           "name": {
             "de": "Mineralwasser 0,5L",
             "ru": "Минеральная вода 0,5л"
@@ -459,7 +459,7 @@
         },
         {
           "id": "d5",
-          "image": "/images/drink-beer.webp",
+          "image": "/images/d5_Bier_0_5L.webp",
           "name": {
             "de": "Bier 0,5L",
             "ru": "Пиво 0,5л"
