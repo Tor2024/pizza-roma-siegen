@@ -562,7 +562,7 @@ export default function AdminDashboard() {
                   <motion.div
                     key={order.id}
                     layout
-                    className={`bg-white/5 rounded-2xl p-6 border ${isUrgent ? 'border-red-500/50 animate-pulse' : 'border-white/10'}`}
+                    className={`rounded-2xl p-6 border ${isUrgent ? 'border-red-500/50 animate-pulse' : isDarkMode ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white shadow-sm'}`}
                   >
                     <div className="flex flex-col lg:flex-row gap-6">
                       {/* Order information */}
@@ -570,10 +570,10 @@ export default function AdminDashboard() {
                         <div className="flex items-start justify-between mb-4">
                           <div>
                             <div className="flex items-center gap-2">
-                              <h3 className="text-xl font-bold">📍 {order.customer.address}</h3>
+                              <h3 className={`text-xl font-bold ${isDarkMode ? '' : 'text-gray-900'}`}>📍 {order.customer.address}</h3>
                               {isUrgent && <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">⚠ {elapsed} Min</span>}
                             </div>
-                            <p className="text-white/60 text-sm">#{order.id.slice(-8)} • {formatTime(order.createdAt)} • Vor {elapsed} Min.</p>
+                            <p className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>#{order.id.slice(-8)} • {formatTime(order.createdAt)} • Vor {elapsed} Min.</p>
                           </div>
                           <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${cfg.color} text-white text-sm font-semibold`}>
                             <StatusIcon size={14} />
@@ -582,29 +582,29 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="space-y-1 mb-4">
-                          <p className="text-white/80">📞 {order.customer.phone}</p>
-                          {order.customer.email && <p className="text-white/60 text-sm">✉️ {order.customer.email}</p>}
-                          {order.customer.note && <p className="text-yellow-400/80 text-sm">� {order.customer.note}</p>}
+                          <p className={isDarkMode ? 'text-white/80' : 'text-gray-700'}>📞 {order.customer.phone}</p>
+                          {order.customer.email && <p className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>✉️ {order.customer.email}</p>}
+                          {order.customer.note && <p className={`text-sm ${isDarkMode ? 'text-yellow-400/80' : 'text-yellow-600'}`}>📝 {order.customer.note}</p>}
                           {order.paymentMethod && (
-                            <p className="text-white/60 text-sm">
+                            <p className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>
                               💰 {order.paymentMethod === 'cash' ? 'Barzahlung' : order.paymentMethod === 'card' ? 'Karte' : order.paymentMethod === 'paypal' ? 'PayPal' : order.paymentMethod}
                             </p>
                           )}
                           {order.deliveryTime && (
-                            <p className="text-white/60 text-sm">🕐 {order.deliveryTime === 'asap' ? 'Schnellstmöglich' : order.deliveryTime}</p>
+                            <p className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>🕐 {order.deliveryTime === 'asap' ? 'Schnellstmöglich' : order.deliveryTime}</p>
                           )}
                         </div>
 
-                        <div className="bg-black/20 rounded-xl p-4">
-                          <p className="text-sm text-white/60 mb-2">Bestellinhalt:</p>
+                        <div className={`rounded-xl p-4 ${isDarkMode ? 'bg-black/20' : 'bg-gray-100'}`}>
+                          <p className={`text-sm mb-2 ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>Bestellinhalt:</p>
                           {order.items.map((item, idx) => (
                             <div key={idx} className="py-1">
-                              <div className="flex justify-between text-sm">
+                              <div className={`flex justify-between text-sm ${isDarkMode ? '' : 'text-gray-700'}`}>
                                 <span>{item.quantity}x {item.name.de} {item.size && `(${item.size}cm)`}</span>
-                                <span className="text-white/60">{(item.price * item.quantity).toFixed(2)} €</span>
+                                <span className={isDarkMode ? 'text-white/60' : 'text-gray-500'}>{(item.price * item.quantity).toFixed(2)} €</span>
                               </div>
                               {item.toppings && item.toppings.length > 0 && (
-                                <div className="ml-4 text-xs text-white/40">
+                                <div className={`ml-4 text-xs ${isDarkMode ? 'text-white/40' : 'text-gray-400'}`}>
                                   + {item.toppings.map(t => t.name.de).join(', ')}
                                 </div>
                               )}
@@ -616,28 +616,28 @@ export default function AdminDashboard() {
                               <span>-{order.promoDiscount?.toFixed(2)} €</span>
                             </div>
                           )}
-                          <div className="border-t border-white/10 mt-2 pt-2 space-y-1">
-                            <div className="flex justify-between text-sm text-white/60">
+                          <div className={`border-t mt-2 pt-2 space-y-1 ${isDarkMode ? 'border-white/10' : 'border-gray-300'}`}>
+                            <div className={`flex justify-between text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>
                               <span>Zwischensumme</span>
                               <span>{order.subtotal.toFixed(2)} €</span>
                             </div>
-                            <div className="flex justify-between text-sm text-white/60">
+                            <div className={`flex justify-between text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>
                               <span>Lieferkosten</span>
                               <span>{order.deliveryFee.toFixed(2)} €</span>
                             </div>
-                            <div className="flex justify-between font-bold">
+                            <div className={`flex justify-between font-bold ${isDarkMode ? '' : 'text-gray-900'}`}>
                               <span>Gesamt</span>
-                              <span className="text-roma-gold">{order.total.toFixed(2)} €</span>
+                              <span className="text-roma-red">{order.total.toFixed(2)} €</span>
                             </div>
                           </div>
                         </div>
 
-                        <p className="text-sm text-roma-gold mt-3">{cfg.hint}</p>
+                        <p className={`text-sm mt-3 ${isDarkMode ? 'text-roma-gold' : 'text-orange-600'}`}>{cfg.hint}</p>
                       </div>
 
                       {/* Status management */}
                       <div className="lg:w-64 space-y-2">
-                        <p className="text-sm text-white/60 mb-2">Status ändern:</p>
+                        <p className={`text-sm mb-2 ${isDarkMode ? 'text-white/60' : 'text-gray-500'}`}>Status ändern:</p>
                         {Object.entries(statusMap).map(([status, config]) => (
                           <button
                             key={status}
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
                             className={`w-full flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                               order.status === status
                                 ? `${config.color} text-white cursor-default`
-                                : 'bg-white/5 hover:bg-white/10 text-white/80'
+                                : isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white/80' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                             }`}
                           >
                             <config.icon size={14} />
@@ -682,29 +682,29 @@ export default function AdminDashboard() {
                 {menuLoading ? (
                   <div className="text-center py-10">
                     <FiRefreshCw className="animate-spin mx-auto mb-2" size={24} />
-                    <p className="text-white/60">Wird geladen...</p>
+                    <p className={isDarkMode ? 'text-white/60' : 'text-gray-500'}>Wird geladen...</p>
                   </div>
                 ) : menuData ? (
                   <div className="space-y-4">
                     {/* Delivery settings */}
-                    <div className="bg-black/20 rounded-xl p-4">
-                      <h3 className="font-semibold mb-3">Lieferungseinstellungen</h3>
+                    <div className={`rounded-xl p-4 ${isDarkMode ? 'bg-black/20' : 'bg-gray-100'}`}>
+                      <h3 className={`font-semibold mb-3 ${isDarkMode ? '' : 'text-gray-900'}`}>Lieferungseinstellungen</h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                          <label className="text-sm text-white/60">Min. Bestellung (€)</label>
-                          <input type="number" step="0.1" value={menuData.settings?.delivery?.minOrder || 15} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, minOrder: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
+                          <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Min. Bestellung (€)</label>
+                          <input type="number" step="0.1" value={menuData.settings?.delivery?.minOrder || 15} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, minOrder: parseFloat(e.target.value)}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-sm text-white/60">Gratis ab (€)</label>
-                          <input type="number" step="0.1" value={menuData.settings?.delivery?.freeDeliveryThreshold || 25} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, freeDeliveryThreshold: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
+                          <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Gratis ab (€)</label>
+                          <input type="number" step="0.1" value={menuData.settings?.delivery?.freeDeliveryThreshold || 25} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, freeDeliveryThreshold: parseFloat(e.target.value)}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-sm text-white/60">Lieferkosten (€)</label>
-                          <input type="number" step="0.1" value={menuData.settings?.delivery?.deliveryFee || 3.5} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, deliveryFee: parseFloat(e.target.value)}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
+                          <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Lieferkosten (€)</label>
+                          <input type="number" step="0.1" value={menuData.settings?.delivery?.deliveryFee || 3.5} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, deliveryFee: parseFloat(e.target.value)}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-sm text-white/60">Lieferzeit</label>
-                          <input type="text" value={menuData.settings?.delivery?.estimatedTime || '25-35 Min'} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, estimatedTime: e.target.value}}})} className="w-full bg-white/10 rounded-lg px-3 py-2 mt-1 text-white" />
+                          <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Lieferzeit</label>
+                          <input type="text" value={menuData.settings?.delivery?.estimatedTime || '25-35 Min'} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, estimatedTime: e.target.value}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                       </div>
                     </div>
@@ -720,16 +720,16 @@ export default function AdminDashboard() {
                     {/* Category editor */}
                     <div className="space-y-4">
                       {Object.entries(menuData.categories || {}).map(([catKey, category]: [string, any]) => (
-                        <div key={catKey} className="bg-black/20 rounded-xl p-4">
+                        <div key={catKey} className={`rounded-xl p-4 ${isDarkMode ? 'bg-black/20' : 'bg-gray-100'}`}>
                           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                             {/* Editable category names */}
                             <div className="flex-1">
-                              <label className="text-xs text-white/50">Kategoriename</label>
+                              <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Kategoriename</label>
                               <input 
                                 type="text" 
                                 value={category.name?.de || catKey} 
                                 onChange={(e) => updateCategoryName(catKey, e.target.value)}
-                                className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-white font-semibold"
+                                className={`w-full rounded px-3 py-2 mt-1 font-semibold ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`}
                               />
                             </div>
                             <div className="flex gap-2">
@@ -745,7 +745,7 @@ export default function AdminDashboard() {
                           {/* Item list */}
                           <div className="space-y-3">
                             {category.items?.map((item: any, idx: number) => (
-                              <div key={item.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                              <div key={item.id || idx} className={`rounded-lg p-4 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-3">
                                   {/* Name and Bild in one row - SYMMETRIC */}
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -815,7 +815,7 @@ export default function AdminDashboard() {
                                       <img 
                                         src={item.image} 
                                         alt={item.name?.de} 
-                                        className="w-24 h-24 rounded object-cover border border-white/20"
+                                        className={`w-24 h-24 rounded object-cover border ${isDarkMode ? 'border-white/20' : 'border-gray-300'}`}
                                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                       />
                                     </div>
@@ -823,8 +823,8 @@ export default function AdminDashboard() {
                                   {/* Single Price (for non-pizza items) */}
                                   {item.price && !item.prices && (
                                     <div>
-                                      <label className="text-xs text-white/50">Preis (€)</label>
-                                      <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                      <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Preis (€)</label>
+                                      <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                                     </div>
                                   )}
                                 </div>
@@ -833,7 +833,7 @@ export default function AdminDashboard() {
                                 {item.prices && (
                                   <div className="mb-3">
                                     <div className="flex justify-between items-center mb-2">
-                                      <label className="text-xs text-white/50">Größen & Preise</label>
+                                      <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Größen & Preise</label>
                                       <button 
                                         onClick={() => {
                                           const newSize = prompt('Neue Größe eingeben (z.B. 30):');
@@ -841,19 +841,19 @@ export default function AdminDashboard() {
                                             updateItem(catKey, idx, `prices.${newSize}`, 0);
                                           }
                                         }}
-                                        className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors"
+                                        className={`text-xs px-2 py-1 rounded transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-200 hover:bg-gray-300'}`}
                                       >
                                         + Größe
                                       </button>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                       {Object.entries(item.prices).map(([size, price]: [string, any]) => (
-                                        <div key={size} className="bg-white/5 rounded-lg p-2 relative group">
+                                        <div key={size} className={`rounded-lg p-2 relative group ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'}`}>
                                           <div className="flex items-center gap-1 mb-1">
                                             <input 
                                               type="text" 
                                               value={size} 
-                                              className="flex-1 bg-transparent text-xs text-white/70 font-semibold outline-none border-b border-white/20 focus:border-roma-gold"
+                                              className={`flex-1 bg-transparent text-xs font-semibold outline-none border-b focus:border-roma-gold ${isDarkMode ? 'text-white/70 border-white/20' : 'text-gray-700 border-gray-300'}`}
                                               onChange={(e) => {
                                                 const newKey = e.target.value;
                                                 if (newKey !== size) {
@@ -864,7 +864,7 @@ export default function AdminDashboard() {
                                                 }
                                               }}
                                             />
-                                            <span className="text-xs text-white/40">cm</span>
+                                            <span className={`text-xs ${isDarkMode ? 'text-white/40' : 'text-gray-500'}`}>cm</span>
                                             <button 
                                               onClick={() => {
                                                 const newPrices = { ...item.prices };
@@ -879,7 +879,7 @@ export default function AdminDashboard() {
                                             step="0.01" 
                                             value={price || 0} 
                                             onChange={(e) => updateItem(catKey, idx, `prices.${size}`, parseFloat(e.target.value))} 
-                                            className="w-full bg-white/10 rounded px-2 py-1 text-sm text-white" 
+                                            className={`w-full rounded px-2 py-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
                                           />
                                         </div>
                                       ))}
@@ -889,20 +889,20 @@ export default function AdminDashboard() {
 
                                 {/* Description */}
                                 <div className="mb-3">
-                                  <label className="text-xs text-white/50">Beschreibung</label>
-                                  <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white h-16 resize-none" />
+                                  <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Beschreibung</label>
+                                  <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm h-16 resize-none ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                                 </div>
 
                                 {/* Extras / Toppings */}
                                 <div className="mb-3">
                                   <div className="flex justify-between items-center mb-2">
-                                    <label className="text-xs text-white/50">Extras</label>
-                                    <button onClick={() => addTopping(catKey, idx)} className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">+ Extra</button>
+                                    <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Extras</label>
+                                    <button onClick={() => addTopping(catKey, idx)} className={`text-xs px-2 py-1 rounded transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-200 hover:bg-gray-300'}`}>+ Extra</button>
                                   </div>
                                   {item.toppings?.map((topping: any, tIdx: number) => (
                                     <div key={tIdx} className="flex gap-2 mb-1">
-                                      <input type="text" value={topping.name?.de || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'de', e.target.value)} className="flex-1 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="Extra Name" />
-                                      <input type="number" step="0.1" value={topping.price || 0} onChange={(e) => updateTopping(catKey, idx, tIdx, 'price', e.target.value)} className="w-20 bg-white/10 rounded px-2 py-1 text-xs text-white" placeholder="€" />
+                                      <input type="text" value={topping.name?.de || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'de', e.target.value)} className={`flex-1 rounded px-2 py-1 text-xs ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Extra Name" />
+                                      <input type="number" step="0.1" value={topping.price || 0} onChange={(e) => updateTopping(catKey, idx, tIdx, 'price', e.target.value)} className={`w-20 rounded px-2 py-1 text-xs ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="€" />
                                       <button onClick={() => removeTopping(catKey, idx, tIdx)} className="px-2 py-1 text-red-400 hover:text-red-300 text-xs">×</button>
                                     </div>
                                   ))}
@@ -911,7 +911,7 @@ export default function AdminDashboard() {
                                 {/* Sizes (for pizza) */}
                                 {item.sizes && (
                                   <div className="mb-3">
-                                    <label className="text-xs text-white/50">Größen</label>
+                                    <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Größen</label>
                                     <div className="flex gap-2 mt-1">
                                       {Object.entries(item.sizes).map(([size, price]: [string, any]) => (
                                         <div key={size} className="bg-white/5 rounded px-3 py-1 text-xs">
@@ -940,7 +940,7 @@ export default function AdminDashboard() {
                     </button>
                   </div>
                 ) : (
-                  <p className="text-white/40">Menü konnte nicht geladen werden</p>
+                  <p className={isDarkMode ? 'text-white/40' : 'text-gray-400'}>Menü konnte nicht geladen werden</p>
                 )}
               </div>
             </motion.div>
@@ -967,12 +967,12 @@ export default function AdminDashboard() {
                 {menuLoading ? (
                   <div className="text-center py-10">
                     <FiRefreshCw className="animate-spin mx-auto mb-2" size={24} />
-                    <p className="text-white/60">Wird geladen...</p>
+                    <p className={isDarkMode ? 'text-white/60' : 'text-gray-500'}>Wird geladen...</p>
                   </div>
                 ) : menuData ? (
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-semibold text-lg">Angebote ({menuData.offers?.length || 0})</h3>
+                      <h3 className={`font-semibold text-lg ${isDarkMode ? '' : 'text-gray-900'}`}>Angebote ({menuData.offers?.length || 0})</h3>
                       <button onClick={addOffer} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold transition-colors">
                         + Angebot hinzufügen
                       </button>
@@ -980,7 +980,7 @@ export default function AdminDashboard() {
 
                     <div className="space-y-4">
                       {(menuData.offers || []).map((offer: any, idx: number) => (
-                        <div key={offer.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                        <div key={offer.id || idx} className={`rounded-lg p-4 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-3">
                             {/* Image Preview + Title DE */}
                             <div className="flex items-start gap-3">
@@ -988,34 +988,34 @@ export default function AdminDashboard() {
                                 <img 
                                   src={offer.img} 
                                   alt={offer.title?.de || 'Angebot'} 
-                                  className="w-24 h-24 rounded object-cover border border-white/20 flex-shrink-0"
+                                  className={`w-24 h-24 rounded object-cover border flex-shrink-0 ${isDarkMode ? 'border-white/20' : 'border-gray-300'}`}
                                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                 />
                               )}
                               <div className="flex-1 space-y-2">
                                 <div>
-                                  <label className="text-xs text-white/50">Titel</label>
-                                  <input type="text" value={offer.title?.de || ''} onChange={(e) => updateOffer(idx, 'title.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
+                                  <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Titel</label>
+                                  <input type="text" value={offer.title?.de || ''} onChange={(e) => updateOffer(idx, 'title.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                                 </div>
                               </div>
                             </div>
                             {/* Description + Image URL */}
                             <div className="space-y-2">
                               <div>
-                                <label className="text-xs text-white/50">Beschreibung</label>
-                                <input type="text" value={offer.desc?.de || ''} onChange={(e) => updateOffer(idx, 'desc.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="Beschreibung..." />
+                                <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Beschreibung</label>
+                                <input type="text" value={offer.desc?.de || ''} onChange={(e) => updateOffer(idx, 'desc.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Beschreibung..." />
                               </div>
                               <div>
-                                <label className="text-xs text-white/50">Bild URL</label>
+                                <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Bild URL</label>
                                 <div className="flex gap-2">
                                   <input 
                                     type="text" 
                                     value={offer.img || ''} 
                                     onChange={(e) => updateOffer(idx, 'img', e.target.value)} 
-                                    className="flex-1 bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" 
+                                    className={`flex-1 rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
                                     placeholder="/images/offer.webp" 
                                   />
-                                  <label className="px-3 py-1 mt-1 bg-white/20 hover:bg-white/30 rounded cursor-pointer text-sm flex items-center">
+                                  <label className={`px-3 py-1 mt-1 rounded cursor-pointer text-sm flex items-center ${isDarkMode ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-200 hover:bg-gray-300'}`}>
                                     📁
                                     <input 
                                       type="file" 
@@ -1055,15 +1055,15 @@ export default function AdminDashboard() {
                             {/* Price + Badge */}
                             <div className="space-y-2">
                               <div>
-                                <label className="text-xs text-white/50">Preis</label>
-                                <input type="text" value={offer.price || ''} onChange={(e) => updateOffer(idx, 'price', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="19.90 €" />
+                                <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Preis</label>
+                                <input type="text" value={offer.price || ''} onChange={(e) => updateOffer(idx, 'price', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="19.90 €" />
                               </div>
                               <div>
-                                <label className="text-xs text-white/50">Badge / Etikett</label>
-                                <input type="text" value={offer.badge || ''} onChange={(e) => updateOffer(idx, 'badge', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" placeholder="Spare 30%" />
+                                <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Badge / Etikett</label>
+                                <input type="text" value={offer.badge || ''} onChange={(e) => updateOffer(idx, 'badge', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Spare 30%" />
                               </div>
                               <div className="flex justify-end pt-2">
-                                <button onClick={() => deleteOffer(idx)} className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors">
+                                <button onClick={() => deleteOffer(idx)} className={`px-3 py-1 rounded text-xs transition-colors ${isDarkMode ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400' : 'bg-red-100 hover:bg-red-200 text-red-600'}`}>
                                   Angebot löschen
                                 </button>
                               </div>
@@ -1074,7 +1074,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {(menuData.offers || []).length === 0 && (
-                      <div className="text-center py-10 text-white/40">
+                      <div className={`text-center py-10 ${isDarkMode ? 'text-white/40' : 'text-gray-400'}`}>
                         <p className="text-lg">Keine Angebote</p>
                         <p className="text-sm mt-2">Klicken Sie auf "+ Angebot hinzufügen" um ein neues Angebot zu erstellen</p>
                       </div>
@@ -1085,7 +1085,7 @@ export default function AdminDashboard() {
                     </button>
                   </div>
                 ) : (
-                  <p className="text-white/40">Angebote konnten nicht geladen werden</p>
+                  <p className={isDarkMode ? 'text-white/40' : 'text-gray-400'}>Angebote konnten nicht geladen werden</p>
                 )}
               </div>
             </motion.div>
@@ -1112,163 +1112,163 @@ export default function AdminDashboard() {
                 {menuLoading ? (
                   <div className="text-center py-10">
                     <FiRefreshCw className="animate-spin mx-auto mb-2" size={24} />
-                    <p className="text-white/60">Wird geladen...</p>
+                    <p className={isDarkMode ? 'text-white/60' : 'text-gray-500'}>Wird geladen...</p>
                   </div>
                 ) : menuData ? (
                   <div className="space-y-8">
                     {/* IMPRESSUM */}
-                    <div className="bg-black/20 rounded-xl p-6">
-                      <h3 className="text-xl font-semibold mb-4 text-roma-gold">Impressum (§5 TMG)</h3>
+                    <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-black/20' : 'bg-gray-100'}`}>
+                      <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-roma-gold' : 'text-orange-600'}`}>Impressum (§5 TMG)</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="text-xs text-white/50">Firmenname</label>
-                          <input type="text" value={menuData.legal?.impressum?.companyName || ''} onChange={(e) => updateLegal('impressum', 'companyName', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Firmenname</label>
+                          <input type="text" value={menuData.legal?.impressum?.companyName || ''} onChange={(e) => updateLegal('impressum', 'companyName', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Inhaber</label>
-                          <input type="text" value={menuData.legal?.impressum?.owner || ''} onChange={(e) => updateLegal('impressum', 'owner', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Inhaber</label>
+                          <input type="text" value={menuData.legal?.impressum?.owner || ''} onChange={(e) => updateLegal('impressum', 'owner', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Adresse</label>
-                          <input type="text" value={menuData.legal?.impressum?.address || ''} onChange={(e) => updateLegal('impressum', 'address', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" placeholder="Straße, PLZ Stadt" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Adresse</label>
+                          <input type="text" value={menuData.legal?.impressum?.address || ''} onChange={(e) => updateLegal('impressum', 'address', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Straße, PLZ Stadt" />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Telefon</label>
-                          <input type="text" value={menuData.legal?.impressum?.phone || ''} onChange={(e) => updateLegal('impressum', 'phone', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Telefon</label>
+                          <input type="text" value={menuData.legal?.impressum?.phone || ''} onChange={(e) => updateLegal('impressum', 'phone', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">E-Mail</label>
-                          <input type="email" value={menuData.legal?.impressum?.email || ''} onChange={(e) => updateLegal('impressum', 'email', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>E-Mail</label>
+                          <input type="email" value={menuData.legal?.impressum?.email || ''} onChange={(e) => updateLegal('impressum', 'email', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">USt-IdNr.</label>
-                          <input type="text" value={menuData.legal?.impressum?.ustId || ''} onChange={(e) => updateLegal('impressum', 'ustId', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" placeholder="DEXXXXXXXXX" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>USt-IdNr.</label>
+                          <input type="text" value={menuData.legal?.impressum?.ustId || ''} onChange={(e) => updateLegal('impressum', 'ustId', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="DEXXXXXXXXX" />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Steuernummer</label>
-                          <input type="text" value={menuData.legal?.impressum?.steuernummer || ''} onChange={(e) => updateLegal('impressum', 'steuernummer', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Steuernummer</label>
+                          <input type="text" value={menuData.legal?.impressum?.steuernummer || ''} onChange={(e) => updateLegal('impressum', 'steuernummer', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Registergericht (optional)</label>
-                          <input type="text" value={menuData.legal?.impressum?.registerCourt || ''} onChange={(e) => updateLegal('impressum', 'registerCourt', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Registergericht (optional)</label>
+                          <input type="text" value={menuData.legal?.impressum?.registerCourt || ''} onChange={(e) => updateLegal('impressum', 'registerCourt', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Registernummer (optional)</label>
-                          <input type="text" value={menuData.legal?.impressum?.registerNumber || ''} onChange={(e) => updateLegal('impressum', 'registerNumber', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Registernummer (optional)</label>
+                          <input type="text" value={menuData.legal?.impressum?.registerNumber || ''} onChange={(e) => updateLegal('impressum', 'registerNumber', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Verantwortlich für Inhalt (§55 RStV)</label>
-                          <input type="text" value={menuData.legal?.impressum?.responsibleForContent || ''} onChange={(e) => updateLegal('impressum', 'responsibleForContent', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Verantwortlich für Inhalt (§55 RStV)</label>
+                          <input type="text" value={menuData.legal?.impressum?.responsibleForContent || ''} onChange={(e) => updateLegal('impressum', 'responsibleForContent', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div className="md:col-span-2">
-                          <label className="text-xs text-white/50">Verantwortlich Adresse</label>
-                          <input type="text" value={menuData.legal?.impressum?.responsibleAddress || ''} onChange={(e) => updateLegal('impressum', 'responsibleAddress', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Verantwortlich Adresse</label>
+                          <input type="text" value={menuData.legal?.impressum?.responsibleAddress || ''} onChange={(e) => updateLegal('impressum', 'responsibleAddress', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div className="md:col-span-2">
-                          <label className="text-xs text-white/50">Zusätzliche Informationen</label>
-                          <textarea value={menuData.legal?.impressum?.additionalInfo || ''} onChange={(e) => updateLegal('impressum', 'additionalInfo', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" placeholder="Weitere rechtliche Hinweise..." />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Zusätzliche Informationen</label>
+                          <textarea value={menuData.legal?.impressum?.additionalInfo || ''} onChange={(e) => updateLegal('impressum', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Weitere rechtliche Hinweise..." />
                         </div>
                       </div>
                     </div>
 
                     {/* DATENSCHUTZ */}
-                    <div className="bg-black/20 rounded-xl p-6">
-                      <h3 className="text-xl font-semibold mb-4 text-roma-gold">Datenschutzerklärung (DSGVO)</h3>
+                    <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-black/20' : 'bg-gray-100'}`}>
+                      <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-roma-gold' : 'text-orange-600'}`}>Datenschutzerklärung (DSGVO)</h3>
                       <div className="space-y-4">
                         <div>
-                          <label className="text-xs text-white/50">Einleitung</label>
-                          <textarea value={menuData.legal?.datenschutz?.intro || ''} onChange={(e) => updateLegal('datenschutz', 'intro', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Einleitung</label>
+                          <textarea value={menuData.legal?.datenschutz?.intro || ''} onChange={(e) => updateLegal('datenschutz', 'intro', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Verantwortliche Stelle</label>
-                          <input type="text" value={menuData.legal?.datenschutz?.controller || ''} onChange={(e) => updateLegal('datenschutz', 'controller', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Verantwortliche Stelle</label>
+                          <input type="text" value={menuData.legal?.datenschutz?.controller || ''} onChange={(e) => updateLegal('datenschutz', 'controller', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Erhobene Daten</label>
-                          <textarea value={menuData.legal?.datenschutz?.dataCollected || ''} onChange={(e) => updateLegal('datenschutz', 'dataCollected', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Erhobene Daten</label>
+                          <textarea value={menuData.legal?.datenschutz?.dataCollected || ''} onChange={(e) => updateLegal('datenschutz', 'dataCollected', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Zweck der Verarbeitung</label>
-                          <textarea value={menuData.legal?.datenschutz?.purpose || ''} onChange={(e) => updateLegal('datenschutz', 'purpose', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Zweck der Verarbeitung</label>
+                          <textarea value={menuData.legal?.datenschutz?.purpose || ''} onChange={(e) => updateLegal('datenschutz', 'purpose', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Hosting (Vercel)</label>
-                          <textarea value={menuData.legal?.datenschutz?.hosting || ''} onChange={(e) => updateLegal('datenschutz', 'hosting', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Hosting (Vercel)</label>
+                          <textarea value={menuData.legal?.datenschutz?.hosting || ''} onChange={(e) => updateLegal('datenschutz', 'hosting', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Cookies</label>
-                          <textarea value={menuData.legal?.datenschutz?.cookies || ''} onChange={(e) => updateLegal('datenschutz', 'cookies', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Cookies</label>
+                          <textarea value={menuData.legal?.datenschutz?.cookies || ''} onChange={(e) => updateLegal('datenschutz', 'cookies', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Ihre Rechte (DSGVO Artikel)</label>
-                          <textarea value={menuData.legal?.datenschutz?.rights || ''} onChange={(e) => updateLegal('datenschutz', 'rights', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Ihre Rechte (DSGVO Artikel)</label>
+                          <textarea value={menuData.legal?.datenschutz?.rights || ''} onChange={(e) => updateLegal('datenschutz', 'rights', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Zusätzliche Informationen</label>
-                          <textarea value={menuData.legal?.datenschutz?.additionalInfo || ''} onChange={(e) => updateLegal('datenschutz', 'additionalInfo', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Zusätzliche Informationen</label>
+                          <textarea value={menuData.legal?.datenschutz?.additionalInfo || ''} onChange={(e) => updateLegal('datenschutz', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                       </div>
                     </div>
 
                     {/* AGB */}
-                    <div className="bg-black/20 rounded-xl p-6">
-                      <h3 className="text-xl font-semibold mb-4 text-roma-gold">Allgemeine Geschäftsbedingungen (AGB)</h3>
+                    <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-black/20' : 'bg-gray-100'}`}>
+                      <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-roma-gold' : 'text-orange-600'}`}>Allgemeine Geschäftsbedingungen (AGB)</h3>
                       <div className="space-y-4">
                         <div>
-                          <label className="text-xs text-white/50">Firmenname</label>
-                          <input type="text" value={menuData.legal?.agb?.companyName || ''} onChange={(e) => updateLegal('agb', 'companyName', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Firmenname</label>
+                          <input type="text" value={menuData.legal?.agb?.companyName || ''} onChange={(e) => updateLegal('agb', 'companyName', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">Einleitung</label>
-                          <textarea value={menuData.legal?.agb?.intro || ''} onChange={(e) => updateLegal('agb', 'intro', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Einleitung</label>
+                          <textarea value={menuData.legal?.agb?.intro || ''} onChange={(e) => updateLegal('agb', 'intro', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 1 Geltungsbereich</label>
-                          <textarea value={menuData.legal?.agb?.scope || ''} onChange={(e) => updateLegal('agb', 'scope', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 1 Geltungsbereich</label>
+                          <textarea value={menuData.legal?.agb?.scope || ''} onChange={(e) => updateLegal('agb', 'scope', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 2 Vertragsschluss</label>
-                          <textarea value={menuData.legal?.agb?.contractFormation || ''} onChange={(e) => updateLegal('agb', 'contractFormation', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 2 Vertragsschluss</label>
+                          <textarea value={menuData.legal?.agb?.contractFormation || ''} onChange={(e) => updateLegal('agb', 'contractFormation', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 3 Preise</label>
-                          <textarea value={menuData.legal?.agb?.prices || ''} onChange={(e) => updateLegal('agb', 'prices', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 3 Preise</label>
+                          <textarea value={menuData.legal?.agb?.prices || ''} onChange={(e) => updateLegal('agb', 'prices', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 4 Lieferung</label>
-                          <textarea value={menuData.legal?.agb?.delivery || ''} onChange={(e) => updateLegal('agb', 'delivery', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 4 Lieferung</label>
+                          <textarea value={menuData.legal?.agb?.delivery || ''} onChange={(e) => updateLegal('agb', 'delivery', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 5 Zahlung</label>
-                          <textarea value={menuData.legal?.agb?.payment || ''} onChange={(e) => updateLegal('agb', 'payment', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 5 Zahlung</label>
+                          <textarea value={menuData.legal?.agb?.payment || ''} onChange={(e) => updateLegal('agb', 'payment', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 6 Eigentumsvorbehalt</label>
-                          <textarea value={menuData.legal?.agb?.retentionOfTitle || ''} onChange={(e) => updateLegal('agb', 'retentionOfTitle', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[40px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 6 Eigentumsvorbehalt</label>
+                          <textarea value={menuData.legal?.agb?.retentionOfTitle || ''} onChange={(e) => updateLegal('agb', 'retentionOfTitle', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[40px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 7 Gewährleistung</label>
-                          <textarea value={menuData.legal?.agb?.warranty || ''} onChange={(e) => updateLegal('agb', 'warranty', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 7 Gewährleistung</label>
+                          <textarea value={menuData.legal?.agb?.warranty || ''} onChange={(e) => updateLegal('agb', 'warranty', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 8 Haftung</label>
-                          <textarea value={menuData.legal?.agb?.liability || ''} onChange={(e) => updateLegal('agb', 'liability', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 8 Haftung</label>
+                          <textarea value={menuData.legal?.agb?.liability || ''} onChange={(e) => updateLegal('agb', 'liability', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 9 Widerrufsrecht</label>
-                          <textarea value={menuData.legal?.agb?.rightOfWithdrawal || ''} onChange={(e) => updateLegal('agb', 'rightOfWithdrawal', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 9 Widerrufsrecht</label>
+                          <textarea value={menuData.legal?.agb?.rightOfWithdrawal || ''} onChange={(e) => updateLegal('agb', 'rightOfWithdrawal', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 10 Datenschutz</label>
-                          <textarea value={menuData.legal?.agb?.dataProtection || ''} onChange={(e) => updateLegal('agb', 'dataProtection', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[40px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 10 Datenschutz</label>
+                          <textarea value={menuData.legal?.agb?.dataProtection || ''} onChange={(e) => updateLegal('agb', 'dataProtection', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[40px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 11 Schlussbestimmungen</label>
-                          <textarea value={menuData.legal?.agb?.finalProvisions || ''} onChange={(e) => updateLegal('agb', 'finalProvisions', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[60px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 11 Schlussbestimmungen</label>
+                          <textarea value={menuData.legal?.agb?.finalProvisions || ''} onChange={(e) => updateLegal('agb', 'finalProvisions', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                         <div>
-                          <label className="text-xs text-white/50">§ 12 Zusätzliche Bestimmungen</label>
-                          <textarea value={menuData.legal?.agb?.additionalInfo || ''} onChange={(e) => updateLegal('agb', 'additionalInfo', e.target.value)} className="w-full bg-white/10 rounded px-3 py-2 mt-1 text-sm text-white min-h-[80px]" />
+                          <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 12 Zusätzliche Bestimmungen</label>
+                          <textarea value={menuData.legal?.agb?.additionalInfo || ''} onChange={(e) => updateLegal('agb', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
                         </div>
                       </div>
                     </div>
@@ -1278,7 +1278,7 @@ export default function AdminDashboard() {
                     </button>
                   </div>
                 ) : (
-                  <p className="text-white/40">Daten konnten nicht geladen werden</p>
+                  <p className={isDarkMode ? 'text-white/40' : 'text-gray-400'}>Daten konnten nicht geladen werden</p>
                 )}
               </div>
             </motion.div>
