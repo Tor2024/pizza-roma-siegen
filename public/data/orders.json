@@ -134,5 +134,97 @@
     "status": "delivering",
     "createdAt": 1777624791414,
     "updatedAt": 1777626034853
+  },
+  {
+    "id": "ord_1777647628656_o6c4y6ddu",
+    "items": [
+      {
+        "id": "d2",
+        "name": {
+          "de": "Fanta 0,5L",
+          "ru": "Фанта 0,5л"
+        },
+        "size": "1",
+        "price": 0.5,
+        "quantity": 1,
+        "toppings": [],
+        "image": "/images/drink-fanta.webp"
+      },
+      {
+        "id": "d1",
+        "name": {
+          "de": "Coca Cola 0,5L",
+          "ru": "Кока-Кола 0,5л"
+        },
+        "size": "1",
+        "price": 0.5,
+        "quantity": 1,
+        "toppings": [],
+        "image": "/images/drink-cola.webp"
+      },
+      {
+        "id": "d3",
+        "name": {
+          "de": "Sprite 0,5L",
+          "ru": "Спрайт 0,5л"
+        },
+        "size": "1",
+        "price": 0.5,
+        "quantity": 1,
+        "toppings": [],
+        "image": "/images/drink-sprite.webp"
+      },
+      {
+        "id": "d5",
+        "name": {
+          "de": "Bier 0,5L",
+          "ru": "Пиво 0,5л"
+        },
+        "size": "1",
+        "price": 3.9,
+        "quantity": 1,
+        "toppings": [],
+        "image": "/images/drink-beer.webp"
+      },
+      {
+        "id": "d4",
+        "name": {
+          "de": "Mineralwasser 0,5L",
+          "ru": "Минеральная вода 0,5л"
+        },
+        "size": "1",
+        "price": 2.5,
+        "quantity": 1,
+        "toppings": [],
+        "image": "/images/drink-water.webp"
+      },
+      {
+        "id": "pas1",
+        "name": {
+          "de": "Pasta Carbonara",
+          "ru": "Паста Карбонара"
+        },
+        "size": "1",
+        "price": 11.9,
+        "quantity": 2,
+        "toppings": [],
+        "image": "/images/pas1_pasta_carb.webp"
+      }
+    ],
+    "customer": {
+      "name": "Koblenzer 1",
+      "phone": "0157777787888",
+      "email": "bar5v@gmail.com",
+      "address": "Koblenzer 1, 57072 Siegen",
+      "note": "Schnell wie moglich"
+    },
+    "subtotal": 31.700000000000003,
+    "deliveryFee": 0,
+    "total": 31.700000000000003,
+    "paymentMethod": "cash",
+    "deliveryTime": "asap",
+    "status": "received",
+    "createdAt": 1777647628656,
+    "updatedAt": 1777647628656
   }
 ]
