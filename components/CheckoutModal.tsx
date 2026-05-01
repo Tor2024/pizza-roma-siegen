@@ -48,12 +48,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   });
 
   const paymentMethods = [
-    { id: 'paypal', name: t('paypal'), icon: 'PayPal' },
-    { id: 'card', name: t('card'), icon: '💳' },
-    { id: 'cash', name: t('cash'), icon: '💵' },
-    { id: 'googlepay', name: t('googlepay'), icon: 'G' },
+    { id: 'cash', name: 'Barzahlung bei Lieferung', icon: '💵' },
   ];
-  const [selectedPayment, setSelectedPayment] = useState('card');
+  const [selectedPayment, setSelectedPayment] = useState('cash');
 
   const applyPromoCode = () => {
     if (promoCode.toLowerCase() === 'roma10') {
@@ -365,7 +362,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                           <span>{t('total')}</span>
                           <span>{finalTotal.toFixed(2)} €</span>
                         </div>
-                        <p className="text-xs text-white/50 mt-1">Alle Preise inkl. 19% MwSt. zzgl. Lieferkosten.</p>
+                        <p className="text-xs text-white/50 mt-1">Alle Preise inkl. 7% MwSt. (Lebensmittel) / 19% MwSt. (Getränke).</p>
                       </div>
                     </div>
 
@@ -452,7 +449,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                           </>
                         ) : (
                           <>
-                            <FiCreditCard /> Zahlungspflichtig bestellen {finalTotal.toFixed(2)} €
+                            <FiCheck /> Kostenpflichtig bestellen {finalTotal.toFixed(2)} €
                           </>
                         )}
                       </button>

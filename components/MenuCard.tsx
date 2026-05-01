@@ -15,9 +15,11 @@ interface Props {
   desc: { de: string; ru: string };
   prices: { [size: string]: number };
   toppings: Topping[];
+  allergens?: string[];
+  allergensDesc?: { de: string; ru: string };
 }
 
-export default function MenuCard({ id, image, name, desc, prices, toppings }: Props) {
+export default function MenuCard({ id, image, name, desc, prices, toppings, allergens, allergensDesc }: Props) {
   const { t } = useLanguage();
   const addItem = useCartStore(state => state.addItem);
   const [selectedSize, setSelectedSize] = useState(Object.keys(prices)[0]);
@@ -66,7 +68,16 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
 
       <div className="p-5">
         <h3 className="font-poppins font-bold text-xl mb-1">{name.de}</h3>
-        <p className="text-sm text-gray-500 mb-4">{desc.de}</p>
+        <p className="text-sm text-gray-500 mb-2">{desc.de}</p>
+        
+        {/* Allergens */}
+        {allergens && allergens.length > 0 && (
+          <div className="mb-3">
+            <p className="text-xs text-amber-600 font-medium">
+              <span className="font-bold">Allergene:</span> {allergensDesc?.de || allergens.join(', ')}
+            </p>
+          </div>
+        )}
 
         {/* Size selection */}
         <div className="mb-4">

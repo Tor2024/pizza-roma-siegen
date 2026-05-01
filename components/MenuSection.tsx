@@ -359,6 +359,8 @@ export default function MenuSection() {
                   desc={item.desc || item.description}
                   prices={item.prices || { '1': item.price }}
                   toppings={item.toppings || []}
+                  allergens={item.allergens}
+                  allergensDesc={item.allergensDesc}
                 />
               ))}
             </div>
