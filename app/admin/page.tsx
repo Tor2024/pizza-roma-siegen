@@ -79,6 +79,14 @@ export default function AdminDashboard() {
   const [menuLoading, setMenuLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [orderFilter, setOrderFilter] = useState<OrderStatus | 'all'>('all');
+  
+  // Theme state
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  
+  // Toggle theme
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   // Get admin token from cookie
   const getAdminToken = () => {
@@ -407,9 +415,9 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-roma-dark text-white pt-0">
+    <div className={`min-h-screen pt-0 transition-colors duration-300 ${isDarkMode ? 'bg-roma-dark text-white' : 'bg-gray-50 text-gray-900'}`}>
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 px-6 py-3">
+      <header className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b px-6 py-3 transition-colors duration-300 ${isDarkMode ? 'bg-black/80 border-white/10' : 'bg-white/80 border-gray-200'}`}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <span className="text-roma-red text-2xl">♛</span>
@@ -417,9 +425,17 @@ export default function AdminDashboard() {
           </div>
           
           <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-200 hover:bg-gray-300'}`}
+              title={isDarkMode ? 'Helles Design' : 'Dunkles Design'}
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
             <button 
               onClick={fetchOrders}
-              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-200 hover:bg-gray-300'}`}
               title="Aktualisieren"
             >
               <FiRefreshCw className={loading ? 'animate-spin' : ''} size={18} />
@@ -439,11 +455,13 @@ export default function AdminDashboard() {
 
       {/* Tabs */}
       <div className="max-w-7xl mx-auto px-6 mt-6">
-        <div className="flex gap-2 border-b border-white/10">
+        <div className={`flex gap-2 border-b ${isDarkMode ? 'border-white/10' : 'border-gray-300'}`}>
           <button 
             onClick={() => setTab('orders')} 
             className={`px-6 py-3 rounded-t-lg font-semibold transition-colors ${
-              tab === 'orders' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
+              tab === 'orders' 
+                ? 'bg-roma-red text-white' 
+                : isDarkMode ? 'text-white/50 hover:text-white' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             Bestellungen ({orders.filter(o => o.status === 'received').length}/{orders.length})
@@ -451,7 +469,9 @@ export default function AdminDashboard() {
           <button 
             onClick={() => setTab('menu')} 
             className={`px-6 py-3 rounded-t-lg font-semibold transition-colors ${
-              tab === 'menu' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
+              tab === 'menu' 
+                ? 'bg-roma-red text-white' 
+                : isDarkMode ? 'text-white/50 hover:text-white' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             Menü & Einstellungen
@@ -459,7 +479,9 @@ export default function AdminDashboard() {
           <button 
             onClick={() => setTab('offers')} 
             className={`px-6 py-3 rounded-t-lg font-semibold transition-colors ${
-              tab === 'offers' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
+              tab === 'offers' 
+                ? 'bg-roma-red text-white' 
+                : isDarkMode ? 'text-white/50 hover:text-white' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             Angebote
@@ -467,7 +489,9 @@ export default function AdminDashboard() {
           <button 
             onClick={() => setTab('legal')} 
             className={`px-6 py-3 rounded-t-lg font-semibold transition-colors ${
-              tab === 'legal' ? 'bg-roma-red text-white' : 'text-white/50 hover:text-white'
+              tab === 'legal' 
+                ? 'bg-roma-red text-white' 
+                : isDarkMode ? 'text-white/50 hover:text-white' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             Rechtliches
@@ -493,7 +517,7 @@ export default function AdminDashboard() {
               )}
 
               {orders.length === 0 && !loading && (
-                <div className="text-center py-20 text-white/40">
+                <div className={`text-center py-20 ${isDarkMode ? 'text-white/40' : 'text-gray-500'}`}>
                   <FiPackage size={48} className="mx-auto mb-4" />
                   <p className="text-xl">Noch keine Bestellungen...</p>
                   <p className="text-sm mt-2">Neue Bestellungen erscheinen hier automatisch</p>
@@ -505,7 +529,7 @@ export default function AdminDashboard() {
                 <div className="flex gap-2 flex-wrap mb-4">
                   <button
                     onClick={() => setOrderFilter('all')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${orderFilter === 'all' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${orderFilter === 'all' ? 'bg-roma-red text-white' : isDarkMode ? 'bg-white/5 text-white/50 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                   >
                     Alle ({orders.length})
                   </button>
@@ -516,7 +540,7 @@ export default function AdminDashboard() {
                       <button
                         key={status}
                         onClick={() => setOrderFilter(status as OrderStatus)}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${orderFilter === status ? `${config.color} text-white` : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
+                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${orderFilter === status ? `${config.color} text-white` : isDarkMode ? 'bg-white/5 text-white/50 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                       >
                         <config.icon size={12} />
                         {config.label} ({count})
@@ -643,7 +667,7 @@ export default function AdminDashboard() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+              <div className={`rounded-2xl p-6 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
                 <h2 className="text-2xl font-bold mb-4">Menüverwaltung</h2>
                 <p className="text-white/60 mb-6">
                   Änderungen werden an GitHub gesendet. Vercel aktualisiert die Site automatisch innerhalb von 1 Minute.
@@ -723,70 +747,79 @@ export default function AdminDashboard() {
                             {category.items?.map((item: any, idx: number) => (
                               <div key={item.id || idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-3">
-                                  {/* Name with Image Preview */}
-                                  <div className="flex items-center gap-3">
-                                    {item.image && (
+                                  {/* Name and Bild in one row - SYMMETRIC */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Name field */}
+                                    <div>
+                                      <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Name</label>
+                                      <input 
+                                        type="text" 
+                                        value={item.name?.de || ''} 
+                                        onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} 
+                                        className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900 border border-gray-300'}`} 
+                                      />
+                                    </div>
+                                    {/* Bild field */}
+                                    <div>
+                                      <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Bild</label>
+                                      <div className="flex gap-2">
+                                        <input 
+                                          type="text" 
+                                          value={item.image || ''} 
+                                          onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} 
+                                          className={`flex-1 rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900 border border-gray-300'}`} 
+                                          placeholder="/images/pizza.webp" 
+                                        />
+                                        <label className={`px-3 py-2 mt-1 rounded cursor-pointer text-sm flex items-center ${isDarkMode ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-200 hover:bg-gray-300'}`}>
+                                          📁
+                                          <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            className="hidden"
+                                            onChange={async (e) => {
+                                              const file = e.target.files?.[0];
+                                              if (!file) return;
+                                              
+                                              const token = getAdminToken();
+                                              const formData = new FormData();
+                                              const filename = `${item.id}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                                              formData.append('file', file);
+                                              formData.append('filename', filename);
+                                              
+                                              try {
+                                                const res = await fetch('/api/admin/upload', {
+                                                  method: 'POST',
+                                                  headers: { 'Authorization': `Bearer ${token}` },
+                                                  body: formData
+                                                });
+                                                const data = await res.json();
+                                                if (data.success) {
+                                                  updateItem(catKey, idx, 'image', data.path);
+                                                  setSaveMessage('✅ Bild hochgeladen!');
+                                                  setTimeout(() => setSaveMessage(''), 2000);
+                                                } else {
+                                                  setSaveMessage(`❌ Fehler: ${data.error}`);
+                                                }
+                                              } catch (err) {
+                                                setSaveMessage('❌ Upload fehlgeschlagen');
+                                              }
+                                            }}
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {/* Image preview below */}
+                                  {item.image && (
+                                    <div className="mt-2">
                                       <img 
                                         src={item.image} 
                                         alt={item.name?.de} 
                                         className="w-24 h-24 rounded object-cover border border-white/20"
                                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                       />
-                                    )}
-                                    <div className="flex-1">
-                                      <label className="text-xs text-white/50">Name</label>
-                                      <input type="text" value={item.name?.de || ''} onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} className="w-full bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" />
                                     </div>
-                                  </div>
-                                  {/* Image Upload */}
-                                  <div>
-                                    <label className="text-xs text-white/50">Bild</label>
-                                    <div className="flex gap-2">
-                                      <input 
-                                        type="text" 
-                                        value={item.image || ''} 
-                                        onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} 
-                                        className="flex-1 bg-white/10 rounded px-2 py-1 mt-1 text-sm text-white" 
-                                        placeholder="/images/pizza.webp" 
-                                      />
-                                      <label className="px-3 py-1 mt-1 bg-white/20 hover:bg-white/30 rounded cursor-pointer text-sm flex items-center">
-                                        📁
-                                        <input 
-                                          type="file" 
-                                          accept="image/*" 
-                                          className="hidden"
-                                          onChange={async (e) => {
-                                            const file = e.target.files?.[0];
-                                            if (!file) return;
-                                            
-                                            const token = getAdminToken();
-                                            const formData = new FormData();
-                                            const filename = `${item.id}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-                                            formData.append('file', file);
-                                            formData.append('filename', filename);
-                                            
-                                            try {
-                                              const res = await fetch('/api/admin/upload', {
-                                                method: 'POST',
-                                                headers: { 'Authorization': `Bearer ${token}` },
-                                                body: formData
-                                              });
-                                              const data = await res.json();
-                                              if (data.success) {
-                                                updateItem(catKey, idx, 'image', data.path);
-                                                setSaveMessage('✅ Bild hochgeladen!');
-                                                setTimeout(() => setSaveMessage(''), 2000);
-                                              } else {
-                                                setSaveMessage(`❌ Fehler: ${data.error}`);
-                                              }
-                                            } catch (err) {
-                                              setSaveMessage('❌ Upload fehlgeschlagen');
-                                            }
-                                          }}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
+                                  )}
                                   {/* Single Price (for non-pizza items) */}
                                   {item.price && !item.prices && (
                                     <div>
@@ -919,7 +952,7 @@ export default function AdminDashboard() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+              <div className={`rounded-2xl p-6 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
                 <h2 className="text-2xl font-bold mb-4">Angebote verwalten</h2>
                 <p className="text-white/60 mb-6">
                   Änderungen werden an GitHub gesendet und sind in ca. 30 Sekunden auf der Website sichtbar.
@@ -1064,7 +1097,7 @@ export default function AdminDashboard() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+              <div className={`rounded-2xl p-6 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
                 <h2 className="text-2xl font-bold mb-4">Rechtliche Texte verwalten</h2>
                 <p className="text-white/60 mb-6">
                   Impressum, Datenschutzerklärung und AGB. Änderungen werden an GitHub gesendet und auf der Website aktualisiert.
