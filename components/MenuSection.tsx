@@ -235,7 +235,7 @@ export default function MenuSection() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
 
   useEffect(() => {
-    fetch('/data/menu.json')
+    fetch('/data/menu.json', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         setMenuData(data);
