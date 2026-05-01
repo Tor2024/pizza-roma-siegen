@@ -4,12 +4,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCartStore } from '@/store/useCartStore';
 import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const { t } = useLanguage();
   const { toggleCart, items } = useCartStore();
+  const pathname = usePathname();
+  const isHomePage = pathname === '/' || pathname === '';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -18,12 +21,12 @@ export default function Header() {
   }, []);
 
   const navLinks = [
-    { key: 'nav_home', href: '#home' },
-    { key: 'nav_menu', href: '#menu' },
-    { key: 'nav_offers', href: '#offers' },
-    { key: 'nav_delivery', href: '#delivery' },
-    { key: 'nav_about', href: '#about' },
-    { key: 'nav_contact', href: '#contact' },
+    { key: 'nav_home', href: isHomePage ? '#home' : '/#home' },
+    { key: 'nav_menu', href: isHomePage ? '#menu' : '/#menu' },
+    { key: 'nav_offers', href: isHomePage ? '#offers' : '/#offers' },
+    { key: 'nav_delivery', href: isHomePage ? '#delivery' : '/#delivery' },
+    { key: 'nav_about', href: isHomePage ? '#about' : '/#about' },
+    { key: 'nav_contact', href: isHomePage ? '#contact' : '/#contact' },
   ];
 
   return (
@@ -34,7 +37,7 @@ export default function Header() {
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="text-2xl font-poppins font-bold text-white flex items-center gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <a href="/" className="text-2xl font-poppins font-bold text-white flex items-center gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
           <span className="text-roma-red text-3xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">♛</span> Pizza Roma
         </a>
 
@@ -60,7 +63,7 @@ export default function Header() {
           </button>
 
           {/* CTA Button */}
-          <a href="#menu" className="hidden lg:block bg-roma-red hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-poppins font-semibold transition-all hover:shadow-lg hover:shadow-roma-red/30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+          <a href={isHomePage ? '#menu' : '/#menu'} className="hidden lg:block bg-roma-red hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-poppins font-semibold transition-all hover:shadow-lg hover:shadow-roma-red/30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
             {t('hero_btn_order')}
           </a>
 

@@ -1,8 +1,11 @@
 'use client';
 import { useLanguage } from '@/context/LanguageContext';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const { t } = useLanguage();
+  const pathname = usePathname();
+  const isHomePage = pathname === '/' || pathname === '';
   return (
     <footer className="bg-[#0A0A0A] pt-16 pb-8 text-white/60">
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-12 mb-12">
@@ -18,10 +21,10 @@ export default function Footer() {
         <div>
           <h4 className="text-lg font-poppins font-semibold text-white mb-4">{t('footer_nav')}</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#menu" className="hover:text-roma-gold transition-colors">{t('nav_menu')}</a></li>
-            <li><a href="#delivery" className="hover:text-roma-gold transition-colors">{t('nav_delivery')}</a></li>
-            <li><a href="#about" className="hover:text-roma-gold transition-colors">{t('nav_about')}</a></li>
-            <li><a href="#contact" className="hover:text-roma-gold transition-colors">{t('nav_contact')}</a></li>
+            <li><a href={isHomePage ? '#menu' : '/#menu'} className="hover:text-roma-gold transition-colors">{t('nav_menu')}</a></li>
+            <li><a href={isHomePage ? '#delivery' : '/#delivery'} className="hover:text-roma-gold transition-colors">{t('nav_delivery')}</a></li>
+            <li><a href={isHomePage ? '#about' : '/#about'} className="hover:text-roma-gold transition-colors">{t('nav_about')}</a></li>
+            <li><a href={isHomePage ? '#contact' : '/#contact'} className="hover:text-roma-gold transition-colors">{t('nav_contact')}</a></li>
           </ul>
         </div>
 
