@@ -391,7 +391,7 @@
       "items": [
         {
           "id": "d1",
-          "image": "/images/d1_cola.webp",
+          "image": "/images/drink-cola.webp",
           "name": {
             "de": "Coca Cola 0,5L",
             "ru": "Кока-Кола 0,5л"
@@ -408,7 +408,7 @@
         },
         {
           "id": "d2",
-          "image": "/images/d2_fanta.webp",
+          "image": "/images/drink-fanta.webp",
           "name": {
             "de": "Fanta 0,5L",
             "ru": "Фанта 0,5л"
@@ -425,7 +425,7 @@
         },
         {
           "id": "d3",
-          "image": "/images/d3_sprite.webp",
+          "image": "/images/drink-sprite.webp",
           "name": {
             "de": "Sprite 0,5L",
             "ru": "Спрайт 0,5л"
@@ -442,7 +442,7 @@
         },
         {
           "id": "d4",
-          "image": "/images/d4_Mineralwasser_0_5L.webp",
+          "image": "/images/drink-water.webp",
           "name": {
             "de": "Mineralwasser 0,5L",
             "ru": "Минеральная вода 0,5л"
@@ -459,7 +459,7 @@
         },
         {
           "id": "d5",
-          "image": "/images/d5_Bier_0_5L.webp",
+          "image": "/images/drink-beer.webp",
           "name": {
             "de": "Bier 0,5L",
             "ru": "Пиво 0,5л"
