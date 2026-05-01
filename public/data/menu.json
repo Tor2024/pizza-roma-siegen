@@ -2,77 +2,224 @@
   "categories": {
     "pizzas": {
       "id": "pizzas",
-      "name": { "de": "Pizza", "ru": "Пицца" },
+      "name": {
+        "de": "Pizza",
+        "ru": "Пицца"
+      },
       "items": [
         {
           "id": "p1",
           "image": "/images/pizza-margherita.webp",
-          "name": { "de": "Margherita Classic", "ru": "Маргарита Классик" },
-          "desc": { "de": "Tomatensauce, Mozzarella, Basilikum", "ru": "Томатный соус, Моцарелла, Базилик" },
-          "prices": { "26": 8.90, "32": 11.90, "40": 15.90 },
+          "name": {
+            "de": "Margherita Classic",
+            "ru": "Маргарита Классик"
+          },
+          "desc": {
+            "de": "Tomatensauce, Mozzarella, Basilikum",
+            "ru": "Томатный соус, Моцарелла, Базилик"
+          },
+          "prices": {
+            "26": 8.9,
+            "32": 1600,
+            "40": 15.9
+          },
           "toppings": [
-            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
-            { "id": "t2", "name": { "de": "Oliven", "ru": "Оливки" }, "price": 1.00 }
+            {
+              "id": "t1",
+              "name": {
+                "de": "Extra Käse",
+                "ru": "Доп. сыр"
+              },
+              "price": 1.5
+            },
+            {
+              "id": "t2",
+              "name": {
+                "de": "Oliven",
+                "ru": "Оливки"
+              },
+              "price": 1
+            }
           ],
           "available": true
         },
         {
           "id": "p2",
           "image": "/images/pizza-salami.webp",
-          "name": { "de": "Salami", "ru": "Салями" },
-          "desc": { "de": "Tomatensauce, Mozzarella, Salami", "ru": "Томатный соус, Моцарелла, Салями" },
-          "prices": { "26": 9.90, "32": 12.90, "40": 16.90 },
+          "name": {
+            "de": "Salami",
+            "ru": "Салями"
+          },
+          "desc": {
+            "de": "Tomatensauce, Mozzarella, Salami",
+            "ru": "Томатный соус, Моцарелла, Салями"
+          },
+          "prices": {
+            "26": 1600,
+            "32": 1600,
+            "40": 16.9
+          },
           "toppings": [
-            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
-            { "id": "t3", "name": { "de": "Pepperoni", "ru": "Пепперони" }, "price": 1.50 }
+            {
+              "id": "t1",
+              "name": {
+                "de": "Extra Käse",
+                "ru": "Доп. сыр"
+              },
+              "price": 1.5
+            },
+            {
+              "id": "t3",
+              "name": {
+                "de": "Pepperoni",
+                "ru": "Пепперони"
+              },
+              "price": 1.5
+            }
           ],
           "available": true
         },
         {
           "id": "p3",
           "image": "/images/pizza-tonno.webp",
-          "name": { "de": "Tonno", "ru": "Тонно" },
-          "desc": { "de": "Tomatensauce, Mozzarella, Thunfisch, Zwiebeln", "ru": "Томатный соус, Моцарелла, Тунец, Лук" },
-          "prices": { "26": 10.50, "32": 13.50, "40": 17.50 },
+          "name": {
+            "de": "Tonno",
+            "ru": "Тонно"
+          },
+          "desc": {
+            "de": "Tomatensauce, Mozzarella, Thunfisch, Zwiebeln",
+            "ru": "Томатный соус, Моцарелла, Тунец, Лук"
+          },
+          "prices": {
+            "26": 10.5,
+            "32": 13.5,
+            "40": 17.5
+          },
           "toppings": [
-            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
-            { "id": "t2", "name": { "de": "Oliven", "ru": "Оливки" }, "price": 1.00 }
+            {
+              "id": "t1",
+              "name": {
+                "de": "Extra Käse",
+                "ru": "Доп. сыр"
+              },
+              "price": 1.5
+            },
+            {
+              "id": "t2",
+              "name": {
+                "de": "Oliven",
+                "ru": "Оливки"
+              },
+              "price": 1
+            }
           ],
           "available": true
         },
         {
           "id": "p4",
           "image": "/images/pizza-diavola.webp",
-          "name": { "de": "Diavola", "ru": "Дьявола" },
-          "desc": { "de": "Tomatensauce, Mozzarella, Scharfe Salami, Chili", "ru": "Томатный соус, Моцарелла, Острая салями, Чили" },
-          "prices": { "26": 10.90, "32": 13.90, "40": 17.90 },
+          "name": {
+            "de": "Diavola",
+            "ru": "Дьявола"
+          },
+          "desc": {
+            "de": "Tomatensauce, Mozzarella, Scharfe Salami, Chili",
+            "ru": "Томатный соус, Моцарелла, Острая салями, Чили"
+          },
+          "prices": {
+            "26": 10.9,
+            "32": 13.9,
+            "40": 17.9
+          },
           "toppings": [
-            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
-            { "id": "t4", "name": { "de": "Extra Chili", "ru": "Доп. чили" }, "price": 0.50 }
+            {
+              "id": "t1",
+              "name": {
+                "de": "Extra Käse",
+                "ru": "Доп. сыр"
+              },
+              "price": 1.5
+            },
+            {
+              "id": "t4",
+              "name": {
+                "de": "Extra Chili",
+                "ru": "Доп. чили"
+              },
+              "price": 0.5
+            }
           ],
           "available": true
         },
         {
           "id": "p5",
           "image": "/images/pizza-quattro.webp",
-          "name": { "de": "Quattro Formaggi", "ru": "Четыре сыра" },
-          "desc": { "de": "Mozzarella, Gorgonzola, Parmesan, Emmentaler", "ru": "Моцарелла, Горгонзола, Пармезан, Эмменталер" },
-          "prices": { "26": 11.50, "32": 14.50, "40": 18.50 },
+          "name": {
+            "de": "Quattro Formaggi",
+            "ru": "Четыре сыра"
+          },
+          "desc": {
+            "de": "Mozzarella, Gorgonzola, Parmesan, Emmentaler",
+            "ru": "Моцарелла, Горгонзола, Пармезан, Эмменталер"
+          },
+          "prices": {
+            "26": 11.5,
+            "32": 14.5,
+            "40": 18.5
+          },
           "toppings": [
-            { "id": "t5", "name": { "de": "Honig", "ru": "Мед" }, "price": 1.00 },
-            { "id": "t6", "name": { "de": "Walnüsse", "ru": "Грецкие орехи" }, "price": 1.50 }
+            {
+              "id": "t5",
+              "name": {
+                "de": "Honig",
+                "ru": "Мед"
+              },
+              "price": 1
+            },
+            {
+              "id": "t6",
+              "name": {
+                "de": "Walnüsse",
+                "ru": "Грецкие орехи"
+              },
+              "price": 1.5
+            }
           ],
           "available": true
         },
         {
           "id": "p6",
           "image": "/images/pizza-prosciutto.webp",
-          "name": { "de": "Prosciutto Funghi", "ru": "Прошутто Фунги" },
-          "desc": { "de": "Tomatensauce, Mozzarella, Schinken, Champignons", "ru": "Томатный соус, Моцарелла, Ветчина, Грибы" },
-          "prices": { "26": 10.90, "32": 13.90, "40": 17.90 },
+          "name": {
+            "de": "Prosciutto Funghi",
+            "ru": "Прошутто Фунги"
+          },
+          "desc": {
+            "de": "Tomatensauce, Mozzarella, Schinken, Champignons",
+            "ru": "Томатный соус, Моцарелла, Ветчина, Грибы"
+          },
+          "prices": {
+            "26": 10.9,
+            "32": 13.9,
+            "40": 17.9
+          },
           "toppings": [
-            { "id": "t1", "name": { "de": "Extra Käse", "ru": "Доп. сыр" }, "price": 1.50 },
-            { "id": "t7", "name": { "de": "Trüffelöl", "ru": "Трюфельное масло" }, "price": 2.00 }
+            {
+              "id": "t1",
+              "name": {
+                "de": "Extra Käse",
+                "ru": "Доп. сыр"
+              },
+              "price": 1.5
+            },
+            {
+              "id": "t7",
+              "name": {
+                "de": "Trüffelöl",
+                "ru": "Трюфельное масло"
+              },
+              "price": 2
+            }
           ],
           "available": true
         }
@@ -80,23 +227,42 @@
     },
     "pasta": {
       "id": "pasta",
-      "name": { "de": "Pasta", "ru": "Паста" },
+      "name": {
+        "de": "Pasta",
+        "ru": "Паста"
+      },
       "items": [
         {
           "id": "pas1",
           "image": "/images/pasta-carb.webp",
-          "name": { "de": "Pasta Carbonara", "ru": "Паста Карбонара" },
-          "desc": { "de": "Speck, Sahmesauce, Parmesan", "ru": "Бекон, сливочный соус, Пармезан" },
-          "prices": { "1": 11.90 },
+          "name": {
+            "de": "Pasta Carbonara",
+            "ru": "Паста Карбонара"
+          },
+          "desc": {
+            "de": "Speck, Sahmesauce, Parmesan",
+            "ru": "Бекон, сливочный соус, Пармезан"
+          },
+          "prices": {
+            "1": 11.9
+          },
           "toppings": [],
           "available": true
         },
         {
           "id": "pas2",
           "image": "/images/pasta-bolo.webp",
-          "name": { "de": "Pasta Bolognese", "ru": "Паста Болоньезе" },
-          "desc": { "de": "Rindfleischsauce, Parmesan", "ru": "Мясной соус, Пармезан" },
-          "prices": { "1": 10.90 },
+          "name": {
+            "de": "Pasta Bolognese",
+            "ru": "Паста Болоньезе"
+          },
+          "desc": {
+            "de": "Rindfleischsauce, Parmesan",
+            "ru": "Мясной соус, Пармезан"
+          },
+          "prices": {
+            "1": 10.9
+          },
           "toppings": [],
           "available": true
         }
@@ -104,41 +270,110 @@
     },
     "salads": {
       "id": "salads",
-      "name": { "de": "Salate", "ru": "Салаты" },
+      "name": {
+        "de": "Salate",
+        "ru": "Салаты"
+      },
       "items": [
         {
           "id": "s1",
           "image": "/images/salad-caesar.webp",
-          "name": { "de": "Caesar Salad", "ru": "Салат Цезарь" },
-          "desc": { "de": "Römersalat, Croutons, Parmesan, Caesar-Dressing", "ru": "Салат романо, крутоны, пармезан, соус Цезарь" },
-          "prices": { "1": 8.90 },
+          "name": {
+            "de": "Caesar Salad",
+            "ru": "Салат Цезарь"
+          },
+          "desc": {
+            "de": "Römersalat, Croutons, Parmesan, Caesar-Dressing",
+            "ru": "Салат романо, крутоны, пармезан, соус Цезарь"
+          },
+          "prices": {
+            "1": 8.9
+          },
           "toppings": [
-            { "id": "s1", "name": { "de": "Hähnchenbrust", "ru": "Куриная грудка" }, "price": 3.50 },
-            { "id": "s2", "name": { "de": "Extra Parmesan", "ru": "Доп. пармезан" }, "price": 1.50 }
+            {
+              "id": "s1",
+              "name": {
+                "de": "Hähnchenbrust",
+                "ru": "Куриная грудка"
+              },
+              "price": 3.5
+            },
+            {
+              "id": "s2",
+              "name": {
+                "de": "Extra Parmesan",
+                "ru": "Доп. пармезан"
+              },
+              "price": 1.5
+            }
           ],
           "available": true
         },
         {
           "id": "s2",
           "image": "/images/salad-mista.webp",
-          "name": { "de": "Insalata Mista", "ru": "Смешанный салат" },
-          "desc": { "de": "Gemischter Blattsalat, Tomaten, Gurken, Oliven", "ru": "Смешанный листовой салат, томаты, огурцы, оливки" },
-          "prices": { "1": 7.50 },
+          "name": {
+            "de": "Insalata Mista",
+            "ru": "Смешанный салат"
+          },
+          "desc": {
+            "de": "Gemischter Blattsalat, Tomaten, Gurken, Oliven",
+            "ru": "Смешанный листовой салат, томаты, огурцы, оливки"
+          },
+          "prices": {
+            "1": 7.5
+          },
           "toppings": [
-            { "id": "s3", "name": { "de": "Thunfisch", "ru": "Тунец" }, "price": 2.50 },
-            { "id": "s4", "name": { "de": "Mozzarella", "ru": "Моцарелла" }, "price": 2.00 }
+            {
+              "id": "s3",
+              "name": {
+                "de": "Thunfisch",
+                "ru": "Тунец"
+              },
+              "price": 2.5
+            },
+            {
+              "id": "s4",
+              "name": {
+                "de": "Mozzarella",
+                "ru": "Моцарелла"
+              },
+              "price": 2
+            }
           ],
           "available": true
         },
         {
           "id": "s3",
           "image": "/images/salad-tomate.webp",
-          "name": { "de": "Tomaten-Mozzarella", "ru": "Томат с моцареллой" },
-          "desc": { "de": "Frische Tomaten, Büffelmozzarella, Basilikum, Olivenöl", "ru": "Свежие томаты, буйволиная моцарелла, базилик, оливковое масло" },
-          "prices": { "1": 9.90 },
+          "name": {
+            "de": "Tomaten-Mozzarella",
+            "ru": "Томат с моцареллой"
+          },
+          "desc": {
+            "de": "Frische Tomaten, Büffelmozzarella, Basilikum, Olivenöl",
+            "ru": "Свежие томаты, буйволиная моцарелла, базилик, оливковое масло"
+          },
+          "prices": {
+            "1": 9.9
+          },
           "toppings": [
-            { "id": "s5", "name": { "de": "Rucola", "ru": "Руккола" }, "price": 1.50 },
-            { "id": "s6", "name": { "de": "Balsamico", "ru": "Бальзамико" }, "price": 0.50 }
+            {
+              "id": "s5",
+              "name": {
+                "de": "Rucola",
+                "ru": "Руккола"
+              },
+              "price": 1.5
+            },
+            {
+              "id": "s6",
+              "name": {
+                "de": "Balsamico",
+                "ru": "Бальзамико"
+              },
+              "price": 0.5
+            }
           ],
           "available": true
         }
@@ -146,50 +381,93 @@
     },
     "drinks": {
       "id": "drinks",
-      "name": { "de": "Getränke", "ru": "Напитки" },
+      "name": {
+        "de": "Getränke",
+        "ru": "Напитки"
+      },
       "items": [
         {
           "id": "d1",
           "image": "/images/drink-cola.webp",
-          "name": { "de": "Coca Cola 0,5L", "ru": "Кока-Кола 0,5л" },
-          "desc": { "de": "Eisgekühlt", "ru": "Ледяная" },
-          "prices": { "1": 2.90 },
+          "name": {
+            "de": "Coca Cola 0,5L",
+            "ru": "Кока-Кола 0,5л"
+          },
+          "desc": {
+            "de": "Eisgekühlt",
+            "ru": "Ледяная"
+          },
+          "prices": {
+            "1": 2.9
+          },
           "toppings": [],
           "available": true
         },
         {
           "id": "d2",
           "image": "/images/drink-fanta.webp",
-          "name": { "de": "Fanta 0,5L", "ru": "Фанта 0,5л" },
-          "desc": { "de": "Orange, erfrischend", "ru": "Апельсин, освежающая" },
-          "prices": { "1": 2.90 },
+          "name": {
+            "de": "Fanta 0,5L",
+            "ru": "Фанта 0,5л"
+          },
+          "desc": {
+            "de": "Orange, erfrischend",
+            "ru": "Апельсин, освежающая"
+          },
+          "prices": {
+            "1": 2.9
+          },
           "toppings": [],
           "available": true
         },
         {
           "id": "d3",
           "image": "/images/drink-sprite.webp",
-          "name": { "de": "Sprite 0,5L", "ru": "Спрайт 0,5л" },
-          "desc": { "de": "Lemon-Lime, erfrischend", "ru": "Лимон-лайм, освежающий" },
-          "prices": { "1": 2.90 },
+          "name": {
+            "de": "Sprite 0,5L",
+            "ru": "Спрайт 0,5л"
+          },
+          "desc": {
+            "de": "Lemon-Lime, erfrischend",
+            "ru": "Лимон-лайм, освежающий"
+          },
+          "prices": {
+            "1": 2.9
+          },
           "toppings": [],
           "available": true
         },
         {
           "id": "d4",
           "image": "/images/drink-water.webp",
-          "name": { "de": "Mineralwasser 0,5L", "ru": "Минеральная вода 0,5л" },
-          "desc": { "de": "Mit oder ohne Kohlensäure", "ru": "С газом или без" },
-          "prices": { "1": 2.50 },
+          "name": {
+            "de": "Mineralwasser 0,5L",
+            "ru": "Минеральная вода 0,5л"
+          },
+          "desc": {
+            "de": "Mit oder ohne Kohlensäure",
+            "ru": "С газом или без"
+          },
+          "prices": {
+            "1": 2.5
+          },
           "toppings": [],
           "available": true
         },
         {
           "id": "d5",
           "image": "/images/drink-beer.webp",
-          "name": { "de": "Bier 0,5L", "ru": "Пиво 0,5л" },
-          "desc": { "de": "Deutsches Pils", "ru": "Немецкий пилснер" },
-          "prices": { "1": 3.90 },
+          "name": {
+            "de": "Bier 0,5L",
+            "ru": "Пиво 0,5л"
+          },
+          "desc": {
+            "de": "Deutsches Pils",
+            "ru": "Немецкий пилснер"
+          },
+          "prices": {
+            "1": 3.9
+          },
           "toppings": [],
           "available": true
         }
@@ -197,39 +475,94 @@
     },
     "desserts": {
       "id": "desserts",
-      "name": { "de": "Desserts", "ru": "Десерты" },
+      "name": {
+        "de": "Desserts",
+        "ru": "Десерты"
+      },
       "items": [
         {
           "id": "de1",
           "image": "/images/dessert-tiramisu.webp",
-          "name": { "de": "Tiramisu", "ru": "Тирамису" },
-          "desc": { "de": "Hausgemacht, klassisch italienisch", "ru": "Домашнее, классическое итальянское" },
-          "prices": { "1": 5.90 },
+          "name": {
+            "de": "Tiramisu",
+            "ru": "Тирамису"
+          },
+          "desc": {
+            "de": "Hausgemacht, klassisch italienisch",
+            "ru": "Домашнее, классическое итальянское"
+          },
+          "prices": {
+            "1": 5.9
+          },
           "toppings": [
-            { "id": "de1", "name": { "de": "Extra Kakao", "ru": "Доп. какао" }, "price": 0.50 }
+            {
+              "id": "de1",
+              "name": {
+                "de": "Extra Kakao",
+                "ru": "Доп. какао"
+              },
+              "price": 0.5
+            }
           ],
           "available": true
         },
         {
           "id": "de2",
           "image": "/images/dessert-panna.webp",
-          "name": { "de": "Panna Cotta", "ru": "Панна-котта" },
-          "desc": { "de": "Mit Erdbeersauce", "ru": "С клубничным соусом" },
-          "prices": { "1": 5.50 },
+          "name": {
+            "de": "Panna Cotta",
+            "ru": "Панна-котта"
+          },
+          "desc": {
+            "de": "Mit Erdbeersauce",
+            "ru": "С клубничным соусом"
+          },
+          "prices": {
+            "1": 5.5
+          },
           "toppings": [
-            { "id": "de2", "name": { "de": "Beerenmix", "ru": "Ягодный микс" }, "price": 1.50 }
+            {
+              "id": "de2",
+              "name": {
+                "de": "Beerenmix",
+                "ru": "Ягодный микс"
+              },
+              "price": 1.5
+            }
           ],
           "available": true
         },
         {
           "id": "de3",
           "image": "/images/dessert-ice.webp",
-          "name": { "de": "Eis 3 Kugeln", "ru": "Мороженое 3 шарика" },
-          "desc": { "de": "Vanille, Schoko, Erdbeere", "ru": "Ваниль, шоколад, клубника" },
-          "prices": { "1": 4.90 },
+          "name": {
+            "de": "Eis 3 Kugeln",
+            "ru": "Мороженое 3 шарика"
+          },
+          "desc": {
+            "de": "Vanille, Schoko, Erdbeere",
+            "ru": "Ваниль, шоколад, клубника"
+          },
+          "prices": {
+            "1": 4.9
+          },
           "toppings": [
-            { "id": "de3", "name": { "de": "Sahne", "ru": "Сливки" }, "price": 0.50 },
-            { "id": "de4", "name": { "de": "Schokosoße", "ru": "Шоколадный соус" }, "price": 0.50 }
+            {
+              "id": "de3",
+              "name": {
+                "de": "Sahne",
+                "ru": "Сливки"
+              },
+              "price": 0.5
+            },
+            {
+              "id": "de4",
+              "name": {
+                "de": "Schokosoße",
+                "ru": "Шоколадный соус"
+              },
+              "price": 0.5
+            }
           ],
           "available": true
         }
@@ -238,9 +571,9 @@
   },
   "settings": {
     "delivery": {
-      "minOrder": 15.00,
-      "freeDeliveryThreshold": 25.00,
-      "deliveryFee": 3.50,
+      "minOrder": 15,
+      "freeDeliveryThreshold": 25,
+      "deliveryFee": 3.5,
       "estimatedTime": "25-35 Min"
     },
     "hours": {
@@ -249,8 +582,14 @@
       "sun": "12:00 - 22:00"
     },
     "promoCodes": {
-      "ROMA10": { "discount": 0.1, "active": true },
-      "ROMA20": { "discount": 0.2, "active": true }
+      "ROMA10": {
+        "discount": 0.1,
+        "active": true
+      },
+      "ROMA20": {
+        "discount": 0.2,
+        "active": true
+      }
     }
   }
 }
