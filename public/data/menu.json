@@ -425,7 +425,7 @@
         },
         {
           "id": "d3",
-          "image": "/images/drink-sprite.webp",
+          "image": "/images/d3_sprite.webp",
           "name": {
             "de": "Sprite 0,5L",
             "ru": "Спрайт 0,5л"
