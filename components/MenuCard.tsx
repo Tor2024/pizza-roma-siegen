@@ -52,7 +52,7 @@ export default function MenuCard({ id, image, name, desc, prices, toppings }: Pr
       whileHover={{ y: -5 }}
       className="glass-light rounded-3xl overflow-hidden flex flex-col h-full text-roma-text"
     >
-      <div className="relative h-52 overflow-hidden group">
+      <div className="relative aspect-[4/3] overflow-hidden group">
         <Image 
           src={image} 
           alt={name.de} 
