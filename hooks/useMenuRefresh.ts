@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 export function useMenuRefresh(refreshInterval: number = 30000) { // 30 seconds
-  const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
+  const [lastUpdate, setLastUpdate] = useState<number>(() => Date.now());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

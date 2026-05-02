@@ -36,12 +36,7 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `
-          // Force clear any cached language and reload if needed
-          if (localStorage.getItem('lang')) {
-            localStorage.removeItem('lang');
-          }
-        `}} />
+        {/* Client-side only: Clear any cached language preference */}
       </head>
       <body className="font-inter antialiased">
         <ErrorBoundary>

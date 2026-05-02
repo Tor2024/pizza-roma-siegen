@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface ImpressumData {
@@ -114,14 +115,14 @@ export default function ImpressumPage() {
           )}
         </div>
 
-        <div className="mt-8 text-center">
-          <a href="/" className="text-roma-gold hover:underline">← Zurück zur Startseite</a>
-        </div>
-        <div className="mt-4 text-center">
-          <a href="/datenschutz" className="text-sm text-white/50 hover:text-roma-gold mx-2">Datenschutz</a>
-          <span className="text-white/30">|</span>
-          <a href="/agb" className="text-sm text-white/50 hover:text-roma-gold mx-2">AGB</a>
-        </div>
+          <div className="mt-8 text-center">
+            <Link href="/" className="text-roma-gold hover:underline">← Zurück zur Startseite</Link>
+          </div>
+          <div className="mt-4 text-center">
+            <Link href="/datenschutz" className="text-sm text-white/50 hover:text-roma-gold mx-2">Datenschutz</Link>
+            <span className="text-white/30">|</span>
+            <Link href="/agb" className="text-sm text-white/50 hover:text-roma-gold mx-2">AGB</Link>
+          </div>
       </div>
     </div>
   );

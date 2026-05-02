@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiRefreshCw, FiLogOut, FiCheckCircle, FiAlertCircle, FiPackage, FiTruck, FiClock } from 'react-icons/fi';
+import { MenuData } from '@/types';
 
 // Status configuration - German only
 const statusMap = {
@@ -75,14 +76,12 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState<'orders' | 'menu' | 'offers' | 'legal'>('orders');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [menuData, setMenuData] = useState<any>(null);
+  const [menuData, setMenuData] = useState<MenuData | null>(null);
   const [menuLoading, setMenuLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
-  const [orderFilter, setOrderFilter] = useState<OrderStatus | 'all'>('all');
-  
+  const [orderFilter, setOrderFilter] = useState<OrderStatus | 'all'>('all');  
   // Theme state
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  
+  const [isDarkMode, setIsDarkMode] = useState(true);  
   // Toggle theme
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -97,7 +96,7 @@ export default function AdminDashboard() {
   };
 
   // Load orders
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     const token = getAdminToken();
     if (!token) {
       setError('Not authenticated');
@@ -121,10 +120,10 @@ export default function AdminDashboard() {
       setError('Network error');
     }
     setLoading(false);
-  };
+  }, []);
 
   // Load menu with cache busting
-  const fetchMenu = async () => {
+  const fetchMenu = useCallback(async () => {
     setMenuLoading(true);
     try {
       const res = await fetch(`/api/admin/menu?_t=${Date.now()}`, {
@@ -132,28 +131,28 @@ export default function AdminDashboard() {
         headers: { 'Cache-Control': 'no-cache' }
       });
       if (res.ok) {
-        const data = await res.json();
+        const data: MenuData = await res.json();
         setMenuData(data);
       }
     } catch (err) {
       console.error('Failed to load menu:', err);
     }
     setMenuLoading(false);
-  };
+  }, []);
 
   // Poll every 10 seconds
   useEffect(() => {
     fetchOrders();
     const interval = setInterval(fetchOrders, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchOrders]);
 
   // Load menu when switching tabs
   useEffect(() => {
     if (tab === 'menu' || tab === 'offers' || tab === 'legal') {
       fetchMenu();
     }
-  }, [tab]);
+  }, [tab, fetchMenu]);
 
   // Change order status
   const changeStatus = async (orderId: string, newStatus: OrderStatus) => {
@@ -241,10 +240,11 @@ export default function AdminDashboard() {
 
   // Update legal field
   const updateLegal = (section: 'impressum' | 'datenschutz' | 'agb', field: string, value: string) => {
-    const newMenuData = { ...menuData };
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
     if (!newMenuData.legal) newMenuData.legal = {};
     if (!newMenuData.legal[section]) newMenuData.legal[section] = {};
-    newMenuData.legal[section][field] = value;
+    (newMenuData.legal[section] as Record<string, unknown>)[field] = value;
     setMenuData(newMenuData);
   };
 
@@ -290,31 +290,106 @@ export default function AdminDashboard() {
     });
   };
 
-  // Update menu item
-  const updateItem = (categoryKey: string, itemIndex: number, field: string, value: any) => {
-    const newMenuData = { ...menuData };
-    const item = newMenuData.categories[categoryKey].items[itemIndex];
+  // Calculate elapsed time for orders
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const getElapsedMinutes = (createdAt: number) => {
+    return Math.floor((currentTime - createdAt) / 60000);
+  };
+
+    // Update menu item
+  const updateItem = (categoryKey: string, itemIndex: number, field: string, value: string | number | { [size: string]: number }) => {
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    const category = newMenuData.categories[categoryKey];
+    if (!category) return;
+    const item = category.items[itemIndex];
+    if (!item) return;
     
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
-      item[parent] = { ...item[parent], [child]: value };
+      if (parent === 'name' && item.name) {
+        (item.name as Record<string, unknown>)[child] = value;
+      } else if (parent === 'description' && item.description) {
+        (item.description as Record<string, unknown>)[child] = value;
+      } else if (parent === 'prices' && item.prices) {
+        // Add or update price for a specific size
+        item.prices[child] = value as number;
+      }
     } else {
-      item[field] = value;
+      if (field === 'image') item.image = value as string;
+      else if (field === 'price') item.price = value as number;
+      else if (field === 'prices') item.prices = value as { [size: string]: number };
     }
     
     setMenuData(newMenuData);
   };
 
+  // Add a new size to item prices
+  const addSizeToItem = (categoryKey: string, itemIndex: number) => {
+    const newSize = prompt('Neue Größe/Gewicht eingeben (z.B. 30, 0.33L, 500g):');
+    if (!newSize) return;
+    
+    if (!menuData) {
+      alert('Menüdaten noch nicht geladen!');
+      return;
+    }
+    
+    // Create a deep copy of menuData
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    
+    if (!newMenuData.categories) {
+      alert('Kategorien nicht gefunden!');
+      return;
+    }
+    
+    const category = newMenuData.categories[categoryKey];
+    if (!category) {
+      alert('Kategorie nicht gefunden!');
+      return;
+    }
+    
+    const item = category.items[itemIndex];
+    if (!item) {
+      alert('Artikel nicht gefunden!');
+      return;
+    }
+    
+    if (!item.prices) item.prices = {};
+    
+    if (item.prices[newSize]) {
+      alert('Diese Größe existiert bereits!');
+      return;
+    }
+    
+    item.prices[newSize] = 0;
+    setMenuData(newMenuData);
+    alert(`Größe "${newSize}" wurde hinzugefügt!`);
+  };
+
   // Update topping
-  const updateTopping = (categoryKey: string, itemIndex: number, toppingIndex: number, field: 'de' | 'price', value: any) => {
-    const newMenuData = { ...menuData };
-    const item = newMenuData.categories[categoryKey].items[itemIndex];
+  const updateTopping = (categoryKey: string, itemIndex: number, toppingIndex: number, field: 'de' | 'price', value: string | number) => {
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    const category = newMenuData.categories[categoryKey];
+    if (!category) return;
+    const item = category.items[itemIndex];
+    if (!item) return;
     if (!item.toppings) item.toppings = [];
     
     if (field === 'price') {
-      item.toppings[toppingIndex].price = parseFloat(value);
+      item.toppings[toppingIndex].price = typeof value === 'string' ? parseFloat(value) : value;
     } else {
-      item.toppings[toppingIndex].name[field] = value;
+      item.toppings[toppingIndex].name[field] = value as string;
     }
     
     setMenuData(newMenuData);
@@ -322,10 +397,15 @@ export default function AdminDashboard() {
 
   // Add new item
   const addItem = (categoryKey: string) => {
-    const newMenuData = { ...menuData };
-    newMenuData.categories[categoryKey].items.push({
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    const category = newMenuData.categories[categoryKey];
+    if (!category) return;
+    category.items.push({
       id: `new_${Date.now()}`,
       name: { de: 'Neues Item', ru: 'Neues Item' },
+      desc: { de: '', ru: '' },
       description: { de: '', ru: '' },
       price: 0,
       image: '/images/placeholder.webp',
@@ -336,37 +416,53 @@ export default function AdminDashboard() {
 
   // Delete item
   const deleteItem = (categoryKey: string, itemIndex: number) => {
-    if (confirm('Diesen Artikel löschen?')) {
-      const newMenuData = { ...menuData };
-      newMenuData.categories[categoryKey].items.splice(itemIndex, 1);
-      setMenuData(newMenuData);
-    }
+    if (!menuData) return;
+    if (!confirm('Diesen Artikel löschen?')) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    const category = newMenuData.categories[categoryKey];
+    if (!category) return;
+    category.items.splice(itemIndex, 1);
+    setMenuData(newMenuData);
   };
 
   // Add topping
   const addTopping = (categoryKey: string, itemIndex: number) => {
-    const newMenuData = { ...menuData };
-    const item = newMenuData.categories[categoryKey].items[itemIndex];
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    const category = newMenuData.categories[categoryKey];
+    if (!category) return;
+    const item = category.items[itemIndex];
+    if (!item) return;
     if (!item.toppings) item.toppings = [];
-    item.toppings.push({ name: { de: 'Extra', ru: '' }, price: 1 });
+    item.toppings.push({ id: `t_${Date.now()}`, name: { de: 'Extra', ru: '' }, price: 1 });
     setMenuData(newMenuData);
   };
 
   // Remove topping
   const removeTopping = (categoryKey: string, itemIndex: number, toppingIndex: number) => {
-    const newMenuData = { ...menuData };
-    newMenuData.categories[categoryKey].items[itemIndex].toppings.splice(toppingIndex, 1);
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    const category = newMenuData.categories[categoryKey];
+    if (!category) return;
+    const item = category.items[itemIndex];
+    if (!item) return;
+    item.toppings.splice(toppingIndex, 1);
     setMenuData(newMenuData);
   };
 
   // Add new category
   const addCategory = () => {
+    if (!menuData) return;
     const catId = prompt('Kategorie ID eingeben (z.B. snacks, drinks):');
     if (!catId) return;
     
     const name = prompt('Kategoriename:') || 'Neue Kategorie';
     
-    const newMenuData = { ...menuData };
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) newMenuData.categories = {};
     newMenuData.categories[catId] = {
       id: catId,
       name: { de: name, ru: name },
@@ -377,31 +473,45 @@ export default function AdminDashboard() {
 
   // Delete category
   const deleteCategory = (catKey: string) => {
-    if (confirm(`Kategorie "${menuData.categories[catKey].name.de}" und alle Artikel löschen?`)) {
-      const newMenuData = { ...menuData };
-      delete newMenuData.categories[catKey];
-      setMenuData(newMenuData);
-    }
+    if (!menuData) return;
+    if (!confirm(`Kategorie "${menuData.categories?.[catKey]?.name.de}" und alle Artikel löschen?`)) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    delete newMenuData.categories[catKey];
+    setMenuData(newMenuData);
   };
 
   // Update category name
   const updateCategoryName = (catKey: string, value: string) => {
-    const newMenuData = { ...menuData };
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.categories) return;
+    if (!newMenuData.categories[catKey]) return;
     newMenuData.categories[catKey].name.de = value;
     setMenuData(newMenuData);
   };
 
   // Update offer
-  const updateOffer = (offerIndex: number, field: string, value: any) => {
-    const newMenuData = { ...menuData };
-    if (!newMenuData.offers) newMenuData.offers = [];
+  const updateOffer = (offerIndex: number, field: string, value: string | number) => {
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.offers) return;
     const offer = newMenuData.offers[offerIndex];
+    if (!offer) return;
     
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
-      offer[parent] = { ...offer[parent], [child]: value };
+      if (parent === 'title' && offer.title) {
+        (offer.title as Record<string, unknown>)[child] = value;
+      } else if (parent === 'desc' && offer.desc) {
+        (offer.desc as Record<string, unknown>)[child] = value;
+      }
     } else {
-      offer[field] = value;
+      if (field === 'title') offer.title = value as any;
+      else if (field === 'desc') offer.desc = value as any;
+      else if (field === 'price') offer.price = value as string;
+      else if (field === 'img') offer.img = value as string;
+      else if (field === 'badge') offer.badge = value as string;
     }
     
     setMenuData(newMenuData);
@@ -409,7 +519,8 @@ export default function AdminDashboard() {
 
   // Add new offer
   const addOffer = () => {
-    const newMenuData = { ...menuData };
+    if (!menuData) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
     if (!newMenuData.offers) newMenuData.offers = [];
     newMenuData.offers.push({
       id: `o_${Date.now()}`,
@@ -424,11 +535,12 @@ export default function AdminDashboard() {
 
   // Delete offer
   const deleteOffer = (offerIndex: number) => {
-    if (confirm('Dieses Angebot löschen?')) {
-      const newMenuData = { ...menuData };
-      newMenuData.offers.splice(offerIndex, 1);
-      setMenuData(newMenuData);
-    }
+    if (!menuData) return;
+    if (!confirm('Dieses Angebot löschen?')) return;
+    const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+    if (!newMenuData.offers) return;
+    newMenuData.offers.splice(offerIndex, 1);
+    setMenuData(newMenuData);
   };
 
   return (
@@ -572,7 +684,7 @@ export default function AdminDashboard() {
                 .map((order) => {
                 const cfg = statusMap[order.status];
                 const StatusIcon = cfg.icon;
-                const elapsed = Math.floor((Date.now() - order.createdAt) / 60000);
+                const elapsed = getElapsedMinutes(order.createdAt);
                 const isUrgent = order.status === 'received' && elapsed > 10;
                 
                 return (
@@ -617,7 +729,7 @@ export default function AdminDashboard() {
                           {order.items.map((item, idx) => (
                             <div key={idx} className="py-1">
                               <div className={`flex justify-between text-sm ${isDarkMode ? '' : 'text-gray-700'}`}>
-                                <span>{item.quantity}x {item.name.de} {item.size && `(${item.size}cm)`}</span>
+                                <span>{item.quantity}x {item.name.de} {item.size && `(${item.size})`}</span>
                                 <span className={isDarkMode ? 'text-white/60' : 'text-gray-500'}>{(item.price * item.quantity).toFixed(2)} €</span>
                               </div>
                               {item.toppings && item.toppings.length > 0 && (
@@ -709,19 +821,51 @@ export default function AdminDashboard() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                           <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Min. Bestellung (€)</label>
-                          <input type="number" step="0.1" value={menuData.settings?.delivery?.minOrder || 15} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, minOrder: parseFloat(e.target.value)}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="number" step="0.1" value={menuData?.settings?.delivery?.minOrder || 15} onChange={(e) => {
+                            if (!menuData) return;
+                            const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+                            if (!newMenuData.settings) newMenuData.settings = { delivery: { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' } };
+                            if (!newMenuData.settings.delivery) newMenuData.settings.delivery = { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' };
+                            newMenuData.settings.delivery.minOrder = parseFloat(e.target.value) || 15;
+                            setMenuData(newMenuData);
+                          }} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                          title="Mindestbestellwert in Euro" placeholder="15.00" />
                         </div>
                         <div>
                           <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Gratis ab (€)</label>
-                          <input type="number" step="0.1" value={menuData.settings?.delivery?.freeDeliveryThreshold || 25} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, freeDeliveryThreshold: parseFloat(e.target.value)}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="number" step="0.1" value={menuData?.settings?.delivery?.freeDeliveryThreshold || 25} onChange={(e) => {
+                            if (!menuData) return;
+                            const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+                            if (!newMenuData.settings) newMenuData.settings = { delivery: { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' } };
+                            if (!newMenuData.settings.delivery) newMenuData.settings.delivery = { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' };
+                            newMenuData.settings.delivery.freeDeliveryThreshold = parseFloat(e.target.value) || 25;
+                            setMenuData(newMenuData);
+                          }} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                          title="Kostenlose Lieferung ab Betrag" placeholder="25.00" />
                         </div>
                         <div>
                           <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Lieferkosten (€)</label>
-                          <input type="number" step="0.1" value={menuData.settings?.delivery?.deliveryFee || 3.5} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, deliveryFee: parseFloat(e.target.value)}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="number" step="0.1" value={menuData?.settings?.delivery?.deliveryFee || 3.5} onChange={(e) => {
+                            if (!menuData) return;
+                            const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+                            if (!newMenuData.settings) newMenuData.settings = { delivery: { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' } };
+                            if (!newMenuData.settings.delivery) newMenuData.settings.delivery = { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' };
+                            newMenuData.settings.delivery.deliveryFee = parseFloat(e.target.value) || 3.5;
+                            setMenuData(newMenuData);
+                          }} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                          title="Lieferkosten in Euro" placeholder="3.50" />
                         </div>
                         <div>
                           <label className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-gray-600'}`}>Lieferzeit</label>
-                          <input type="text" value={menuData.settings?.delivery?.estimatedTime || '25-35 Min'} onChange={(e) => setMenuData({...menuData, settings: {...menuData.settings, delivery: {...menuData.settings?.delivery, estimatedTime: e.target.value}}})} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData?.settings?.delivery?.estimatedTime || '25-35 Min'} onChange={(e) => {
+                            if (!menuData) return;
+                            const newMenuData: MenuData = JSON.parse(JSON.stringify(menuData));
+                            if (!newMenuData.settings) newMenuData.settings = { delivery: { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' } };
+                            if (!newMenuData.settings.delivery) newMenuData.settings.delivery = { minOrder: 15, freeDeliveryThreshold: 25, deliveryFee: 3.5, estimatedTime: '25-35 Min' };
+                            newMenuData.settings.delivery.estimatedTime = e.target.value;
+                            setMenuData(newMenuData);
+                          }} className={`w-full rounded-lg px-3 py-2 mt-1 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                          title="Geschätzte Lieferzeit" placeholder="25-35 Min" />
                         </div>
                       </div>
                     </div>
@@ -747,6 +891,7 @@ export default function AdminDashboard() {
                                 value={category.name?.de || catKey} 
                                 onChange={(e) => updateCategoryName(catKey, e.target.value)}
                                 className={`w-full rounded px-3 py-2 mt-1 font-semibold ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`}
+                                title="Name der Kategorie"
                               />
                             </div>
                             <div className="flex gap-2">
@@ -765,16 +910,18 @@ export default function AdminDashboard() {
                               <div key={item.id || idx} className={`rounded-lg p-4 border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
                                 <div className="flex flex-col md:flex-row gap-4 mb-3">
                                   {/* Image preview - LEFT SIDE */}
-                                  {item.image && (
-                                    <div className="flex-shrink-0">
-                                      <img 
-                                        src={item.image} 
-                                        alt={item.name?.de} 
-                                        className={`w-24 h-24 rounded object-cover border ${isDarkMode ? 'border-white/20' : 'border-gray-300'}`}
-                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                      />
-                                    </div>
-                                  )}
+                                   {item.image && (
+                                     <div className="flex-shrink-0">
+                                       <img 
+                                         src={item.image} 
+                                         alt={item.name?.de} 
+                                         width={96}
+                                         height={96}
+                                         className={`w-24 h-24 rounded object-cover border ${isDarkMode ? 'border-white/20' : 'border-gray-300'}`}
+                                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                       />
+                                     </div>
+                                   )}
                                   {/* Name and Bild fields - RIGHT SIDE */}
                                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* Name field */}
@@ -784,7 +931,8 @@ export default function AdminDashboard() {
                                         type="text" 
                                         value={item.name?.de || ''} 
                                         onChange={(e) => updateItem(catKey, idx, 'name.de', e.target.value)} 
-                                        className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900 border border-gray-300'}`} 
+                                        className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                                        title="Name des Gerichts"
                                       />
                                     </div>
                                     {/* Bild field */}
@@ -795,8 +943,9 @@ export default function AdminDashboard() {
                                           type="text" 
                                           value={item.image || ''} 
                                           onChange={(e) => updateItem(catKey, idx, 'image', e.target.value)} 
-                                          className={`flex-1 rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900 border border-gray-300'}`} 
-                                          placeholder="/images/pizza.webp" 
+                                          className={`flex-1 rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                                          placeholder="/images/pizza.webp"
+                                          title="Bild-URL" 
                                         />
                                         <label className={`px-3 py-2 mt-1 rounded cursor-pointer text-sm flex items-center ${isDarkMode ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-200 hover:bg-gray-300'}`}>
                                           📁
@@ -843,7 +992,7 @@ export default function AdminDashboard() {
                                 {item.price && !item.prices && (
                                   <div className="mb-3">
                                     <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Preis (€)</label>
-                                    <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                                    <input type="number" step="0.01" value={item.price || 0} onChange={(e) => updateItem(catKey, idx, 'price', parseFloat(e.target.value))} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Preis in Euro" placeholder="0.00" />
                                   </div>
                                 )}
 
@@ -853,36 +1002,29 @@ export default function AdminDashboard() {
                                     <div className="flex justify-between items-center mb-2">
                                       <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Größen & Preise</label>
                                       <button 
-                                        onClick={() => {
-                                          const newSize = prompt('Neue Größe eingeben (z.B. 30):');
-                                          if (newSize && !item.prices[newSize]) {
-                                            updateItem(catKey, idx, `prices.${newSize}`, 0);
-                                          }
-                                        }}
+                                        onClick={() => addSizeToItem(catKey, idx)}
                                         className={`text-xs px-2 py-1 rounded transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-200 hover:bg-gray-300'}`}
                                       >
                                         + Größe
                                       </button>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                      {Object.entries(item.prices).map(([size, price]: [string, any]) => (
-                                        <div key={size} className={`rounded-lg p-2 relative group ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'}`}>
+                                      {Object.entries(item.prices).map(([size, price]: [string, any], sizeIdx: number) => (
+                                        <div key={sizeIdx} className={`rounded-lg p-2 relative group ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'}`}>
                                           <div className="flex items-center gap-1 mb-1">
-                                            <input 
-                                              type="text" 
-                                              value={size} 
-                                              className={`flex-1 bg-transparent text-xs font-semibold outline-none border-b focus:border-roma-gold ${isDarkMode ? 'text-white/70 border-white/20' : 'text-gray-700 border-gray-300'}`}
-                                              onChange={(e) => {
-                                                const newKey = e.target.value;
-                                                if (newKey !== size) {
+                                            <span className={`flex-1 text-xs font-semibold ${isDarkMode ? 'text-white/70' : 'text-gray-700'}`}>{size}</span>
+                                            <button 
+                                              onClick={() => {
+                                                const newSize = prompt('Neue Größe/Gewicht eingeben (z.B. 30, 0.33L, 500g):', size);
+                                                if (newSize && newSize !== size && !item.prices[newSize]) {
                                                   const newPrices = { ...item.prices };
-                                                  newPrices[newKey] = newPrices[size];
+                                                  newPrices[newSize] = newPrices[size];
                                                   delete newPrices[size];
                                                   updateItem(catKey, idx, 'prices', newPrices);
                                                 }
                                               }}
-                                            />
-                                            <span className={`text-xs ${isDarkMode ? 'text-white/40' : 'text-gray-500'}`}>cm</span>
+                                              className="text-xs px-1 py-0.5 rounded bg-blue-500/20 hover:bg-blue-500/30 text-blue-400"
+                                            >Edit</button>
                                             <button 
                                               onClick={() => {
                                                 const newPrices = { ...item.prices };
@@ -896,8 +1038,14 @@ export default function AdminDashboard() {
                                             type="number" 
                                             step="0.01" 
                                             value={price || 0} 
-                                            onChange={(e) => updateItem(catKey, idx, `prices.${size}`, parseFloat(e.target.value))} 
+                                            onChange={(e) => {
+                                              const newPrices = { ...item.prices };
+                                              newPrices[size] = parseFloat(e.target.value) || 0;
+                                              updateItem(catKey, idx, 'prices', newPrices);
+                                            }} 
                                             className={`w-full rounded px-2 py-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                                            title="Preis in Euro"
+                                            placeholder="0.00"
                                           />
                                         </div>
                                       ))}
@@ -905,11 +1053,63 @@ export default function AdminDashboard() {
                                   </div>
                                 )}
 
-                                {/* Description */}
-                                <div className="mb-3">
-                                  <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Beschreibung</label>
-                                  <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm h-16 resize-none ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
-                                </div>
+                                 {/* Description */}
+                                 <div className="mb-3">
+                                   <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Beschreibung</label>
+                                   <textarea value={item.description?.de || ''} onChange={(e) => updateItem(catKey, idx, 'description.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm h-16 resize-none ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Beschreibung des Gerichts" placeholder="Beschreibung eingeben..." />
+                                 </div>
+
+                                 {/* Allergens */}
+                                 <div className="mb-3">
+                                   <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Allergene</label>
+                                   <input 
+                                     type="text" 
+                                     value={(item.allergens || []).join(', ')} 
+                                     onChange={(e) => {
+                                       if (!menuData) return;
+                                       const newMenuData = JSON.parse(JSON.stringify(menuData));
+                                       const allergens = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                                       if (newMenuData.categories?.[catKey]?.items[idx]) {
+                                         newMenuData.categories[catKey].items[idx].allergens = allergens;
+                                         setMenuData(newMenuData);
+                                       }
+                                     }}
+                                     className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
+                                     title="Allergene (durch Komma getrennt)"
+                                     placeholder="z.B. Gluten, Milch, Eier"
+                                   />
+                                   {item.allergensDesc?.de && (
+                                     <input 
+                                       type="text" 
+                                       value={item.allergensDesc?.de || ''} 
+                                       onChange={(e) => updateItem(catKey, idx, 'allergensDesc.de', e.target.value)} 
+                                       className={`w-full rounded px-2 py-1 mt-1 text-xs ${isDarkMode ? 'bg-white/10 text-white/70' : 'bg-white text-gray-700 border border-gray-300'}`} 
+                                       title="Beschreibung der Allergene"
+                                       placeholder="Allergen Beschreibung (optional)"
+                                     />
+                                   )}
+                                 </div>
+
+                                 {/* Availability */}
+                                 <div className="mb-3 flex items-center gap-2">
+                                   <input 
+                                     type="checkbox" 
+                                     checked={item.available !== false} 
+                                     onChange={(e) => {
+                                       if (!menuData) return;
+                                       const newMenuData = JSON.parse(JSON.stringify(menuData));
+                                       if (newMenuData.categories?.[catKey]?.items[idx]) {
+                                         newMenuData.categories[catKey].items[idx].available = e.target.checked;
+                                         setMenuData(newMenuData);
+                                       }
+                                     }}
+                                     className="rounded"
+                                     id={`available-${catKey}-${idx}`}
+                                   />
+                                   <label htmlFor={`available-${catKey}-${idx}`} className={`text-xs ${isDarkMode ? 'text-white/70' : 'text-gray-700'}`}>
+                                     🟢 Verfügbar (im Menü anzeigen)
+                                   </label>
+                                 </div>
 
                                 {/* Extras / Toppings */}
                                 <div className="mb-3">
@@ -919,26 +1119,12 @@ export default function AdminDashboard() {
                                   </div>
                                   {item.toppings?.map((topping: any, tIdx: number) => (
                                     <div key={tIdx} className="flex gap-2 mb-1">
-                                      <input type="text" value={topping.name?.de || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'de', e.target.value)} className={`flex-1 rounded px-2 py-1 text-xs ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Extra Name" />
-                                      <input type="number" step="0.1" value={topping.price || 0} onChange={(e) => updateTopping(catKey, idx, tIdx, 'price', e.target.value)} className={`w-20 rounded px-2 py-1 text-xs ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="€" />
+                                      <input type="text" value={topping.name?.de || ''} onChange={(e) => updateTopping(catKey, idx, tIdx, 'de', e.target.value)} className={`flex-1 rounded px-2 py-1 text-xs ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Extra Name" title="Name des Extras" />
+                                      <input type="number" step="0.1" value={topping.price || 0} onChange={(e) => updateTopping(catKey, idx, tIdx, 'price', e.target.value)} className={`w-20 rounded px-2 py-1 text-xs ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="€" title="Preis des Extras" />
                                       <button onClick={() => removeTopping(catKey, idx, tIdx)} className="px-2 py-1 text-red-400 hover:text-red-300 text-xs">×</button>
                                     </div>
                                   ))}
                                 </div>
-
-                                {/* Sizes (for pizza) */}
-                                {item.sizes && (
-                                  <div className="mb-3">
-                                    <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Größen</label>
-                                    <div className="flex gap-2 mt-1">
-                                      {Object.entries(item.sizes).map(([size, price]: [string, any]) => (
-                                        <div key={size} className="bg-white/5 rounded px-3 py-1 text-xs">
-                                          {size}cm: {price}€
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
 
                                 {/* Buttons */}
                                 <div className="flex justify-end">
@@ -1013,7 +1199,7 @@ export default function AdminDashboard() {
                               <div className="flex-1 space-y-2">
                                 <div>
                                   <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Titel</label>
-                                  <input type="text" value={offer.title?.de || ''} onChange={(e) => updateOffer(idx, 'title.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                                  <input type="text" value={offer.title?.de || ''} onChange={(e) => updateOffer(idx, 'title.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Titel des Angebots" placeholder="Angebotstitel" />
                                 </div>
                               </div>
                             </div>
@@ -1021,7 +1207,7 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                               <div>
                                 <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Beschreibung</label>
-                                <input type="text" value={offer.desc?.de || ''} onChange={(e) => updateOffer(idx, 'desc.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Beschreibung..." />
+                                <input type="text" value={offer.desc?.de || ''} onChange={(e) => updateOffer(idx, 'desc.de', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Beschreibung..." title="Beschreibung des Angebots" />
                               </div>
                               <div>
                                 <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Bild URL</label>
@@ -1032,6 +1218,7 @@ export default function AdminDashboard() {
                                     onChange={(e) => updateOffer(idx, 'img', e.target.value)} 
                                     className={`flex-1 rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} 
                                     placeholder="/images/offer.webp" 
+                                    title="Bild-URL für das Angebot"
                                   />
                                   <label className={`px-3 py-1 mt-1 rounded cursor-pointer text-sm flex items-center ${isDarkMode ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-200 hover:bg-gray-300'}`}>
                                     📁
@@ -1074,11 +1261,11 @@ export default function AdminDashboard() {
                             <div className="space-y-2">
                               <div>
                                 <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Preis</label>
-                                <input type="text" value={offer.price || ''} onChange={(e) => updateOffer(idx, 'price', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="19.90 €" />
+                                <input type="text" value={offer.price || ''} onChange={(e) => updateOffer(idx, 'price', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="19.90 €" title="Preis des Angebots" />
                               </div>
                               <div>
                                 <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Badge / Etikett</label>
-                                <input type="text" value={offer.badge || ''} onChange={(e) => updateOffer(idx, 'badge', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Spare 30%" />
+                                <input type="text" value={offer.badge || ''} onChange={(e) => updateOffer(idx, 'badge', e.target.value)} className={`w-full rounded px-2 py-1 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Spare 30%" title="Badge oder Etikett" />
                               </div>
                               <div className="flex justify-end pt-2">
                                 <button onClick={() => deleteOffer(idx)} className={`px-3 py-1 rounded text-xs transition-colors ${isDarkMode ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400' : 'bg-red-100 hover:bg-red-200 text-red-600'}`}>
@@ -1140,51 +1327,51 @@ export default function AdminDashboard() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Firmenname</label>
-                          <input type="text" value={menuData.legal?.impressum?.companyName || ''} onChange={(e) => updateLegal('impressum', 'companyName', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.companyName || ''} onChange={(e) => updateLegal('impressum', 'companyName', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Firmenname des Unternehmens" placeholder="z.B. Pizza Roma Siegen" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Inhaber</label>
-                          <input type="text" value={menuData.legal?.impressum?.owner || ''} onChange={(e) => updateLegal('impressum', 'owner', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.owner || ''} onChange={(e) => updateLegal('impressum', 'owner', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Name des Inhabers" placeholder="Vorname Nachname" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Adresse</label>
-                          <input type="text" value={menuData.legal?.impressum?.address || ''} onChange={(e) => updateLegal('impressum', 'address', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Straße, PLZ Stadt" />
+                          <input type="text" value={menuData.legal?.impressum?.address || ''} onChange={(e) => updateLegal('impressum', 'address', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Geschäftsadresse" placeholder="Musterstraße 1, 57000 Siegen" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Telefon</label>
-                          <input type="text" value={menuData.legal?.impressum?.phone || ''} onChange={(e) => updateLegal('impressum', 'phone', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.phone || ''} onChange={(e) => updateLegal('impressum', 'phone', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Telefonnummer" placeholder="+49 123 456789" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>E-Mail</label>
-                          <input type="email" value={menuData.legal?.impressum?.email || ''} onChange={(e) => updateLegal('impressum', 'email', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="email" value={menuData.legal?.impressum?.email || ''} onChange={(e) => updateLegal('impressum', 'email', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="E-Mail Adresse" placeholder="info@pizza-roma.de" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>USt-IdNr.</label>
-                          <input type="text" value={menuData.legal?.impressum?.ustId || ''} onChange={(e) => updateLegal('impressum', 'ustId', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="DEXXXXXXXXX" />
+                          <input type="text" value={menuData.legal?.impressum?.ustId || ''} onChange={(e) => updateLegal('impressum', 'ustId', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Umsatzsteuer-Identifikationsnummer" placeholder="DE123456789" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Steuernummer</label>
-                          <input type="text" value={menuData.legal?.impressum?.steuernummer || ''} onChange={(e) => updateLegal('impressum', 'steuernummer', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.steuernummer || ''} onChange={(e) => updateLegal('impressum', 'steuernummer', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Steuernummer" placeholder="123/456/78901" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Registergericht (optional)</label>
-                          <input type="text" value={menuData.legal?.impressum?.registerCourt || ''} onChange={(e) => updateLegal('impressum', 'registerCourt', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.registerCourt || ''} onChange={(e) => updateLegal('impressum', 'registerCourt', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Registergericht" placeholder="Amtsgericht Siegen" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Registernummer (optional)</label>
-                          <input type="text" value={menuData.legal?.impressum?.registerNumber || ''} onChange={(e) => updateLegal('impressum', 'registerNumber', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.registerNumber || ''} onChange={(e) => updateLegal('impressum', 'registerNumber', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Registernummer" placeholder="HRA 12345" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Verantwortlich für Inhalt (§55 RStV)</label>
-                          <input type="text" value={menuData.legal?.impressum?.responsibleForContent || ''} onChange={(e) => updateLegal('impressum', 'responsibleForContent', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.responsibleForContent || ''} onChange={(e) => updateLegal('impressum', 'responsibleForContent', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Verantwortliche Person" placeholder="Vorname Nachname" />
                         </div>
                         <div className="md:col-span-2">
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Verantwortlich Adresse</label>
-                          <input type="text" value={menuData.legal?.impressum?.responsibleAddress || ''} onChange={(e) => updateLegal('impressum', 'responsibleAddress', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.impressum?.responsibleAddress || ''} onChange={(e) => updateLegal('impressum', 'responsibleAddress', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Adresse der verantwortlichen Person" placeholder="Straße, PLZ Stadt" />
                         </div>
                         <div className="md:col-span-2">
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Zusätzliche Informationen</label>
-                          <textarea value={menuData.legal?.impressum?.additionalInfo || ''} onChange={(e) => updateLegal('impressum', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} placeholder="Weitere rechtliche Hinweise..." />
+                          <textarea value={menuData.legal?.impressum?.additionalInfo || ''} onChange={(e) => updateLegal('impressum', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Zusätzliche rechtliche Hinweise" placeholder="Weitere rechtliche Hinweise..." />
                         </div>
                       </div>
                     </div>
@@ -1195,35 +1382,35 @@ export default function AdminDashboard() {
                       <div className="space-y-4">
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Einleitung</label>
-                          <textarea value={menuData.legal?.datenschutz?.intro || ''} onChange={(e) => updateLegal('datenschutz', 'intro', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.datenschutz?.intro || ''} onChange={(e) => updateLegal('datenschutz', 'intro', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Einleitung zur Datenschutzerklärung" placeholder="Informationen über die Erhebung personenbezogener Daten..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Verantwortliche Stelle</label>
-                          <input type="text" value={menuData.legal?.datenschutz?.controller || ''} onChange={(e) => updateLegal('datenschutz', 'controller', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.datenschutz?.controller || ''} onChange={(e) => updateLegal('datenschutz', 'controller', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Name der verantwortlichen Stelle" placeholder="Pizza Roma Inhaber" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Erhobene Daten</label>
-                          <textarea value={menuData.legal?.datenschutz?.dataCollected || ''} onChange={(e) => updateLegal('datenschutz', 'dataCollected', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.datenschutz?.dataCollected || ''} onChange={(e) => updateLegal('datenschutz', 'dataCollected', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Art der erhobenen Daten" placeholder="IP-Adresse, Bestellungen, Kontaktdaten..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Zweck der Verarbeitung</label>
-                          <textarea value={menuData.legal?.datenschutz?.purpose || ''} onChange={(e) => updateLegal('datenschutz', 'purpose', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.datenschutz?.purpose || ''} onChange={(e) => updateLegal('datenschutz', 'purpose', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Zweck der Datenverarbeitung" placeholder="Bestellabwicklung, Kundenservice..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Hosting (Vercel)</label>
-                          <textarea value={menuData.legal?.datenschutz?.hosting || ''} onChange={(e) => updateLegal('datenschutz', 'hosting', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.datenschutz?.hosting || ''} onChange={(e) => updateLegal('datenschutz', 'hosting', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Informationen zum Hosting" placeholder="Gehostet bei Vercel Inc..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Cookies</label>
-                          <textarea value={menuData.legal?.datenschutz?.cookies || ''} onChange={(e) => updateLegal('datenschutz', 'cookies', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.datenschutz?.cookies || ''} onChange={(e) => updateLegal('datenschutz', 'cookies', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Verwendung von Cookies" placeholder="Wir verwenden Cookies fur..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Ihre Rechte (DSGVO Artikel)</label>
-                          <textarea value={menuData.legal?.datenschutz?.rights || ''} onChange={(e) => updateLegal('datenschutz', 'rights', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.datenschutz?.rights || ''} onChange={(e) => updateLegal('datenschutz', 'rights', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Rechte der betroffenen Personen" placeholder="Auskunftsrecht, Löschung, Berichtigung..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Zusätzliche Informationen</label>
-                          <textarea value={menuData.legal?.datenschutz?.additionalInfo || ''} onChange={(e) => updateLegal('datenschutz', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.datenschutz?.additionalInfo || ''} onChange={(e) => updateLegal('datenschutz', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Zusätzliche Informationen zum Datenschutz" placeholder="Weitere Hinweise..." />
                         </div>
                       </div>
                     </div>
@@ -1234,59 +1421,59 @@ export default function AdminDashboard() {
                       <div className="space-y-4">
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Firmenname</label>
-                          <input type="text" value={menuData.legal?.agb?.companyName || ''} onChange={(e) => updateLegal('agb', 'companyName', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <input type="text" value={menuData.legal?.agb?.companyName || ''} onChange={(e) => updateLegal('agb', 'companyName', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Firmenname fur AGB" placeholder="Pizza Roma Siegen" />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Einleitung</label>
-                          <textarea value={menuData.legal?.agb?.intro || ''} onChange={(e) => updateLegal('agb', 'intro', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.intro || ''} onChange={(e) => updateLegal('agb', 'intro', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Einleitung zu den AGB" placeholder="Geltungsbereich und Allgemeines..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 1 Geltungsbereich</label>
-                          <textarea value={menuData.legal?.agb?.scope || ''} onChange={(e) => updateLegal('agb', 'scope', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.scope || ''} onChange={(e) => updateLegal('agb', 'scope', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Geltungsbereich der AGB" placeholder="Diese Bedingungen gelten fur..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 2 Vertragsschluss</label>
-                          <textarea value={menuData.legal?.agb?.contractFormation || ''} onChange={(e) => updateLegal('agb', 'contractFormation', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.contractFormation || ''} onChange={(e) => updateLegal('agb', 'contractFormation', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Zustandekommen des Vertrags" placeholder="Der Vertrag kommt zustande durch..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 3 Preise</label>
-                          <textarea value={menuData.legal?.agb?.prices || ''} onChange={(e) => updateLegal('agb', 'prices', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.prices || ''} onChange={(e) => updateLegal('agb', 'prices', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Preise und Versandkosten" placeholder="Alle Preise inkl. MwSt..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 4 Lieferung</label>
-                          <textarea value={menuData.legal?.agb?.delivery || ''} onChange={(e) => updateLegal('agb', 'delivery', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.delivery || ''} onChange={(e) => updateLegal('agb', 'delivery', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Lieferbedingungen" placeholder="Lieferzeit, Versandart..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 5 Zahlung</label>
-                          <textarea value={menuData.legal?.agb?.payment || ''} onChange={(e) => updateLegal('agb', 'payment', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.payment || ''} onChange={(e) => updateLegal('agb', 'payment', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Zahlungsbedingungen" placeholder="Bar, PayPal, Kreditkarte..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 6 Eigentumsvorbehalt</label>
-                          <textarea value={menuData.legal?.agb?.retentionOfTitle || ''} onChange={(e) => updateLegal('agb', 'retentionOfTitle', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[40px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.retentionOfTitle || ''} onChange={(e) => updateLegal('agb', 'retentionOfTitle', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[40px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Eigentumsvorbehalt" placeholder="Bis zur vollstandigen Bezahlung..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 7 Gewährleistung</label>
-                          <textarea value={menuData.legal?.agb?.warranty || ''} onChange={(e) => updateLegal('agb', 'warranty', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.warranty || ''} onChange={(e) => updateLegal('agb', 'warranty', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Gewährleistung und Haftung" placeholder="Haftung fur Sachmangel..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 8 Haftung</label>
-                          <textarea value={menuData.legal?.agb?.liability || ''} onChange={(e) => updateLegal('agb', 'liability', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.liability || ''} onChange={(e) => updateLegal('agb', 'liability', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Haftungsausschluss" placeholder="Keine Haftung fur..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 9 Widerrufsrecht</label>
-                          <textarea value={menuData.legal?.agb?.rightOfWithdrawal || ''} onChange={(e) => updateLegal('agb', 'rightOfWithdrawal', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.rightOfWithdrawal || ''} onChange={(e) => updateLegal('agb', 'rightOfWithdrawal', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Widerrufsbelehrung" placeholder="Widerrufsfrist, Musterformular..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 10 Datenschutz</label>
-                          <textarea value={menuData.legal?.agb?.dataProtection || ''} onChange={(e) => updateLegal('agb', 'dataProtection', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[40px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.dataProtection || ''} onChange={(e) => updateLegal('agb', 'dataProtection', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[40px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Datenschutzbestimmungen" placeholder="Hinweis auf Datenschutzerklarung..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 11 Schlussbestimmungen</label>
-                          <textarea value={menuData.legal?.agb?.finalProvisions || ''} onChange={(e) => updateLegal('agb', 'finalProvisions', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.finalProvisions || ''} onChange={(e) => updateLegal('agb', 'finalProvisions', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[60px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Schlussbestimmungen" placeholder="Gerichtsstand, anwendbares Recht..." />
                         </div>
                         <div>
                           <label className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>§ 12 Zusätzliche Bestimmungen</label>
-                          <textarea value={menuData.legal?.agb?.additionalInfo || ''} onChange={(e) => updateLegal('agb', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} />
+                          <textarea value={menuData.legal?.agb?.additionalInfo || ''} onChange={(e) => updateLegal('agb', 'additionalInfo', e.target.value)} className={`w-full rounded px-3 py-2 mt-1 text-sm min-h-[80px] ${isDarkMode ? 'bg-white/10 text-white' : 'bg-white text-gray-900 border border-gray-300'}`} title="Zusätzliche Bestimmungen zu den AGB" placeholder="Weitere rechtliche Hinweise..." />
                         </div>
                       </div>
                     </div>

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCartStore } from '@/store/useCartStore';
@@ -37,16 +38,16 @@ export default function Header() {
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <a href="/" className="text-2xl font-poppins font-bold text-white flex items-center gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <Link href="/" className="text-2xl font-poppins font-bold text-white flex items-center gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
           <span className="text-roma-red text-3xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">♛</span> Pizza Roma
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 font-poppins text-sm tracking-wide">
           {navLinks.map(link => (
-            <a key={link.key} href={link.href} className="text-white hover:text-roma-gold transition-colors duration-300 uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-semibold">
+            <Link key={link.key} href={link.href} className="text-white hover:text-roma-gold transition-colors duration-300 uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-semibold">
               {t(link.key)}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -63,9 +64,9 @@ export default function Header() {
           </button>
 
           {/* CTA Button */}
-          <a href={isHomePage ? '#menu' : '/#menu'} className="hidden lg:block bg-roma-red hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-poppins font-semibold transition-all hover:shadow-lg hover:shadow-roma-red/30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+          <Link href={isHomePage ? '#menu' : '/#menu'} className="hidden lg:block bg-roma-red hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-poppins font-semibold transition-all hover:shadow-lg hover:shadow-roma-red/30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
             {t('hero_btn_order')}
-          </a>
+          </Link>
 
           {/* Mobile menu button */}
           <button onClick={() => setMobileMenu(!mobileMenu)} className="lg:hidden text-white text-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
@@ -85,9 +86,9 @@ export default function Header() {
           >
             <nav className="flex flex-col p-6 gap-4">
               {navLinks.map(link => (
-                <a key={link.key} href={link.href} onClick={() => setMobileMenu(false)} className="text-white text-lg border-b border-white/10 pb-2">
+                <Link key={link.key} href={link.href} onClick={() => setMobileMenu(false)} className="text-white text-lg border-b border-white/10 pb-2">
                   {t(link.key)}
-                </a>
+                </Link>
               ))}
             </nav>
           </motion.div>

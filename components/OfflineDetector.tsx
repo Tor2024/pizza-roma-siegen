@@ -6,10 +6,14 @@ export default function OfflineDetector() {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
-    setIsOnline(navigator.onLine);
-
+    // Set initial state without triggering re-render during mount
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
+
+    // Check initial state
+    if (navigator.onLine !== isOnline) {
+      setIsOnline(navigator.onLine);
+    }
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);

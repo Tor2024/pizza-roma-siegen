@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface DatenschutzData {
@@ -100,14 +101,14 @@ export default function DatenschutzPage() {
           )}
         </div>
 
-        <div className="mt-8 text-center">
-          <a href="/" className="text-roma-gold hover:underline">← Zurück zur Startseite</a>
-        </div>
-        <div className="mt-4 text-center">
-          <a href="/impressum" className="text-sm text-white/50 hover:text-roma-gold mx-2">Impressum</a>
-          <span className="text-white/30">|</span>
-          <a href="/agb" className="text-sm text-white/50 hover:text-roma-gold mx-2">AGB</a>
-        </div>
+          <div className="mt-8 text-center">
+            <Link href="/" className="text-roma-gold hover:underline">← Zurück zur Startseite</Link>
+          </div>
+          <div className="mt-4 text-center">
+            <Link href="/impressum" className="text-sm text-white/50 hover:text-roma-gold mx-2">Impressum</Link>
+            <span className="text-white/30">|</span>
+            <Link href="/agb" className="text-sm text-white/50 hover:text-roma-gold mx-2">AGB</Link>
+          </div>
       </div>
     </div>
   );

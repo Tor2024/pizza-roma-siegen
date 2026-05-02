@@ -8,7 +8,9 @@ const MENU_FILE_PATH = 'public/data/menu.json';
 const BRANCH = 'main';
 
 // Get menu from GitHub
-export async function getMenuFromGitHub(): Promise<any> {
+import { MenuData } from '@/types';
+
+export async function getMenuFromGitHub(): Promise<MenuData | null> {
   try {
     if (!GITHUB_TOKEN) {
       console.log('No GITHUB_TOKEN for menu, using fallback');
@@ -45,7 +47,7 @@ export async function getMenuFromGitHub(): Promise<any> {
 }
 
 // Save menu to GitHub
-export async function saveMenuToGitHub(menuData: any): Promise<boolean> {
+export async function saveMenuToGitHub(menuData: MenuData): Promise<boolean> {
   try {
     if (!GITHUB_TOKEN) {
       console.log('No GITHUB_TOKEN, cannot save menu');

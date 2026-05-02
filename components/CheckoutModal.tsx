@@ -65,6 +65,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [hasPaid, setHasPaid] = useState(false);
   const [orderError, setOrderError] = useState('');
   const [agbAccepted, setAgbAccepted] = useState(false);
+  const [trackId, setTrackId] = useState('');
 
   const handlePayment = async () => {
     if (hasPaid || isProcessing) return; // Prevent double submission
@@ -73,6 +74,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     setOrderError('');
     
     try {
+      // Generate track ID once when order is placed
+      const newTrackId = `PR${Date.now().toString().slice(-6)}`;
+      
       // Send order to server
       const response = await fetch('/api/admin/orders', {
         method: 'POST',
@@ -107,6 +111,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       const result = await response.json();
       
       if (response.ok && result.success) {
+        setTrackId(newTrackId);
         clearCart();
         setIsProcessing(false);
         setIsSuccess(true);
@@ -204,7 +209,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   </div>
                   <div className="flex items-center gap-3 text-white/80">
                     <FiTruck className="text-roma-gold" />
-                    <span>{t('track_id')}: #PR{Date.now().toString().slice(-6)}</span>
+                    <span>{t('track_id')}: #{trackId}</span>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -339,7 +344,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       <h3 className="text-white font-semibold mb-3">{t('order_summary')}</h3>
                       {items.map((item, idx) => (
                         <div key={idx} className="flex justify-between text-white/80 text-sm mb-2">
-                          <span>{item.quantity}x {item.name.de} ({item.size}cm)</span>
+                          <span>{item.quantity}x {item.name.de} ({item.size})</span>
                           <span>{((item.price + item.toppings.reduce((a,t) => a+t.price, 0)) * item.quantity).toFixed(2)} €</span>
                         </div>
                       ))}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -122,9 +123,9 @@ function LoginForm() {
           </form>
 
           <div className="mt-6 text-center">
-            <a href="/" className="text-white/40 hover:text-white text-sm transition-colors">
+            <Link href="/" className="text-white/40 hover:text-white text-sm transition-colors">
               ← Zurück zur Website
-            </a>
+            </Link>
           </div>
         </div>
 

@@ -10,7 +10,9 @@ export default function CookieConsent() {
     // Check if user already consented
     const consent = localStorage.getItem('cookieConsent');
     if (!consent) {
-      setShowBanner(true);
+      // Use timeout to avoid setState during render
+      const timer = setTimeout(() => setShowBanner(true), 0);
+      return () => clearTimeout(timer);
     }
   }, []);
 

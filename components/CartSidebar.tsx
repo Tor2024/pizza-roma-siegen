@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { useCartStore } from '@/store/useCartStore';
 import { useLanguage } from '@/context/LanguageContext';
 import { FiX, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi';
@@ -37,7 +38,7 @@ export default function CartSidebar() {
               <h2 className="text-2xl font-poppins font-bold text-white flex items-center gap-3">
                 <FiShoppingBag className="text-roma-gold" /> {t('cart_title')}
               </h2>
-              <button onClick={toggleCart} className="text-white/70 hover:text-white text-2xl"><FiX /></button>
+              <button onClick={toggleCart} className="text-white/70 hover:text-white text-2xl" title="Warenkorb schließen"><FiX /></button>
             </div>
 
             {/* Items list */}
@@ -52,22 +53,22 @@ export default function CartSidebar() {
                   const topStr = item.toppings.map(t=>t.id).join(',');
                   return (
                     <motion.div key={`${item.id}-${item.size}-${topStr}`} layout className="flex gap-4 bg-white/5 p-3 rounded-2xl">
-                      <img src={item.image} alt="" className="w-20 h-20 rounded-xl object-cover"/>
+                      <Image src={item.image} alt="" width={80} height={80} className="w-20 h-20 rounded-xl object-cover"/>
                       <div className="flex-grow">
-                        <h4 className="font-poppins font-semibold text-white">{item.name.de} ({item.size}cm)</h4>
+                        <h4 className="font-poppins font-semibold text-white">{item.name.de} ({item.size})</h4>
                         {item.toppings.length > 0 && (
                           <p className="text-xs text-roma-gold mt-1">+ {item.toppings.map(t => t.name.de).join(', ')}</p>
                         )}
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-2 bg-white/10 rounded-lg">
-                            <button onClick={() => updateQuantity(item.id, item.size, topStr, item.quantity - 1)} className="p-1 text-white/70 hover:text-white"><FiMinus /></button>
+                            <button onClick={() => updateQuantity(item.id, item.size, topStr, item.quantity - 1)} className="p-1 text-white/70 hover:text-white" title="Menge verringern"><FiMinus /></button>
                             <span className="text-white font-bold w-6 text-center">{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.id, item.size, topStr, item.quantity + 1)} className="p-1 text-white/70 hover:text-white"><FiPlus /></button>
+                            <button onClick={() => updateQuantity(item.id, item.size, topStr, item.quantity + 1)} className="p-1 text-white/70 hover:text-white" title="Menge erhöhen"><FiPlus /></button>
                           </div>
                           <span className="text-white font-bold">{(item.price * item.quantity + item.toppings.reduce((a,b)=>a+b.price,0)*item.quantity).toFixed(2)} €</span>
                         </div>
                       </div>
-                      <button onClick={() => removeItem(item.id, item.size, topStr)} className="text-red-400 hover:text-red-300 self-start mt-1"><FiX /></button>
+                      <button onClick={() => removeItem(item.id, item.size, topStr)} className="text-red-400 hover:text-red-300 self-start mt-1" title="Artikel entfernen"><FiX /></button>
                     </motion.div>
                   );
                 })

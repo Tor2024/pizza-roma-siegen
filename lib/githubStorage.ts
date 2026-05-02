@@ -7,16 +7,7 @@ const REPO_NAME = process.env.VERCEL_GIT_REPO_SLUG || 'pizza-roma-siegen';
 const FILE_PATH = 'public/data/orders.json';
 const BRANCH = 'main';
 
-interface Order {
-  id: string;
-  items: any[];
-  customer: any;
-  total: number;
-  status: string;
-  createdAt: number;
-  updatedAt: number;
-  [key: string]: any;
-}
+import { Order, OrderItem, MenuItem, Topping } from '@/types';
 
 // Get orders from GitHub
 export async function getOrdersFromGitHub(): Promise<Order[]> {
@@ -127,7 +118,7 @@ export async function addOrderToGitHub(order: Order): Promise<boolean> {
 }
 
 // Update order status
-export async function updateOrderStatusInGitHub(orderId: string, status: string): Promise<boolean> {
+export async function updateOrderStatusInGitHub(orderId: string, status: Order['status']): Promise<boolean> {
   const orders = await getOrdersFromGitHub();
   const order = orders.find(o => o.id === orderId);
   if (order) {
@@ -172,7 +163,7 @@ export async function saveOrder(order: Order): Promise<void> {
 }
 
 // Update order in both cache and GitHub
-export async function updateOrderStatus(orderId: string, status: string): Promise<void> {
+export async function updateOrderStatus(orderId: string, status: Order['status']): Promise<void> {
   const order = memoryCache.orders.find(o => o.id === orderId);
   if (order) {
     order.status = status;
@@ -229,7 +220,7 @@ export async function getMenuFromGitHub(): Promise<any> {
 }
 
 // Validate order prices against menu
-export async function validateOrderPrices(items: any[]): Promise<{ valid: boolean; error?: string; calculatedTotal?: number }> {
+export async function validateOrderPrices(items: OrderItem[]): Promise<{ valid: boolean; error?: string; calculatedTotal?: number }> {
   const menu = await getMenuFromGitHub();
   if (!menu || !menu.categories) {
     // If we can't fetch menu, accept the order (fallback)
@@ -240,10 +231,10 @@ export async function validateOrderPrices(items: any[]): Promise<{ valid: boolea
 
   for (const item of items) {
     // Find the item in menu categories
-    let foundItem = null;
+    let foundItem: MenuItem | null = null;
     for (const categoryKey of Object.keys(menu.categories)) {
       const category = menu.categories[categoryKey];
-      const menuItem = category.items.find((i: any) => i.id === item.id);
+      const menuItem = category.items.find((i: MenuItem) => i.id === item.id);
       if (menuItem) {
         foundItem = menuItem;
         break;
@@ -255,7 +246,7 @@ export async function validateOrderPrices(items: any[]): Promise<{ valid: boolea
     }
 
     // Validate base price
-    const expectedPrice = foundItem.prices?.[item.size] || foundItem.price;
+    const expectedPrice = foundItem.prices?.[item.size || ''] || foundItem.price || 0;
     if (expectedPrice !== item.price) {
       return { 
         valid: false, 
@@ -268,7 +259,7 @@ export async function validateOrderPrices(items: any[]): Promise<{ valid: boolea
     if (item.toppings && item.toppings.length > 0) {
       for (const topping of item.toppings) {
         // Find topping in menu item
-        const menuTopping = foundItem.toppings?.find((t: any) => t.id === topping.id);
+        const menuTopping = foundItem.toppings?.find((t: Topping) => t.id === topping.id);
         if (menuTopping) {
           itemTotal += menuTopping.price;
         } else {
@@ -283,4 +274,4 @@ export async function validateOrderPrices(items: any[]): Promise<{ valid: boolea
   return { valid: true, calculatedTotal };
 }
 
-export type { Order };
+export type { Order, OrderItem, MenuItem, Topping };

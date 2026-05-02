@@ -19,7 +19,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const savedLang = localStorage.getItem('pizza-roma-lang') as Lang;
     if (savedLang && (savedLang === 'de' || savedLang === 'ru')) {
-      setLang(savedLang);
+      // Avoid setState during render by checking if value actually changed
+      if (savedLang !== lang) {
+        setLang(savedLang);
+      }
     }
   }, []);
 

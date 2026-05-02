@@ -1,21 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-interface Topping {
-  id: string;
-  name: { de: string; ru: string };
-  price: number;
-}
-
-interface CartItem {
-  id: string;
-  name: { de: string; ru: string };
-  size: string;
-  price: number;
-  quantity: number;
-  toppings: Topping[];
-  image: string;
-}
+import { CartItem, Topping } from '@/types';
 
 interface CartState {
   items: CartItem[];
