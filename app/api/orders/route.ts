@@ -24,23 +24,23 @@ export async function POST(req: Request) {
 
     const orderId = `ord_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
-    const newOrder = {
-      id: orderId,
-      items: orderData.items,
-      customer: orderData.customer,
-      total: orderData.total,
-      subtotal: orderData.subtotal,
-      deliveryFee: orderData.deliveryFee,
-      promoCode: orderData.promoCode || null,
-      promoDiscount: orderData.promoDiscount || 0,
-      status: 'received',
-      statusHistory: [
-        { status: 'received', timestamp: Date.now(), note: 'Order received' }
-      ],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      estimatedDelivery: orderData.estimatedDelivery || '25-35 min'
-    };
+      const newOrder: any = {
+        id: orderId,
+        items: orderData.items,
+        customer: orderData.customer,
+        total: orderData.total,
+        subtotal: orderData.subtotal,
+        deliveryFee: orderData.deliveryFee,
+        promoCode: orderData.promoCode || null,
+        promoDiscount: orderData.promoDiscount || 0,
+        status: 'received' as const,
+        statusHistory: [
+          { status: 'received' as const, timestamp: Date.now(), note: 'Order received' }
+        ],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        estimatedDelivery: orderData.estimatedDelivery || '25-35 min'
+      };
 
     // Сохраняем заказ в GitHub (persistent) и cache
     await saveOrder(newOrder);
