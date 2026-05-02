@@ -64,8 +64,14 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
   const [hasPaid, setHasPaid] = useState(false);
   const [orderError, setOrderError] = useState('');
+  const [addressError, setAddressError] = useState('');
   const [agbAccepted, setAgbAccepted] = useState(false);
   const [trackId, setTrackId] = useState('');
+
+  const handleAddressChange = (field: string, value: string) => {
+    setAddress(prev => ({...prev, [field]: value}));
+    setAddressError('');
+  };
 
   const handlePayment = async () => {
     if (hasPaid || isProcessing) return; // Prevent double submission
@@ -244,7 +250,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         placeholder={t('street')}
                         value={address.street}
                         maxLength={100}
-                        onChange={(e) => setAddress({...address, street: e.target.value})}
+                        onChange={(e) => handleAddressChange('street', e.target.value)}
                         className="bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
                       />
                       <input 
@@ -252,7 +258,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         placeholder={t('number')}
                         value={address.number}
                         maxLength={10}
-                        onChange={(e) => setAddress({...address, number: e.target.value})}
+                        onChange={(e) => handleAddressChange('number', e.target.value)}
                         className="bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
                       />
                     </div>
@@ -263,7 +269,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                           placeholder="PLZ (5 Stellen)" 
                           value={address.zip}
                           maxLength={5}
-                          onChange={(e) => setAddress({...address, zip: e.target.value.replace(/\D/g, '')})}
+                          onChange={(e) => handleAddressChange('zip', e.target.value.replace(/\D/g, ''))}
                           className={`w-full bg-white/10 text-white p-3 rounded-xl border outline-none placeholder:text-white/40 ${zipError ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-roma-gold'}`}
                         />
                         {zipError && <p className="text-red-400 text-xs mt-1">5-stelliger ZIP erforderlich</p>}
@@ -273,7 +279,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         placeholder={t('city')}
                         value={address.city}
                         maxLength={50}
-                        onChange={(e) => setAddress({...address, city: e.target.value})}
+                        onChange={(e) => handleAddressChange('city', e.target.value)}
                         className="bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none placeholder:text-white/40"
                       />
                     </div>
@@ -283,7 +289,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         placeholder={t('phone') + ' (z.B. 0271 12345678)'}
                         value={address.phone}
                         maxLength={20}
-                        onChange={(e) => setAddress({...address, phone: e.target.value})}
+                        onChange={(e) => handleAddressChange('phone', e.target.value)}
                         className={`w-full bg-white/10 text-white p-3 rounded-xl border outline-none placeholder:text-white/40 ${phoneError ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-roma-gold'}`}
                       />
                       {phoneError && <p className="text-red-400 text-xs mt-1">Ungültige Telefonnummer</p>}
@@ -294,7 +300,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         placeholder="E-Mail (optional)"
                         value={address.email}
                         maxLength={100}
-                        onChange={(e) => setAddress({...address, email: e.target.value})}
+                        onChange={(e) => handleAddressChange('email', e.target.value)}
                         className={`w-full bg-white/10 text-white p-3 rounded-xl border outline-none placeholder:text-white/40 ${emailError ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-roma-gold'}`}
                       />
                       {emailError && <p className="text-red-400 text-xs mt-1">Ungültige E-Mail-Adresse</p>}
@@ -322,14 +328,26 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         placeholder={t('comment')}
                         value={address.note}
                         maxLength={500}
-                        onChange={(e) => setAddress({...address, note: e.target.value})}
+                        onChange={(e) => handleAddressChange('note', e.target.value)}
                         className="w-full bg-white/10 text-white p-3 rounded-xl border border-white/10 focus:border-roma-gold outline-none h-20 resize-none placeholder:text-white/40"
                       />
                       <p className="text-white/40 text-xs mt-1 text-right">{address.note.length}/500</p>
                     </div>
 
+                    {addressError && (
+                      <div className="w-full mb-2 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm">
+                        {addressError}
+                      </div>
+                    )}
                     <button 
-                      onClick={() => setStep(2)}
+                      onClick={() => {
+                        if (!isAddressValid) {
+                          setAddressError('Bitte füllen Sie alle Pflichtfelder korrekt aus.');
+                          return;
+                        }
+                        setAddressError('');
+                        setStep(2);
+                      }}
                       disabled={!isAddressValid}
                       className="w-full bg-roma-gold text-roma-dark py-4 rounded-xl font-bold hover:bg-yellow-500 transition-all disabled:bg-gray-600 disabled:cursor-not-allowed"
                       aria-label="Weiter zur Zahlung"
