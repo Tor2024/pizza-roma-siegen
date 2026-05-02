@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // ADMIN_SECRET должен быть установлен в переменных окружения
 const ADMIN_SECRET = process.env.ADMIN_SECRET;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin') || 
                        request.nextUrl.pathname.startsWith('/api/admin');
   
