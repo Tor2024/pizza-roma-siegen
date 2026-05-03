@@ -316,7 +316,7 @@ export default function MenuSection() {
             )}
             {menuData?._source && (
               <span className={`text-xs px-2 py-1 rounded ${menuData._source === 'github' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                {menuData._source === 'github' ? '✓ GitHub' : '⚠ Local'}
+              {menuData._source === 'github' ? '✓ Server' : '⚠ Local'}
               </span>
             )}
           </div>
