@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
+import { verifyAdminToken } from '@/lib/auth';
 
 // POST - загрузить изображение на GitHub
 export async function POST(req: Request) {
   try {
     // Проверка авторизации
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+    if (!verifyAdminToken(req.headers.get('authorization'))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

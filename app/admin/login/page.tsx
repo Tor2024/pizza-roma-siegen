@@ -43,17 +43,20 @@ function LoginForm() {
     setError('');
 
     try {
-      // Проверяем пароль через API
-      const res = await fetch('/api/admin/orders', {
-        headers: { 'Authorization': `Bearer ${password}` },
-        credentials: 'include'
+      // Проверяем пароль через API, получаем хеш-токен
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
       });
 
       if (res.status === 429) {
         setError('Zu viele Versuche. Bitte warten Sie einen Moment.');
       } else if (res.ok) {
-        // Session-Cookie (wird beim Schließen des Browsers gelöscht)
-        document.cookie = `admin_token=${password}; Path=/; SameSite=Strict`;
+        const data = await res.json();
+        // Store hashed token (not raw password) in session cookie with Secure flag
+        const isSecure = window.location.protocol === 'https:';
+        document.cookie = `admin_token=${data.token}; Path=/; SameSite=Strict${isSecure ? '; Secure' : ''}`;
         window.location.href = from;
       } else {
         setError('Falsches Passwort');

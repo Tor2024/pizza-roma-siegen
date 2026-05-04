@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getMenu, updateMenu } from '@/lib/menuStorage';
 import { saveMenuToGitHub, getMenuFromGitHub } from '@/lib/githubMenuStorage';
+import { verifyAdminToken } from '@/lib/auth';
 
 // GET - получить текущее меню (сначала GitHub, потом fallback)
 export async function GET() {
@@ -39,8 +40,7 @@ export async function POST(req: Request) {
     const newMenuData = await req.json();
     
     // Проверка авторизации
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+    if (!verifyAdminToken(req.headers.get('authorization'))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getOrders, saveOrder, updateOrderStatus as updateGitHubStatus, deleteOrder, validateOrderPrices, Order, OrderItem, Topping } from '@/lib/githubStorage';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
+import { verifyAdminToken } from '@/lib/auth';
 
 // In-memory cache for fast access
 const orderCache = new Map<string, Order>();
@@ -25,8 +26,7 @@ const refreshCache = async () => {
       }
 
       // Проверка авторизации
-      const authHeader = request.headers.get('authorization');
-      if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+      if (!verifyAdminToken(request.headers.get('authorization'))) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
@@ -107,8 +107,7 @@ const refreshCache = async () => {
       const { id, newStatus } = await req.json();
       
       // Проверка авторизации
-      const authHeader = req.headers.get('authorization');
-      if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+      if (!verifyAdminToken(req.headers.get('authorization'))) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
@@ -149,8 +148,7 @@ const refreshCache = async () => {
       const { id } = await req.json();
       
       // Проверка авторизации
-      const authHeader = req.headers.get('authorization');
-      if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+      if (!verifyAdminToken(req.headers.get('authorization'))) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 

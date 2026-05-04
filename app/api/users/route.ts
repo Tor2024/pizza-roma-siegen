@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUsers, addUser, findUserByEmail, addOrderToUser, saveUsers } from '@/lib/userStorage';
+import { verifyAdminToken } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   // Check admin auth
-  const authHeader = req.headers.get('authorization');
-  const adminSecret = process.env.ADMIN_SECRET;
-  if (!authHeader || authHeader !== `Bearer ${adminSecret}`) {
+  if (!verifyAdminToken(req.headers.get('authorization'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
