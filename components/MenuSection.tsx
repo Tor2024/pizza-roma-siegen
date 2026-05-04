@@ -236,7 +236,7 @@ const categoryColors: { [key: string]: string } = {
 };
 
 export default function MenuSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [menuData, setMenuData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
@@ -379,6 +379,20 @@ export default function MenuSection() {
             <p>Menü wird geladen... / Меню загружается...</p>
           </div>
         )}
+      </div>
+
+      {/* Allergen disclaimer - EU 1169/2011 compliance */}
+      <div className="mt-8 max-w-4xl mx-auto px-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
+          <p className="font-semibold mb-1">
+            {lang === 'de' ? '⚠️ Allergenhinweis' : '⚠️ Предупреждение об аллергенах'}
+          </p>
+          <p>
+            {lang === 'de'
+              ? 'Die gekennzeichneten Allergene sind in den jeweiligen Gerichten enthalten. Wir können nicht garantieren, dass unsere Produkte frei von Spuren anderer Allergene sind. Bei Fragen wenden Sie sich bitte an unser Personal. Allergencodes: A=Gluten, B=Krebstiere, C=Eier, D=Fisch, E=Erdnüsse, G=Milch/Laktose, H=Nüsse, L=Sellerie, M=Senf, N=Sesam, O=Sulfite, P=Lupinen, R=Weichtiere.'
+              : 'Обозначенные аллергены содержатся в соответствующих блюдах. Мы не можем гарантировать, что наши продукты свободны от следов других аллергенов. При вопросах обращайтесь к нашему персоналу. Коды аллергенов: A=Глютен, B=Ракообразные, C=Яйца, D=Рыба, E=Арахис, G=Молоко/Лактоза, H=Орехи, L=Сельдерей, M=Горчица, N=Кунжут, O=Сульфиты, P=Люпин, R=Моллюски.'}
+          </p>
+        </div>
       </div>
     </section>
   );
