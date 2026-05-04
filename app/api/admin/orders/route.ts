@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getOrders, saveOrder, updateOrderStatus as updateGitHubStatus, deleteOrder, validateOrderPrices, Order, OrderItem, Topping } from '@/lib/githubStorage';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 // In-memory cache for fast access
 const orderCache = new Map<string, Order>();
@@ -13,6 +14,16 @@ const refreshCache = async () => {
   // GET - получить все заказы
   export async function GET(request: Request) {
     try {
+      // Rate limit admin API: 30 requests per minute per IP
+      const ip = getClientIp(request);
+      const { allowed, resetAt } = rateLimit(`admin_${ip}`, 30, 60000);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests' },
+          { status: 429, headers: { 'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)) } }
+        );
+      }
+
       // Проверка авторизации
       const authHeader = request.headers.get('authorization');
       if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {

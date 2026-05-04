@@ -49,7 +49,9 @@ function LoginForm() {
         credentials: 'include'
       });
 
-      if (res.ok) {
+      if (res.status === 429) {
+        setError('Zu viele Versuche. Bitte warten Sie einen Moment.');
+      } else if (res.ok) {
         // Session-Cookie (wird beim Schließen des Browsers gelöscht)
         document.cookie = `admin_token=${password}; Path=/; SameSite=Strict`;
         window.location.href = from;

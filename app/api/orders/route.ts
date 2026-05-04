@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { saveOrder, getOrder } from '@/lib/githubStorage';
 import { findUserByEmail, addUser, addOrderToUser } from '@/lib/userStorage';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 // In-memory cache for fast access
 const orderCache = new Map<string, any>();
@@ -25,6 +26,16 @@ const PIZZERIA_ADDRESS = 'Kölner Tor 1, Siegen, Germany';
 // POST - создать заказ (для клиентов)
 export async function POST(req: Request) {
   try {
+    // Rate limit: 5 orders per minute per IP
+    const ip = getClientIp(req);
+    const { allowed, remaining, resetAt } = rateLimit(`order_${ip}`, 5, 60000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait before placing another order.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
     const orderData = await req.json();
     
     // Валидация обязательных полей
