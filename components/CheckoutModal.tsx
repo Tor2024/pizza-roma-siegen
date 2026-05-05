@@ -74,6 +74,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState('');
   const [confirmationCode, setConfirmationCode] = useState<string | undefined>(undefined);
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
 
   const handleAddressChange = (field: string, value: string) => {
     setAddress(prev => ({...prev, [field]: value}));
@@ -90,6 +91,14 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       // Generate track ID once when order is placed
       const newTrackId = `PR${Date.now().toString().slice(-6)}`;
       
+      // Verify Turnstile token before submitting
+      if (!turnstileToken && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+        setOrderError('Bitte warten Sie, bis die Sicherheitsüberprüfung abgeschlossen ist.');
+        setIsProcessing(false);
+        setHasPaid(false);
+        return;
+      }
+
       // Send order to server
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -117,7 +126,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           paymentMethod: selectedPayment,
           deliveryTime: deliveryTime,
           promoCode: promoCode || undefined,
-          promoDiscount: promoDiscount > 0 ? promoDiscount : undefined
+          promoDiscount: promoDiscount > 0 ? promoDiscount : undefined,
+          turnstileToken: turnstileToken || undefined
         })
       });
 
@@ -126,7 +136,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       if (response.ok && result.success) {
         setTrackId(newTrackId);
         setCreatedOrderId(result.orderId);
-        setConfirmationCode(result.confirmationCode);
+        // Only show confirmation code on screen if no email provided
+        // If email provided, code is sent via email (not shown on screen)
+        setConfirmationCode(address.email ? undefined : result.confirmationCode);
         setStep(3); // Move to confirmation step
         setIsProcessing(false);
         setHasPaid(false);
@@ -502,6 +514,18 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       </label>
                     </div>
 
+                    {/* Cloudflare Turnstile - free invisible captcha */}
+                    {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                      <div className="mb-4 flex justify-center">
+                        <div
+                          className="cf-turnstile"
+                          data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                          data-callback={(token: string) => setTurnstileToken(token)}
+                          data-theme="dark"
+                        />
+                      </div>
+                    )}
+
                     <div className="flex gap-3 pt-4">
                       {orderError && (
                         <div className="w-full mb-2 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm">
@@ -544,20 +568,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         </p>
                       ) : (
                         <p className="text-white/60 text-sm">
-                          Ihr Bestätigungscode:
+                          Bitte geben Sie den Bestätigungscode ein, den Sie per Telefon erhalten.
                         </p>
                       )}
                     </div>
                     
-                    {confirmationCode && (
+                    {confirmationCode && !address.email && (
                       <div className="bg-roma-gold/20 border border-roma-gold/50 rounded-xl p-6 max-w-xs mx-auto">
                         <p className="text-white/60 text-sm mb-2">Ihr Bestätigungscode:</p>
                         <div className="text-4xl font-bold text-roma-gold tracking-[0.3em]">
                           {confirmationCode}
                         </div>
-                        {address.email && (
-                          <p className="text-white/40 text-xs mt-2">Code wurde auch an {address.email} gesendet</p>
-                        )}
                       </div>
                     )}
                     

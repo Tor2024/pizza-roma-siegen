@@ -33,6 +33,29 @@ const refreshCache = async () => {
       // Получаем заказы из GitHub (с кэшированием)
       const orders = await refreshCache();
       
+      // Auto-cancel unconfirmed orders older than 15 minutes
+      const AUTO_CANCEL_MS = 15 * 60 * 1000; // 15 minutes
+      const now = Date.now();
+      let needsSave = false;
+      for (const order of orders) {
+        if (order.status === 'pending_confirmation' && order.createdAt && (now - order.createdAt > AUTO_CANCEL_MS)) {
+          order.status = 'cancelled';
+          order.updatedAt = now;
+          if (!order.statusHistory) order.statusHistory = [];
+          order.statusHistory.push({
+            status: 'cancelled',
+            timestamp: now,
+            note: 'Automatisch storniert: Bestätigungscode nicht innerhalb von 15 Minuten eingegeben'
+          });
+          needsSave = true;
+        }
+      }
+      if (needsSave) {
+        // Save updated orders back to GitHub
+        const { saveOrdersToGitHub } = await import('@/lib/githubStorage');
+        await saveOrdersToGitHub(orders);
+      }
+      
       // Сортируем по времени (новые сверху)
       orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       

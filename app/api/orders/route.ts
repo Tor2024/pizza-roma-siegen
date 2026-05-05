@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { saveOrder, getOrder } from '@/lib/githubStorage';
 import { findUserByEmail, addUser, addOrderToUser } from '@/lib/userStorage';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 // In-memory cache for fast access
 const orderCache = new Map<string, any>();
@@ -37,6 +38,14 @@ export async function POST(req: Request) {
     }
 
     const orderData = await req.json();
+    
+    // Verify Turnstile captcha (free bot protection)
+    if (orderData.turnstileToken) {
+      const isHuman = await verifyTurnstile(orderData.turnstileToken);
+      if (!isHuman) {
+        return NextResponse.json({ error: 'Sicherheitsüberprüfung fehlgeschlagen.' }, { status: 400 });
+      }
+    }
     
     // Валидация обязательных полей
     if (!orderData.items || orderData.items.length === 0) {

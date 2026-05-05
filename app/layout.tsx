@@ -36,7 +36,8 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
-        {/* Client-side only: Clear any cached language preference */}
+        {/* Cloudflare Turnstile - free invisible captcha */}
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       </head>
       <body className="font-inter antialiased">
         <ErrorBoundary>
